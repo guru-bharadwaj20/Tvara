@@ -65,6 +65,14 @@ void test_metadata() {
     Bytes bad; integer(bad,100,8); Reader truncated(bad); rejects([&]{ read_string(truncated); });
 }
 
+void test_tensor_dimensions() {
+    Bytes data; string_bytes(data,"weight"); integer(data,2,4); integer(data,32,8); integer(data,4,8);
+    Reader r(data); auto t=read_tensor_info(r);
+    check(t.name=="weight" && t.dimensions==std::vector<std::uint64_t>({32,4}));
+    Bytes bad; string_bytes(bad,"weight"); integer(bad,5,4);
+    Reader invalid(bad); rejects([&]{ read_tensor_info(invalid); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -73,6 +81,7 @@ int main() {
         test_counts();
         test_scalars();
         test_metadata();
+        test_tensor_dimensions();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {

@@ -114,5 +114,22 @@ inline Metadata read_metadata(Reader& r, std::uint64_t count) {
     return values;
 }
 
+struct TensorInfo {
+    std::string name;
+    std::vector<std::uint64_t> dimensions;
+};
+inline TensorInfo read_tensor_info(Reader& r) {
+    TensorInfo tensor;
+    tensor.name=read_string(r);
+    const auto rank=r.uint_le(4);
+    if (tensor.name.empty() || rank == 0 || rank > 4) throw Error("invalid GGUF tensor name or rank");
+    for (std::uint64_t i=0; i<rank; ++i) {
+        auto dim=r.uint_le(8);
+        if (dim == 0) throw Error("zero GGUF tensor dimension");
+        tensor.dimensions.push_back(dim);
+    }
+    return tensor;
+}
+
 // IMPLEMENTATIONS
 }  // namespace tvara::gguf
