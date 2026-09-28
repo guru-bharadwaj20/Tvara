@@ -20,11 +20,18 @@ void test_embedding() {
     rejects([&]{embedding_lookup(table,2);});
 }
 
+void test_norm() {
+    std::vector<float> x{1,-2,3},w{0.5f,2,-1};auto out=rms_norm(x,w,1e-6f);
+    for(std::size_t i=0;i<3;++i)close(out[i],x[i]*w[i]/std::sqrt(14.f/3+1e-6f));
+    std::fill(x.begin(),x.end(),0);out=rms_norm(x,w,1e-6f);for(auto v:out)check(v==0);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
         test_configuration();
         test_embedding();
+        test_norm();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
