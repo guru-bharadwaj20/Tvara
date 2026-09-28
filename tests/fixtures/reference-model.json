@@ -1,0 +1,11 @@
+{
+  "repository": "hf-internal-testing/tiny-random-LlamaForCausalLM",
+  "revision": "9fb191250dd56d0ba7ec9785a025ed29c03d5998",
+  "purpose": "random-weight architecture correctness fixture",
+  "weight_access": "public at pinned revision; no authentication used",
+  "redistribution": "weights stay local and are not included in this repository",
+  "sha256": {
+    "config.json": "5b52782dd9a2b8a4eb87f321448a61cd56cf0764493a1ff73f327259e14ab382",
+    "model.safetensors": "49c20f32c6c597480fcaec5df2f86c645eabea765cbea1e67886dbae45e5c992"
+  }
+}
