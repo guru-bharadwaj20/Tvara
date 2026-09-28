@@ -36,12 +36,31 @@ void test_q4() {
         close(output[i+16],static_cast<float>(7-static_cast<int>(i))); }
 }
 
+void pack_scales(Bytes& bytes,const std::array<unsigned,8>& scales,const std::array<unsigned,8>& mins) {
+    std::array<unsigned,12> encoded{};
+    for(std::size_t i=0;i<4;++i) { encoded[i]=scales[i]&63; encoded[i+4]=mins[i]&63; }
+    for(std::size_t i=4;i<8;++i) {
+        encoded[i+4]=(scales[i]&15)|((mins[i]&15)<<4);
+        encoded[i-4]|=(scales[i]>>4)<<6; encoded[i]|=(mins[i]>>4)<<6;
+    }
+    for(std::size_t i=0;i<12;++i) bytes[4+i]=std::byte(encoded[i]);
+}
+void test_q4k_scales() {
+    std::array<unsigned,8> scales{0,1,15,16,31,32,47,63},mins{63,47,32,31,16,15,1,0};
+    Bytes bytes(144); pack_scales(bytes,scales,mins);
+    for(std::size_t i=0;i<8;++i) {
+        auto decoded=q4k_scale_min(std::span<const std::byte>(bytes).subspan(4,12),i);
+        check(decoded[0]==scales[i] && decoded[1]==mins[i]);
+    }
+}
+
 // EXTRA_TESTS
 int main() {
     try {
         test_half();
         test_q8();
         test_q4();
+        test_q4k_scales();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }

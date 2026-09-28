@@ -60,5 +60,12 @@ inline void dequantize_q4_0(std::span<const std::byte> bytes,std::span<float> ou
     }
 }
 
+inline std::array<unsigned,2> q4k_scale_min(std::span<const std::byte> scales,std::size_t index) {
+    if(scales.size()!=12 || index>=8) throw std::invalid_argument("invalid Q4_K scale group");
+    auto q=[&](std::size_t i){ return std::to_integer<unsigned>(scales[i]); };
+    if(index<4) return {q(index)&63,q(index+4)&63};
+    return {(q(index+4)&15)|((q(index-4)>>6)<<4), (q(index+4)>>4)|((q(index)>>6)<<4)};
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant
