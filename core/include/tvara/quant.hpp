@@ -185,5 +185,15 @@ inline void matvec_quant(std::span<const std::byte> weights,std::size_t rows,std
     }
 }
 
+inline void matmul_f32(std::span<const float> a,std::span<const float> weights,
+                       std::size_t batch,std::size_t rows,std::size_t cols,std::span<float> out) {
+    if(!batch || !rows || !cols || batch>std::numeric_limits<std::size_t>::max()/cols ||
+       batch>std::numeric_limits<std::size_t>::max()/rows || rows>std::numeric_limits<std::size_t>::max()/cols ||
+       a.size()!=batch*cols || weights.size()!=rows*cols || out.size()!=batch*rows)
+        throw std::invalid_argument("matmul dimensions mismatch");
+    for(std::size_t b=0;b<batch;++b)
+        matvec_f32(weights,rows,cols,a.subspan(b*cols,cols),out.subspan(b*rows,rows));
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant

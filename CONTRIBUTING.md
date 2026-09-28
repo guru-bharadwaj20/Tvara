@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 71 tasks are completed and 199 are not completed.
+Current status: 72 tasks are completed and 198 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -132,7 +132,7 @@ Target: Weeks 3-5.
 - ✅ T069 — Implement scalar Q4_0 dot products. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ✅ T070 — Implement scalar Q4_K dot products. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ✅ T071 — Implement scalar matrix-vector multiplication. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
-- ❌ T072 — Implement scalar matrix-matrix multiplication.
+- ✅ T072 — Implement scalar matrix-matrix multiplication. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ❌ T073 — Test zero and extreme quantized values.
 - ❌ T074 — Compare quantized kernels with dequantized references.
 - ❌ T075 — Document block layouts and error tolerances.
