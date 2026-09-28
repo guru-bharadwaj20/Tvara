@@ -1,5 +1,6 @@
 #pragma once
 #include "tvara/mapped_file.hpp"
+#include <cmath>
 
 namespace tvara::gguf {
 class TensorView {
@@ -62,6 +63,47 @@ inline void validate_llama_tensors(const Document& doc,const LlamaShape& shape) 
         require(p+"ffn_up.weight",{shape.hidden,shape.intermediate});
         require(p+"ffn_down.weight",{shape.intermediate,shape.hidden});
     }
+}
+
+inline LlamaShape llama_shape(const Document& doc) {
+    auto text=[&](const std::string& name) -> const std::string& {
+        auto it=doc.metadata.find(name);
+        if(it==doc.metadata.end()) throw Error("missing metadata: "+name);
+        auto value=std::get_if<std::string>(&it->second.data);
+        if(!value) throw Error("metadata must be a string: "+name);
+        return *value;
+    };
+    auto number=[&](const std::string& name) -> std::uint64_t {
+        auto it=doc.metadata.find(name);
+        if(it==doc.metadata.end()) throw Error("missing metadata: "+name);
+        auto value=std::get_if<std::uint64_t>(&it->second.data);
+        if(!value || !*value || *value>1000000) throw Error("invalid model dimension: "+name);
+        return *value;
+    };
+    if(text("general.architecture")!="llama") throw Error("unsupported model architecture");
+    auto vocab_it=doc.metadata.find("tokenizer.ggml.tokens");
+    if(vocab_it==doc.metadata.end()) throw Error("missing tokenizer vocabulary");
+    auto vocab=std::get_if<Value::Array>(&vocab_it->second.data);
+    if(!vocab || vocab->empty()) throw Error("invalid tokenizer vocabulary");
+    LlamaShape s{vocab->size(),number("llama.embedding_length"),number("llama.feed_forward_length"),
+                 number("llama.block_count"),number("llama.attention.head_count"),
+                 number("llama.attention.head_count_kv"),number("llama.context_length")};
+    auto floating=[&](const std::string& name,double fallback) {
+        auto it=doc.metadata.find(name);
+        if(it==doc.metadata.end()) return fallback;
+        auto value=std::get_if<double>(&it->second.data);
+        if(!value || !std::isfinite(*value) || *value<=0) throw Error("invalid floating metadata: "+name);
+        return *value;
+    };
+    s.rms_epsilon=floating("llama.attention.layer_norm_rms_epsilon",1e-6);
+    s.rope_theta=floating("llama.rope.freq_base",10000);
+    if(s.hidden%s.heads || s.heads%s.kv_heads || (s.hidden/s.heads)%2)
+        throw Error("invalid Llama head layout");
+    if(auto it=doc.metadata.find("llama.rope.scaling.type");it!=doc.metadata.end()) {
+        auto value=std::get_if<std::string>(&it->second.data);
+        if(!value || *value!="none") throw Error("scaled RoPE requires a separate implementation");
+    }
+    return s;
 }
 
 // MODEL_IMPLEMENTATIONS

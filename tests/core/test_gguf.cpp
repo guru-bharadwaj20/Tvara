@@ -135,6 +135,19 @@ void test_llama_names() {
     validate_llama_tensors(doc,shape);
 }
 
+void test_architecture() {
+    Document doc;
+    doc.metadata.emplace("general.architecture",Value{std::string("llama")});
+    doc.metadata.emplace("tokenizer.ggml.tokens",Value{Value::Array(16,Value{std::string("token")})});
+    for(const auto& [name,value] : std::map<std::string,std::uint64_t>{
+         {"embedding_length",8},{"feed_forward_length",12},{"block_count",1},
+         {"attention.head_count",2},{"attention.head_count_kv",1},{"context_length",32}})
+        doc.metadata.emplace("llama."+name,Value{value});
+    auto shape=llama_shape(doc); check(shape.vocab==16 && shape.hidden==8 && shape.kv_heads==1);
+    doc.metadata["general.architecture"]={std::string("unknown")};
+    rejects([&]{ llama_shape(doc); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -149,6 +162,7 @@ int main() {
         test_mapping();
         test_tensor_view();
         test_llama_names();
+        test_architecture();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
