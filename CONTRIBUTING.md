@@ -49,7 +49,7 @@ Target: Week 1.
 - ✅ T006 — Outline performance evaluation metrics. Evidence: [docs/benchmarks.md](docs/benchmarks.md).
 - ✅ T007 — Record the proposed repository layout. Evidence: [docs/layout.md](docs/layout.md).
 - ✅ T008 — Draft the team schedule and effort estimate. Evidence: [docs/schedule.md](docs/schedule.md).
-- ✅ T009 — Record prior work and research references.
+- ✅ T009 — Record prior work and research references. Evidence: [docs/references.md](docs/references.md).
 - ✅ T010 — Document stretch goals and known pitfalls.
 - ✅ T011 — Publish a README with accurate implementation status.
 - ✅ T012 — Create contribution workflow guidance.
