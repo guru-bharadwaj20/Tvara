@@ -303,4 +303,15 @@ class SentencePiece(Tokenizer):
         return paths[-1]
 
     def token_bytes(self, token):
-        return self.vocabulary[token].replace(chr(0x2581), " ").encode("utf-8")
+        word = self.vocabulary[token]
+        if self.metadata.types[token] == 6:
+            if not (len(word) == 6 and word.startswith("<0x") and word.endswith(">")):
+                raise ValueError("Malformed byte-fallback token")
+            return bytes([int(word[3:5], 16)])
+        return word.replace(chr(0x2581), " ").encode("utf-8")
+
+    def decode(self, tokens, skip_special=False, errors="replace"):
+        text = super().decode(tokens, skip_special, errors)
+        if self.metadata.add_space_prefix and text.startswith(" "):
+            text = text[1:]
+        return text
