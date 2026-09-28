@@ -42,5 +42,13 @@ private:
     std::size_t position_ = 0;
 };
 
+struct Header { std::uint32_t version = 0; };
+inline Header read_header(Reader& reader) {
+    if (reader.uint_le(4) != 0x46554747) throw Error("invalid GGUF magic or unsupported byte order");
+    auto version = static_cast<std::uint32_t>(reader.uint_le(4));
+    if (version != 2 && version != 3) throw Error("unsupported GGUF version");
+    return {version};
+}
+
 // IMPLEMENTATIONS
 }  // namespace tvara::gguf
