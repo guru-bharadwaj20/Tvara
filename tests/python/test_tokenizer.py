@@ -132,3 +132,24 @@ def test_utf8_stream_waits_for_complete_emoji_and_flushes_truncation():
         stream.feed([])
     truncated = TokenTextStream(t)
     assert truncated.feed(ids[:1], final=True) == chr(0xFFFD)
+
+
+def test_prompt_special_token_policy_does_not_change_raw_encoding():
+    from dataclasses import replace
+    from tvara.tokenizer import encode_prompt
+
+    t = byte_fixture()
+    m = TokenizerMetadata(
+        "gpt2",
+        tuple(t.vocabulary),
+        tuple([0.0] * len(t.vocabulary)),
+        tuple([1] * len(t.vocabulary)),
+        bos_id=0,
+        eos_id=1,
+        add_bos=True,
+        add_eos=True,
+    )
+    assert encode_prompt(t, "abc", m) == [0, t.ids["abc"], 1]
+    assert t.encode("abc") == [t.ids["abc"]]
+    with pytest.raises(ValueError):
+        encode_prompt(t, "abc", replace(m, bos_id=None))
