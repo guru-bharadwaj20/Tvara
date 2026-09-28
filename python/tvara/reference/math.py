@@ -56,3 +56,12 @@ def attention(q, k, v):
     probs = np.exp(scores - np.max(scores, axis=-1, keepdims=True))
     probs /= np.sum(probs, axis=-1, keepdims=True)
     return np.einsum("hqk,khd->qhd", probs, values).astype(np.float32)
+
+
+def swiglu(gate, up):
+    gate, up = (np.asarray(x, dtype=np.float32) for x in (gate, up))
+    if gate.shape != up.shape:
+        raise ValueError("SwiGLU branches must have identical shapes")
+    small = np.exp(-np.abs(gate))
+    sigmoid = np.where(gate >= 0, 1 / (1 + small), small / (1 + small))
+    return (gate * sigmoid * up).astype(np.float32)

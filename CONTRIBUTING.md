@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 36 tasks are completed and 234 are not completed.
+Current status: 37 tasks are completed and 233 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -87,7 +87,7 @@ Target: Weeks 1-2.
 - ✅ T034 — Implement NumPy RMSNorm. Evidence: [python/tvara/reference/math.py](python/tvara/reference/math.py), [tests/python/test_reference_math.py](tests/python/test_reference_math.py).
 - ✅ T035 — Implement NumPy rotary position embeddings. Evidence: [python/tvara/reference/math.py](python/tvara/reference/math.py), [tests/python/test_reference_math.py](tests/python/test_reference_math.py).
 - ✅ T036 — Implement NumPy grouped-query attention. Evidence: [python/tvara/reference/math.py](python/tvara/reference/math.py), [tests/python/test_reference_math.py](tests/python/test_reference_math.py).
-- ❌ T037 — Implement NumPy SwiGLU.
+- ✅ T037 — Implement NumPy SwiGLU. Evidence: [python/tvara/reference/math.py](python/tvara/reference/math.py), [tests/python/test_reference_math.py](tests/python/test_reference_math.py).
 - ❌ T038 — Assemble a reference transformer block.
 - ❌ T039 — Assemble the full reference forward pass.
 - ❌ T040 — Capture reference logits for fixed prompts.
