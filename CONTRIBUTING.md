@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 34 tasks are completed and 236 are not completed.
+Current status: 35 tasks are completed and 235 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -85,7 +85,7 @@ Target: Weeks 1-2.
 - ✅ T032 — Record model revision and weight access requirements. Evidence: [tests/fixtures/reference-model.json](tests/fixtures/reference-model.json).
 - ✅ T033 — Create a deterministic reference-loading script. Evidence: [python/tvara/reference/oracle.py](python/tvara/reference/oracle.py), [tests/python/test_oracle.py](tests/python/test_oracle.py).
 - ✅ T034 — Implement NumPy RMSNorm. Evidence: [python/tvara/reference/math.py](python/tvara/reference/math.py), [tests/python/test_reference_math.py](tests/python/test_reference_math.py).
-- ❌ T035 — Implement NumPy rotary position embeddings.
+- ✅ T035 — Implement NumPy rotary position embeddings. Evidence: [python/tvara/reference/math.py](python/tvara/reference/math.py), [tests/python/test_reference_math.py](tests/python/test_reference_math.py).
 - ❌ T036 — Implement NumPy grouped-query attention.
 - ❌ T037 — Implement NumPy SwiGLU.
 - ❌ T038 — Assemble a reference transformer block.
