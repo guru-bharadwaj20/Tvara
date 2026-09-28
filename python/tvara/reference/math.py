@@ -34,3 +34,25 @@ def rope(x, positions, theta=10000.0):
     cos, sin = np.cos(angles)[:, None, :], np.sin(angles)[:, None, :]
     a, b = x[..., :half], x[..., half:]
     return np.concatenate((a * cos - b * sin, b * cos + a * sin), axis=-1).astype(np.float32)
+
+
+def attention(q, k, v):
+    """Causal GQA over [sequence, heads, dim], with optional cached-prefix keys."""
+    q, k, v = (np.asarray(a, dtype=np.float32) for a in (q, k, v))
+    if q.ndim != 3 or k.ndim != 3 or v.shape != k.shape:
+        raise ValueError("Attention expects matching rank-3 key/value arrays")
+    if min(q.shape + k.shape) <= 0 or q.shape[-1] != k.shape[-1] or q.shape[1] % k.shape[1]:
+        raise ValueError("Invalid attention dimensions or GQA head ratio")
+    if q.shape[0] > k.shape[0]:
+        raise ValueError("Query sequence cannot exceed available keys")
+    ratio = q.shape[1] // k.shape[1]
+    keys = np.repeat(k, ratio, axis=1)
+    values = np.repeat(v, ratio, axis=1)
+    scores = np.einsum("qhd,khd->hqk", q, keys) / np.float32(np.sqrt(q.shape[-1]))
+    positions = np.arange(q.shape[0]) + k.shape[0] - q.shape[0]
+    scores = np.where(
+        np.arange(k.shape[0])[None, None, :] <= positions[None, :, None], scores, -np.inf
+    )
+    probs = np.exp(scores - np.max(scores, axis=-1, keepdims=True))
+    probs /= np.sum(probs, axis=-1, keepdims=True)
+    return np.einsum("hqk,khd->qhd", probs, values).astype(np.float32)
