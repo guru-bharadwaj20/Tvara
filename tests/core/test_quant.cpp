@@ -80,6 +80,21 @@ void test_float_dot() {
     rejects([&]{ dot_f32(a,std::span<const float>(b).first(2)); });
 }
 
+std::vector<float> activation_reference(std::span<const Q8Activation> blocks) {
+    std::vector<float> values(blocks.size()*32);
+    for(std::size_t b=0;b<blocks.size();++b) for(std::size_t i=0;i<32;++i)
+        values[b*32+i]=blocks[b].scale*blocks[b].values[i];
+    return values;
+}
+void test_q8_dot() {
+    Bytes bytes(68); half(bytes,0x3c00); half(bytes,0x3800,34);
+    for(std::size_t b=0;b<2;++b) for(std::size_t i=0;i<32;++i) bytes[b*34+2+i]=std::byte(i*7);
+    std::vector<float> x(64); for(std::size_t i=0;i<64;++i) x[i]=std::sin(static_cast<float>(i));
+    auto quantized=quantize_activations(x); auto ref=activation_reference(quantized);
+    std::vector<float> weights(64); dequantize_q8_0(bytes,weights);
+    close(dot_q8_0(bytes,quantized),dot_f32(weights,ref),1e-5f);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -90,6 +105,7 @@ int main() {
         test_q4k();
         test_activation_quant();
         test_float_dot();
+        test_q8_dot();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }

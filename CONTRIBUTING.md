@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 67 tasks are completed and 203 are not completed.
+Current status: 68 tasks are completed and 202 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -128,7 +128,7 @@ Target: Weeks 3-5.
 - ✅ T065 — Implement Q4_K reference dequantization. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ✅ T066 — Implement per-block activation quantization. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ✅ T067 — Implement scalar F32 dot products. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
-- ❌ T068 — Implement scalar Q8_0 dot products.
+- ✅ T068 — Implement scalar Q8_0 dot products. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ❌ T069 — Implement scalar Q4_0 dot products.
 - ❌ T070 — Implement scalar Q4_K dot products.
 - ❌ T071 — Implement scalar matrix-vector multiplication.
