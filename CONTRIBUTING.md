@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 14 tasks are completed and 256 are not completed.
+Current status: 15 tasks are completed and 255 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -55,7 +55,7 @@ Target: Week 1.
 - ✅ T012 — Create contribution workflow guidance. Evidence: [.github/pull_request_template.md](.github/pull_request_template.md).
 - ✅ T013 — Add an MIT license for original project material. Evidence: [docs/licensing.md](docs/licensing.md).
 - ✅ T014 — Publish the phased task timeline. Evidence: [tools/audit_roadmap.py](tools/audit_roadmap.py).
-- ❌ T015 — Agree on acceptance criteria and owners for the first implementation milestone.
+- ✅ T015 — Agree on acceptance criteria and owners for the first implementation milestone. Evidence: [docs/milestone-1.md](docs/milestone-1.md).
 
 ### Phase 02: Toolchain and repository setup
 
