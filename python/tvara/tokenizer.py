@@ -373,3 +373,16 @@ class TokenTextStream:
         text = self.decoder.decode(b"".join(raw), final=final)
         self.closed = final
         return text
+
+
+def encode_prompt(tokenizer, text, metadata, allow_special=False):
+    tokens = tokenizer.encode(text, allow_special=allow_special)
+    if metadata.add_bos:
+        if metadata.bos_id is None:
+            raise ValueError("BOS insertion requested without a BOS ID")
+        tokens.insert(0, metadata.bos_id)
+    if metadata.add_eos:
+        if metadata.eos_id is None:
+            raise ValueError("EOS insertion requested without an EOS ID")
+        tokens.append(metadata.eos_id)
+    return tokens
