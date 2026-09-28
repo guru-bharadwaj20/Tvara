@@ -31,3 +31,20 @@ def test_zero_projections_leave_layer_residual_unchanged():
     np.testing.assert_array_equal(transformer_layer(x, zero_layer(c), "", c, [0, 1, 2]), x)
     with pytest.raises(ValueError):
         Config(16, 7, 12, 1, 2, 1)
+
+
+def test_model_validates_weights_tokens_and_context():
+    from tvara.reference.model import ReferenceModel
+
+    c = tiny_config()
+    w = {"model.layers.0." + k: v for k, v in zero_layer(c).items()}
+    w["model.embed_tokens.weight"] = np.ones((16, 8), dtype=np.float32)
+    w["model.norm.weight"] = np.ones(8, dtype=np.float32)
+    w["lm_head.weight"] = np.ones((16, 8), dtype=np.float32)
+    model = ReferenceModel(c, w)
+    assert model.forward([1, 2, 3]).shape == (3, 16)
+    for ids in ([], [16], [-1], [1.0], list(range(16)) * 3):
+        with pytest.raises(ValueError):
+            model.forward(ids)
+    with pytest.raises(ValueError):
+        ReferenceModel(c, {})
