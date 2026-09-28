@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 77 tasks are completed and 193 are not completed.
+Current status: 78 tasks are completed and 192 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -143,7 +143,7 @@ Target: Weeks 3-5.
 
 - ✅ T076 — Extract tokenizer metadata from GGUF. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T077 — Define tokenizer encode and decode interfaces. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
-- ❌ T078 — Implement byte-level token mapping.
+- ✅ T078 — Implement byte-level token mapping. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ❌ T079 — Implement BPE merge ranking.
 - ❌ T080 — Implement BPE token encoding.
 - ❌ T081 — Implement SentencePiece vocabulary loading.
