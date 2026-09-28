@@ -83,5 +83,28 @@ inline Projections project_attention(const LayerWeights& layer,std::span<const f
     return {layer.query.multiply(normalized),layer.key.multiply(normalized),layer.value.multiply(normalized)};
 }
 
+inline std::vector<float> grouped_attention(std::span<const float> q,std::span<const float> keys,
+                                            std::span<const float> values,std::size_t positions,const ModelConfig& c) {
+    c.validate();const auto dim=c.head_dim(),width=c.kv_width();
+    if(!positions || positions>c.context || positions>std::numeric_limits<std::size_t>::max()/width ||
+       q.size()!=c.hidden || keys.size()!=positions*width || values.size()!=keys.size())
+        throw std::invalid_argument("invalid attention storage dimensions");
+    std::vector<float> out(c.hidden),scores(positions);
+    for(std::size_t h=0;h<c.heads;++h) {
+        const auto kv_head=h/(c.heads/c.kv_heads);
+        float maximum=-std::numeric_limits<float>::infinity();
+        for(std::size_t p=0;p<positions;++p) {
+            scores[p]=quant::dot_f32(q.subspan(h*dim,dim),keys.subspan(p*width+kv_head*dim,dim))/std::sqrt(static_cast<float>(dim));
+            maximum=std::max(maximum,scores[p]);
+        }
+        double sum=0;for(auto& score:scores){score=std::exp(score-maximum);sum+=score;}
+        for(std::size_t i=0;i<dim;++i) {
+            double weighted=0;for(std::size_t p=0;p<positions;++p)weighted+=double(scores[p])*values[p*width+kv_head*dim+i];
+            out[h*dim+i]=static_cast<float>(weighted/sum);
+        }
+    }
+    return out;
+}
+
 // MODEL_CODE
 }  // namespace tvara

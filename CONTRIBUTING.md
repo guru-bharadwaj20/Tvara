@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 95 tasks are completed and 175 are not completed.
+Current status: 96 tasks are completed and 174 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -166,7 +166,7 @@ Target: Weeks 4-6.
 - ✅ T093 — Implement scalar RMSNorm in the core. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
 - ✅ T094 — Implement scalar RoPE in the core. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
 - ✅ T095 — Implement query key and value projections. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
-- ❌ T096 — Implement grouped-query causal attention.
+- ✅ T096 — Implement grouped-query causal attention. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
 - ❌ T097 — Implement attention output projection.
 - ❌ T098 — Implement SwiGLU feed-forward layers.
 - ❌ T099 — Implement residual connections and final projection.

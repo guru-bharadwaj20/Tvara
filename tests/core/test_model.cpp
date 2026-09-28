@@ -42,6 +42,13 @@ void test_projections() {
     check(projected.query==x && projected.key.size()==4 && projected.value.size()==4);
 }
 
+void test_attention() {
+    auto c=config();std::vector<float> q(8),keys(8),values{1,2,3,4,5,6,7,8};
+    auto out=grouped_attention(q,keys,values,2,c);
+    for(std::size_t h=0;h<2;++h)for(std::size_t i=0;i<4;++i)close(out[h*4+i],static_cast<float>(3+i));
+    rejects([&]{grouped_attention(q,keys,values,0,c);});
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -50,6 +57,7 @@ int main() {
         test_norm();
         test_rope();
         test_projections();
+        test_attention();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
