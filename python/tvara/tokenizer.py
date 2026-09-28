@@ -229,3 +229,37 @@ class ByteBPE(Tokenizer):
             specials,
             add_prefix,
         )
+
+
+class SentencePiece(Tokenizer):
+    def __init__(self, metadata, normalizer="NFKC", remove_extra_whitespace=True):
+        if metadata.model not in ("llama", "t5", "unigram"):
+            raise ValueError("Unsupported SentencePiece model")
+        super().__init__(
+            metadata.tokens, [i for i, t in enumerate(metadata.types) if t in (2, 3, 4)]
+        )
+        self.metadata = metadata
+        self.normalizer = normalizer
+        self.remove_extra_whitespace = remove_extra_whitespace
+        if normalizer not in (None, "NFC", "NFKC"):
+            raise ValueError("Unsupported SentencePiece normalizer")
+        self.pieces = [
+            (token, i, metadata.scores[i])
+            for i, token in enumerate(metadata.tokens)
+            if metadata.types[i] == 1
+        ]
+        self.unknown = next((i for i, t in enumerate(metadata.types) if t == 2), None)
+        self.byte_ids = {
+            int(token[3:5], 16): i
+            for i, token in enumerate(metadata.tokens)
+            if metadata.types[i] == 6
+            and len(token) == 6
+            and token.startswith("<0x")
+            and token.endswith(">")
+        }
+
+    def encode(self, text, allow_special=False):
+        raise NotImplementedError("SentencePiece encoding has not been implemented")
+
+    def token_bytes(self, token):
+        return self.vocabulary[token].replace(chr(0x2581), " ").encode("utf-8")

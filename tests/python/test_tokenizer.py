@@ -59,3 +59,21 @@ def test_byte_bpe_roundtrip_and_merges():
     assert t.encode("abc") == [t.ids["abc"]]
     for text in [" a b", "hello\nworld", "é", "भारत", "😀"]:
         assert t.decode(t.encode(text)) == text
+
+
+def sentencepiece_fixture():
+    from tvara.tokenizer import SentencePiece
+
+    m = TokenizerMetadata(
+        "unigram",
+        ("<unk>", chr(0x2581), "a", "b", chr(0x2581) + "ab"),
+        (-10.0, -1.0, -1.0, -1.0, -0.1),
+        (2, 1, 1, 1, 1),
+    )
+    return SentencePiece(m)
+
+
+def test_sentencepiece_vocab_retains_scores_types_and_unknown_id():
+    t = sentencepiece_fixture()
+    assert t.unknown == 0 and t.metadata.scores[-1] == -0.1
+    assert t.ids[chr(0x2581) + "ab"] == 4
