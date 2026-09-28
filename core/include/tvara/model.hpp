@@ -54,5 +54,15 @@ inline std::vector<float> embedding_lookup(const Matrix& table,std::size_t token
     return {first,first+static_cast<std::ptrdiff_t>(table.cols)};
 }
 
+inline std::vector<float> rms_norm(std::span<const float> x,std::span<const float> weights,float epsilon) {
+    if(x.empty() || x.size()!=weights.size() || !std::isfinite(epsilon) || epsilon<=0)
+        throw std::invalid_argument("invalid RMSNorm dimensions or epsilon");
+    double sum=0;for(auto value:x)sum+=double(value)*value;
+    const float inverse=static_cast<float>(1/std::sqrt(sum/static_cast<double>(x.size())+epsilon));
+    std::vector<float> out(x.size());
+    for(std::size_t i=0;i<x.size();++i)out[i]=x[i]*inverse*weights[i];
+    return out;
+}
+
 // MODEL_CODE
 }  // namespace tvara
