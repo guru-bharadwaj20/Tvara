@@ -46,5 +46,13 @@ struct ModelWeights {
 };
 struct LayerCache { std::vector<float> keys,values; };
 struct SequenceState { std::size_t length=0; std::vector<LayerCache> layers; };
+inline std::vector<float> embedding_lookup(const Matrix& table,std::size_t token) {
+    if(token>=table.rows || !table.cols || table.rows>std::numeric_limits<std::size_t>::max()/table.cols ||
+       table.values.size()!=table.rows*table.cols)
+        throw std::invalid_argument("invalid embedding token or storage");
+    auto first=table.values.begin()+static_cast<std::ptrdiff_t>(token*table.cols);
+    return {first,first+static_cast<std::ptrdiff_t>(table.cols)};
+}
+
 // MODEL_CODE
 }  // namespace tvara
