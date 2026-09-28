@@ -64,5 +64,16 @@ inline std::vector<float> rms_norm(std::span<const float> x,std::span<const floa
     return out;
 }
 
+inline void rotary(std::span<float> x,std::size_t heads,std::size_t dim,std::size_t position,float theta,bool interleaved) {
+    if(!heads || !dim || dim%2 || heads>std::numeric_limits<std::size_t>::max()/dim || x.size()!=heads*dim ||
+       !std::isfinite(theta) || theta<=0)throw std::invalid_argument("invalid RoPE dimensions");
+    for(std::size_t h=0;h<heads;++h)for(std::size_t i=0;i<dim/2;++i) {
+        const float angle=static_cast<float>(position)/std::pow(theta,static_cast<float>(2*i)/static_cast<float>(dim));
+        const float cosine=std::cos(angle),sine=std::sin(angle);
+        const auto a=h*dim+(interleaved?2*i:i),b=h*dim+(interleaved?2*i+1:i+dim/2);
+        const float left=x[a],right=x[b];x[a]=left*cosine-right*sine;x[b]=right*cosine+left*sine;
+    }
+}
+
 // MODEL_CODE
 }  // namespace tvara
