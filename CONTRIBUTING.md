@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 54 tasks are completed and 216 are not completed.
+Current status: 55 tasks are completed and 215 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -110,7 +110,7 @@ Target: Weeks 3-4.
 - ✅ T052 — Parse tensor types and offsets. Evidence: [core/include/tvara/gguf.hpp](core/include/tvara/gguf.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
 - ✅ T053 — Validate tensor alignment. Evidence: [core/include/tvara/gguf.hpp](core/include/tvara/gguf.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
 - ✅ T054 — Detect truncated files and invalid offsets. Evidence: [core/include/tvara/gguf.hpp](core/include/tvara/gguf.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
-- ❌ T055 — Implement read-only memory mapping.
+- ✅ T055 — Implement read-only memory mapping. Evidence: [core/include/tvara/mapped_file.hpp](core/include/tvara/mapped_file.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
 - ❌ T056 — Represent tensors as typed storage views.
 - ❌ T057 — Validate expected model tensor names.
 - ❌ T058 — Map architecture metadata to a model configuration.

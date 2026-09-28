@@ -1,4 +1,5 @@
 #include "tvara/gguf.hpp"
+#include "tvara/mapped_file.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -95,6 +96,18 @@ void test_payload_bounds() {
     rejects([&]{ tensor_bytes(overflow); });
 }
 
+void test_mapping() {
+    auto data=one_tensor_file(); const auto path=std::filesystem::path("mmap-fixture.bin");
+    { std::ofstream out(path,std::ios::binary); out.write(reinterpret_cast<const char*>(data.data()),static_cast<std::streamsize>(data.size())); }
+    {
+        MappedFile mapping(path);
+        check(mapping.bytes().size()==data.size());
+        check(read_document(mapping.bytes()).tensors.size()==1);
+    }
+    std::filesystem::remove(path);
+    rejects([&]{ MappedFile missing(path); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -106,6 +119,7 @@ int main() {
         test_tensor_dimensions();
         test_alignment();
         test_payload_bounds();
+        test_mapping();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
