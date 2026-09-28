@@ -37,5 +37,16 @@ inline void require_layout(std::span<const std::byte> bytes,std::span<float> out
        output.size()!=bytes.size()/width*elements)
         throw std::invalid_argument("quantized storage/output size mismatch");
 }
+inline void dequantize_q8_0(std::span<const std::byte> bytes,std::span<float> output) {
+    require_layout(bytes,output,34,32);
+    for(std::size_t b=0;b<bytes.size()/34;++b) {
+        const float scale=half_to_float(u16(bytes,b*34));
+        for(std::size_t i=0;i<32;++i) {
+            const auto q=std::bit_cast<std::int8_t>(std::to_integer<std::uint8_t>(bytes[b*34+2+i]));
+            output[b*32+i]=scale*static_cast<float>(q);
+        }
+    }
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant
