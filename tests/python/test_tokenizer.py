@@ -105,3 +105,16 @@ def test_special_tokens_are_opt_in_and_prefer_longer_matches():
     assert t.encode("abc<end>long", allow_special=True) == [t.ids["abc"], t.ids["<end>long"]]
     assert t.ids["<end>"] not in t.encode("<end>")
     assert t.decode([t.ids["<end>"]], skip_special=True) == ""
+
+
+def test_leading_spaces_are_preserved_by_byte_bpe():
+    t = byte_fixture()
+    for text in ["abc", " abc", "  abc", "\tabc", "abc ", "\nabc"]:
+        assert t.decode(t.encode(text)) == text
+    from tvara.tokenizer import ByteBPE
+
+    prefixed = ByteBPE(t.vocabulary, [("a", "b"), ("ab", "c")], add_prefix_space=True)
+    assert prefixed.decode(prefixed.encode("abc")) == " abc"
+    assert prefixed.decode(prefixed.encode(" abc")) == " abc"
+    sp = sentencepiece_fixture()
+    assert sp.decode(sp.encode("  ab  ")) == "ab"
