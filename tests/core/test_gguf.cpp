@@ -148,6 +148,28 @@ void test_architecture() {
     rejects([&]{ llama_shape(doc); });
 }
 
+void test_malformed_files() {
+    auto valid=one_tensor_file();
+    for(std::size_t length=0;length<valid.size();++length)
+        rejects([&]{ read_document(std::span<const std::byte>(valid).first(length)); });
+    Bytes duplicate; integer(duplicate,0x46554747,4); integer(duplicate,3,4);
+    integer(duplicate,2,8); integer(duplicate,0,8);
+    for(int i=0;i<2;++i) {
+        string_bytes(duplicate,"same"); integer(duplicate,1,4); integer(duplicate,4,8);
+        integer(duplicate,0,4); integer(duplicate,0,8);
+    }
+    duplicate.resize(align_up(duplicate.size(),32)+16);
+    rejects([&]{ read_document(duplicate); });
+    Bytes overlap; integer(overlap,0x46554747,4); integer(overlap,3,4);
+    integer(overlap,2,8); integer(overlap,0,8);
+    for(const auto& name : {"a","b"}) {
+        string_bytes(overlap,name); integer(overlap,1,4); integer(overlap,16,8);
+        integer(overlap,0,4); integer(overlap,0,8);
+    }
+    overlap.resize(align_up(overlap.size(),32)+64);
+    rejects([&]{ read_document(overlap); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -163,6 +185,7 @@ int main() {
         test_tensor_view();
         test_llama_names();
         test_architecture();
+        test_malformed_files();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
