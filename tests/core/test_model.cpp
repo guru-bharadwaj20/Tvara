@@ -49,6 +49,12 @@ void test_attention() {
     rejects([&]{grouped_attention(q,keys,values,0,c);});
 }
 
+void test_output_projection() {
+    auto c=config();LayerWeights layer;layer.attention_output=Matrix(8,8);
+    for(std::size_t i=0;i<8;++i)layer.attention_output.values[i*8+i]=2;
+    std::vector<float> x(8,3);auto out=project_attention_output(layer,x,c);for(auto v:out)close(v,6);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -58,6 +64,7 @@ int main() {
         test_rope();
         test_projections();
         test_attention();
+        test_output_projection();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
