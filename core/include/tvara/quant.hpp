@@ -123,5 +123,20 @@ inline float dot_q8_0(std::span<const std::byte> w,std::span<const Q8Activation>
     return static_cast<float>(total);
 }
 
+inline float dot_q4_0(std::span<const std::byte> w,std::span<const Q8Activation> x) {
+    if(w.size()%18 || w.size()/18!=x.size()) throw std::invalid_argument("Q4 dot size mismatch");
+    double total=0;
+    for(std::size_t b=0;b<x.size();++b) {
+        std::int32_t sum=0;
+        for(std::size_t i=0;i<16;++i) {
+            auto q=std::to_integer<unsigned>(w[b*18+2+i]);
+            sum+=(static_cast<int>(q&15)-8)*std::int32_t(x[b].values[i]);
+            sum+=(static_cast<int>(q>>4)-8)*std::int32_t(x[b].values[i+16]);
+        }
+        total+=double(half_to_float(u16(w,b*18)))*double(x[b].scale)*double(sum);
+    }
+    return static_cast<float>(total);
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant
