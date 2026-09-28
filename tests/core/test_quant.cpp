@@ -131,6 +131,19 @@ void test_matmul() {
     rejects([&]{ matmul_f32(a,w,2,2,4,out); });
 }
 
+void test_quant_boundaries() {
+    Bytes q8(34); std::vector<float> out(32,1.f); dequantize_q8_0(q8,out);
+    for(auto value:out) check(value==0);
+    half(q8,0x3c00); q8[2]=std::byte(128); q8[3]=std::byte(127);
+    dequantize_q8_0(q8,out); check(out[0]==-128 && out[1]==127);
+    Bytes q4(18);half(q4,0x3c00);q4[2]=std::byte(0xf0);
+    dequantize_q4_0(q4,out);check(out[0]==-8 && out[16]==7);
+    rejects([&]{ dequantize_q4_0(q4,std::span<float>(out).first(31)); });
+    rejects([&]{ q4k_scale_min(std::span<const std::byte>(q4).first(12),8); });
+    std::vector<float> zero(32); auto activation=quantize_activations(zero);
+    check(activation[0].scale==0 && dot_q8_0(q8,activation)==0);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -146,6 +159,7 @@ int main() {
         test_q4k_dot();
         test_matvec();
         test_matmul();
+        test_quant_boundaries();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
