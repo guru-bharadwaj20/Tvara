@@ -112,5 +112,18 @@ inline std::vector<float> project_attention_output(const LayerWeights& layer,std
     return layer.attention_output.multiply(attention);
 }
 
+inline std::vector<float> feedforward(const LayerWeights& layer,std::span<const float> normalized,const ModelConfig& c) {
+    if(layer.gate.rows!=c.intermediate || layer.up.rows!=c.intermediate ||
+       layer.down.rows!=c.hidden || layer.down.cols!=c.intermediate)
+        throw std::invalid_argument("feed-forward matrix shape mismatch");
+    auto gate=layer.gate.multiply(normalized),up=layer.up.multiply(normalized);
+    for(std::size_t i=0;i<gate.size();++i) {
+        const float small=std::exp(-std::abs(gate[i]));
+        const float sigmoid=gate[i]>=0?1/(1+small):small/(1+small);
+        gate[i]*=sigmoid*up[i];
+    }
+    return layer.down.multiply(gate);
+}
+
 // MODEL_CODE
 }  // namespace tvara
