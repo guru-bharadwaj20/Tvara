@@ -1,5 +1,6 @@
 #include "tvara/gguf.hpp"
 #include "tvara/mapped_file.hpp"
+#include "tvara/gguf_model.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -108,6 +109,18 @@ void test_mapping() {
     rejects([&]{ MappedFile missing(path); });
 }
 
+void test_tensor_view() {
+    auto data=one_tensor_file(); const auto path=std::filesystem::path("view-fixture.bin");
+    { std::ofstream out(path,std::ios::binary); out.write(reinterpret_cast<const char*>(data.data()),static_cast<std::streamsize>(data.size())); }
+    {
+        auto file=std::make_unique<ModelFile>(path);
+        auto view=file->tensor("weight");
+        file.reset();
+        check(view.bytes().size()==16 && view.info().dimensions[0]==4);
+    }
+    std::filesystem::remove(path);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -120,6 +133,7 @@ int main() {
         test_alignment();
         test_payload_bounds();
         test_mapping();
+        test_tensor_view();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
