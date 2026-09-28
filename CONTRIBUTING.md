@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 30 tasks are completed and 240 are not completed.
+Current status: 31 tasks are completed and 239 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -81,7 +81,7 @@ Target: Weeks 1-2.
 
 Target: Weeks 1-2.
 
-- ❌ T031 — Select the first Llama-family reference model.
+- ✅ T031 — Select the first Llama-family reference model. Evidence: [docs/reference-model.md](docs/reference-model.md).
 - ❌ T032 — Record model revision and weight access requirements.
 - ❌ T033 — Create a deterministic reference-loading script.
 - ❌ T034 — Implement NumPy RMSNorm.
