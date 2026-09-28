@@ -85,3 +85,16 @@ class Tokenizer(ABC):
                 continue
             output.append(self.token_bytes(int(token)))
         return b"".join(output).decode("utf-8", errors=errors)
+
+
+def byte_mapping():
+    byte_values = list(range(33, 127)) + list(range(161, 173)) + list(range(174, 256))
+    codepoints = byte_values.copy()
+    extra = 0
+    for byte in range(256):
+        if byte not in byte_values:
+            byte_values.append(byte)
+            codepoints.append(256 + extra)
+            extra += 1
+    forward = {b: chr(c) for b, c in zip(byte_values, codepoints)}
+    return forward, {char: byte for byte, char in forward.items()}
