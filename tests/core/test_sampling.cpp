@@ -13,9 +13,15 @@ void test_filters(){
     p={0.5,0.3,0.2};filter_probabilities(p,0,1,0.5);check(p[2]==0 && p[1]>0);
 }
 
+void test_penalties(){
+    std::vector<float> logits{4,-2,3};std::vector<std::size_t> history{0,0,1};
+    apply_penalties(logits,history,2,0.5f,1);check(logits[0]==0 && logits[1]==-5.5f && logits[2]==3);
+}
+
 // EXTRA_TESTS
 int main(){try{test_temperature();
     test_filters();
+        test_penalties();
         // RUN_TESTS
     std::cout<<"Sampling checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
