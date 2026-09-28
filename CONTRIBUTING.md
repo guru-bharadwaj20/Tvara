@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable is present in the repository documentation.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-At this documentation baseline, 14 tasks are completed and 256 are not completed.
+Current status: 14 tasks are completed and 256 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The original project proposal remains outside these documentation commits as an
@@ -41,7 +41,7 @@ existing local file; the completed proposal tasks refer to that available docume
 
 Target: Week 1.
 
-- ✅ T001 — Document the CPU-only project purpose.
+- ✅ T001 — Document the CPU-only project purpose. Evidence: [README purpose](README.md#purpose-and-scope).
 - ✅ T002 — Write the initial architecture proposal.
 - ✅ T003 — Identify the intended small-model size range.
 - ✅ T004 — Outline planned inference components.

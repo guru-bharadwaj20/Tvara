@@ -7,6 +7,15 @@ text generation through an OpenAI-compatible API. The project focuses on
 understanding each layer of inference and measuring correctness and performance
 against Hugging Face Transformers and llama.cpp on the same hardware.
 
+## Purpose and scope
+
+Build and understand a complete local inference pipeline on CPUs. Start with a
+single Llama-family sequence and a float32 reference; add quantization, concurrency,
+and constrained decoding only after correctness is established. The first target
+is x86-64 with a scalar fallback and optional AVX2. GPU execution and model training
+are outside the scope. This project reports measured results rather than assumed
+speedups or promised parity with mature engines.
+
 ## Project status
 
 Tvara is in the planning stage. This repository contains project documentation;
