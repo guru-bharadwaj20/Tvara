@@ -149,6 +149,25 @@ struct Document {
     std::size_t alignment = 32;
     std::size_t data_offset = 0;
 };
+inline std::size_t tensor_bytes(const TensorInfo& t) {
+    std::size_t block=1, width=0;
+    switch(t.type) {
+        case 0: width=4; break;
+        case 1: width=2; break;
+        case 2: block=32; width=18; break;
+        case 8: block=32; width=34; break;
+        case 12: block=256; width=144; break;
+        default: throw Error("unsupported GGUF tensor storage type");
+    }
+    if (t.dimensions.empty() || t.dimensions[0]%block) throw Error("invalid quantized row width");
+    std::size_t elements=1;
+    for (auto dim : t.dimensions) {
+        if (!dim || dim>std::numeric_limits<std::size_t>::max()/elements) throw Error("tensor shape overflow");
+        elements*=static_cast<std::size_t>(dim);
+    }
+    if (elements/block>std::numeric_limits<std::size_t>::max()/width) throw Error("tensor size overflow");
+    return elements/block*width;
+}
 inline Document read_document(std::span<const std::byte> bytes) {
     Reader r(bytes);
     Document doc;
@@ -170,6 +189,19 @@ inline Document read_document(std::span<const std::byte> bytes) {
     for (const auto& [name,tensor] : doc.tensors) {
         (void)name;
         if (tensor.offset%doc.alignment) throw Error("unaligned GGUF tensor offset");
+    }
+    std::map<std::uint64_t,std::uint64_t> regions;
+    for (const auto& [name,tensor] : doc.tensors) {
+        (void)name;
+        const auto count=tensor_bytes(tensor);
+        if (tensor.offset>bytes.size()-doc.data_offset || count>bytes.size()-doc.data_offset-tensor.offset)
+            throw Error("tensor payload exceeds GGUF file");
+        const auto end=tensor.offset+count;
+        auto next=regions.lower_bound(tensor.offset);
+        if ((next!=regions.end() && next->first<end) ||
+            (next!=regions.begin() && std::prev(next)->second>tensor.offset))
+            throw Error("overlapping GGUF tensor payloads");
+        regions.emplace(tensor.offset,end);
     }
     return doc;
 }

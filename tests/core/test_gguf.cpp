@@ -87,6 +87,14 @@ void test_alignment() {
     auto bad=one_tensor_file(1); rejects([&]{ read_document(bad); });
 }
 
+void test_payload_bounds() {
+    auto bytes=one_tensor_file(1024); rejects([&]{ read_document(bytes); });
+    auto truncated=one_tensor_file(); truncated.pop_back(); rejects([&]{ read_document(truncated); });
+    TensorInfo invalid{"bad",{31},8,0}; rejects([&]{ tensor_bytes(invalid); });
+    TensorInfo overflow{"bad",{std::numeric_limits<std::uint64_t>::max(),2},0,0};
+    rejects([&]{ tensor_bytes(overflow); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -97,6 +105,7 @@ int main() {
         test_metadata();
         test_tensor_dimensions();
         test_alignment();
+        test_payload_bounds();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
