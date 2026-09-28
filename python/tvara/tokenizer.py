@@ -1,5 +1,7 @@
 """Independent tokenizer implementations with explicit supported normalizers."""
 
+import codecs
+
 import json
 from pathlib import Path
 import unicodedata
@@ -346,4 +348,28 @@ class SentencePiece(Tokenizer):
         text = super().decode(tokens, skip_special, errors)
         if self.metadata.add_space_prefix and text.startswith(" "):
             text = text[1:]
+        return text
+
+
+class TokenTextStream:
+    def __init__(self, tokenizer, errors="replace", skip_special=False):
+        self.tokenizer = tokenizer
+        self.skip_special = skip_special
+        self.decoder = codecs.getincrementaldecoder("utf-8")(errors=errors)
+        self.closed = False
+
+    def feed(self, tokens, final=False):
+        if self.closed:
+            raise ValueError("Text stream already finalized")
+        raw = []
+        for token in tokens:
+            if not isinstance(token, (int, np.integer)) or not 0 <= token < len(
+                self.tokenizer.vocabulary
+            ):
+                raise ValueError("Token ID outside vocabulary")
+            if self.skip_special and token in self.tokenizer.special_ids:
+                continue
+            raw.append(self.tokenizer.token_bytes(int(token)))
+        text = self.decoder.decode(b"".join(raw), final=final)
+        self.closed = final
         return text

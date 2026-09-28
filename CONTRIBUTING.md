@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 85 tasks are completed and 185 are not completed.
+Current status: 86 tasks are completed and 184 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -151,7 +151,7 @@ Target: Weeks 3-5.
 - ✅ T083 — Implement special-token recognition. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T084 — Implement byte-fallback decoding. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T085 — Handle leading spaces consistently. Evidence: [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
-- ❌ T086 — Handle Unicode and split UTF-8 sequences.
+- ✅ T086 — Handle Unicode and split UTF-8 sequences. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ❌ T087 — Define beginning and end token policies.
 - ❌ T088 — Compare token IDs with reference tokenizers.
 - ❌ T089 — Test Indic text emoji and whitespace fixtures.
