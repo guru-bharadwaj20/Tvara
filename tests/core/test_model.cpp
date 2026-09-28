@@ -26,12 +26,22 @@ void test_norm() {
     std::fill(x.begin(),x.end(),0);out=rms_norm(x,w,1e-6f);for(auto v:out)check(v==0);
 }
 
+void test_rope() {
+    std::vector<float> x{1,2,3,4},before=x;rotary(x,1,4,0,10000,false);check(x==before);
+    rotary(x,1,4,1,10000,false);
+    close(x[0],std::cos(1.f)-3*std::sin(1.f));
+    close(x[2],3*std::cos(1.f)+std::sin(1.f));
+    std::vector<float> interleaved{1,3,2,4};rotary(interleaved,1,4,1,10000,true);
+    close(interleaved[0],x[0]);close(interleaved[1],x[2]);close(interleaved[2],x[1]);close(interleaved[3],x[3]);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
         test_configuration();
         test_embedding();
         test_norm();
+        test_rope();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
