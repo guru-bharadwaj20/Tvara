@@ -121,6 +121,20 @@ void test_tensor_view() {
     std::filesystem::remove(path);
 }
 
+void test_llama_names() {
+    Document doc; LlamaShape shape{16,8,12,1,2,1,32};
+    rejects([&]{ validate_llama_tensors(doc,shape); });
+    doc.tensors.emplace("token_embd.weight",TensorInfo{"token_embd.weight",{8,16},0,0});
+    doc.tensors.emplace("output_norm.weight",TensorInfo{"output_norm.weight",{8},0,0});
+    for(const auto& [name,dims] : std::map<std::string,std::vector<std::uint64_t>>{
+        {"attn_norm.weight",{8}},{"ffn_norm.weight",{8}}, {"attn_q.weight",{8,8}},
+        {"attn_k.weight",{8,4}},{"attn_v.weight",{8,4}},{"attn_output.weight",{8,8}},
+        {"ffn_gate.weight",{8,12}},{"ffn_up.weight",{8,12}},{"ffn_down.weight",{12,8}}}) {
+        auto key="blk.0."+name; doc.tensors.emplace(key,TensorInfo{key,dims,0,0});
+    }
+    validate_llama_tensors(doc,shape);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -134,6 +148,7 @@ int main() {
         test_payload_bounds();
         test_mapping();
         test_tensor_view();
+        test_llama_names();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
