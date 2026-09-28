@@ -83,5 +83,24 @@ inline void dequantize_q4_k(std::span<const std::byte> bytes,std::span<float> ou
     }
 }
 
+struct Q8Activation { float scale=0; std::array<std::int8_t,32> values{}; };
+inline std::vector<Q8Activation> quantize_activations(std::span<const float> x) {
+    if(x.size()%32) throw std::invalid_argument("activation width must be divisible by 32");
+    std::vector<Q8Activation> blocks(x.size()/32);
+    for(std::size_t b=0;b<blocks.size();++b) {
+        float maximum=0;
+        for(std::size_t i=0;i<32;++i) {
+            const auto value=x[b*32+i];
+            if(!std::isfinite(value)) throw std::invalid_argument("nonfinite activation");
+            maximum=std::max(maximum,std::abs(value));
+        }
+        auto& block=blocks[b]; block.scale=maximum/127.f;
+        if(block.scale==0) continue;
+        for(std::size_t i=0;i<32;++i)
+            block.values[i]=static_cast<std::int8_t>(std::round(x[b*32+i]/block.scale));
+    }
+    return blocks;
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant
