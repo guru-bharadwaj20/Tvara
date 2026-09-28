@@ -43,7 +43,7 @@ Target: Week 1.
 
 - ✅ T001 — Document the CPU-only project purpose. Evidence: [README purpose](README.md#purpose-and-scope).
 - ✅ T002 — Write the initial architecture proposal. Evidence: [docs/design.md](docs/design.md).
-- ✅ T003 — Identify the intended small-model size range.
+- ✅ T003 — Identify the intended small-model size range. Evidence: [docs/models.md](docs/models.md).
 - ✅ T004 — Outline planned inference components.
 - ✅ T005 — Define reference-based correctness goals.
 - ✅ T006 — Outline performance evaluation metrics.
