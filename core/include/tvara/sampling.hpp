@@ -46,5 +46,17 @@ inline void filter_probabilities(std::vector<double>& p,std::size_t top_k=0,doub
     total=std::accumulate(p.begin(),p.end(),0.0);for(auto& v:p)v/=total;
 }
 
+inline void apply_penalties(std::span<float> logits,std::span<const std::size_t> history,
+                            float repetition=1,float frequency=0,float presence=0) {
+    if(!std::isfinite(repetition) || repetition<=0 || !std::isfinite(frequency) || !std::isfinite(presence))
+        throw std::invalid_argument("invalid penalties");
+    std::vector<std::size_t> counts(logits.size());
+    for(auto token:history){if(token>=logits.size())throw std::invalid_argument("history token outside vocabulary");++counts[token];}
+    for(std::size_t i=0;i<logits.size();++i)if(counts[i]) {
+        logits[i]=logits[i]>=0?logits[i]/repetition:logits[i]*repetition;
+        logits[i]-=frequency*static_cast<float>(counts[i])+presence;
+    }
+}
+
 // SAMPLE_CODE
 }  // namespace tvara
