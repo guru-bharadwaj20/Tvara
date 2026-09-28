@@ -1,5 +1,9 @@
 """Independent tokenizer implementations with explicit supported normalizers."""
 
+import json
+from pathlib import Path
+import unicodedata
+
 from abc import ABC, abstractmethod
 
 from dataclasses import dataclass
@@ -122,3 +126,106 @@ def merge_bpe(symbols, ranks):
                 i += 1
         symbols = merged
     return symbols
+
+
+GPT2_PATTERN = r"'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"
+
+
+class ByteBPE(Tokenizer):
+    def __init__(
+        self,
+        vocabulary,
+        merges,
+        pattern=GPT2_PATTERN,
+        normalizer=None,
+        special_ids=(),
+        add_prefix_space=False,
+    ):
+        super().__init__(vocabulary, special_ids)
+        import regex
+
+        self.pattern = regex.compile(pattern)
+        self.normalizer = normalizer
+        if normalizer not in (None, "NFC", "NFKC"):
+            raise ValueError("Unsupported BPE normalizer")
+        self.forward_bytes, self.reverse_bytes = byte_mapping()
+        self.ranks = {}
+        for rank, merge in enumerate(merges):
+            pair = tuple(merge.split(" ") if isinstance(merge, str) else merge)
+            if (
+                len(pair) != 2
+                or pair in self.ranks
+                or any(p not in self.ids for p in pair)
+                or "".join(pair) not in self.ids
+            ):
+                raise ValueError("Malformed BPE merge table")
+            self.ranks[pair] = rank
+        if any(char not in self.ids for char in self.forward_bytes.values()):
+            raise ValueError("Byte BPE requires all 256 base byte tokens")
+        self.add_prefix_space = add_prefix_space
+
+    def encode(self, text, allow_special=False):
+        if not isinstance(text, str):
+            raise TypeError("Tokenizer input must be text")
+        if self.normalizer:
+            text = unicodedata.normalize(self.normalizer, text)
+        if self.add_prefix_space and text and not text.startswith(" "):
+            text = " " + text
+        result = []
+        for match in self.pattern.finditer(text):
+            symbols = "".join(self.forward_bytes[b] for b in match.group().encode("utf-8"))
+            result.extend(self.ids[symbol] for symbol in merge_bpe(symbols, self.ranks))
+        return result
+
+    def token_bytes(self, token):
+        word = self.vocabulary[token]
+        if token in self.special_ids:
+            return word.encode("utf-8")
+        try:
+            return bytes(self.reverse_bytes[c] for c in word)
+        except KeyError as error:
+            raise ValueError("Token is outside byte-mapped vocabulary") from error
+
+    @classmethod
+    def from_json(cls, path):
+        d = json.loads(Path(path).read_text(encoding="utf-8"))
+        model = d["model"]
+        if (
+            model["type"] != "BPE"
+            or model.get("dropout") is not None
+            or model.get("byte_fallback", False)
+        ):
+            raise ValueError("Unsupported tokenizer BPE variant")
+        vocab = dict(model["vocab"])
+        specials = []
+        for item in d.get("added_tokens", []):
+            if item.get("lstrip") or item.get("rstrip") or item.get("single_word"):
+                raise ValueError("Added-token whitespace/word matching is unsupported")
+            vocab[item["content"]] = item["id"]
+            if item.get("special"):
+                specials.append(item["id"])
+        if sorted(vocab.values()) != list(range(len(vocab))):
+            raise ValueError("Sparse tokenizer IDs")
+        words = [None] * len(vocab)
+        for word, index in vocab.items():
+            words[index] = word
+        pre = d["pre_tokenizer"]
+        steps = pre["pretokenizers"] if pre["type"] == "Sequence" else [pre]
+        pattern = GPT2_PATTERN
+        add_prefix = False
+        for step in steps:
+            if step["type"] == "Split":
+                pattern = step["pattern"]["Regex"]
+            elif step["type"] == "ByteLevel":
+                add_prefix = step.get("add_prefix_space", False)
+            else:
+                raise ValueError("Unsupported pre-tokenizer")
+        normalizer = d.get("normalizer")
+        return cls(
+            words,
+            model["merges"],
+            pattern,
+            normalizer["type"] if normalizer else None,
+            specials,
+            add_prefix,
+        )

@@ -43,3 +43,19 @@ def test_bpe_rank_order_and_overlapping_pairs():
     assert merge_bpe("abc", {("b", "c"): 0, ("a", "b"): 1}) == ["a", "bc"]
     assert merge_bpe("aaaa", {("a", "a"): 0, ("aa", "aa"): 1}) == ["aaaa"]
     assert merge_bpe("xyz", {}) == ["x", "y", "z"]
+
+
+def byte_fixture():
+    from tvara.tokenizer import ByteBPE, byte_mapping
+
+    forward, _ = byte_mapping()
+    words = list(forward.values())
+    words += ["ab", "abc"]
+    return ByteBPE(words, [("a", "b"), ("ab", "c")])
+
+
+def test_byte_bpe_roundtrip_and_merges():
+    t = byte_fixture()
+    assert t.encode("abc") == [t.ids["abc"]]
+    for text in [" a b", "hello\nworld", "é", "भारत", "😀"]:
+        assert t.decode(t.encode(text)) == text

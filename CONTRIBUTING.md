@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 79 tasks are completed and 191 are not completed.
+Current status: 80 tasks are completed and 190 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -145,7 +145,7 @@ Target: Weeks 3-5.
 - ✅ T077 — Define tokenizer encode and decode interfaces. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T078 — Implement byte-level token mapping. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T079 — Implement BPE merge ranking. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
-- ❌ T080 — Implement BPE token encoding.
+- ✅ T080 — Implement BPE token encoding. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py), [pyproject.toml](pyproject.toml).
 - ❌ T081 — Implement SentencePiece vocabulary loading.
 - ❌ T082 — Implement SentencePiece token encoding.
 - ❌ T083 — Implement special-token recognition.
