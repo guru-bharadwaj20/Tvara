@@ -135,5 +135,44 @@ inline TensorInfo read_tensor_info(Reader& r) {
     return tensor;
 }
 
+inline std::size_t align_up(std::size_t position, std::size_t alignment) {
+    if (alignment == 0 || alignment > 65536 || (alignment & (alignment-1)) != 0)
+        throw Error("GGUF alignment must be a bounded power of two");
+    if (position > std::numeric_limits<std::size_t>::max() - (alignment-1))
+        throw Error("GGUF alignment overflow");
+    return (position+alignment-1) & ~(alignment-1);
+}
+struct Document {
+    Header header;
+    Metadata metadata;
+    std::map<std::string,TensorInfo> tensors;
+    std::size_t alignment = 32;
+    std::size_t data_offset = 0;
+};
+inline Document read_document(std::span<const std::byte> bytes) {
+    Reader r(bytes);
+    Document doc;
+    doc.header=read_header(r);
+    doc.metadata=read_metadata(r,doc.header.metadata_count);
+    for (std::uint64_t i=0; i<doc.header.tensor_count; ++i) {
+        auto tensor=read_tensor_info(r);
+        auto name=tensor.name;
+        if (!doc.tensors.emplace(std::move(name),std::move(tensor)).second)
+            throw Error("duplicate GGUF tensor name");
+    }
+    if (auto it=doc.metadata.find("general.alignment"); it!=doc.metadata.end()) {
+        auto value=std::get_if<std::uint64_t>(&it->second.data);
+        if (!value || *value>65536) throw Error("invalid general.alignment metadata");
+        doc.alignment=static_cast<std::size_t>(*value);
+    }
+    doc.data_offset=align_up(r.position(),doc.alignment);
+    if (doc.data_offset>bytes.size()) throw Error("truncated GGUF alignment padding");
+    for (const auto& [name,tensor] : doc.tensors) {
+        (void)name;
+        if (tensor.offset%doc.alignment) throw Error("unaligned GGUF tensor offset");
+    }
+    return doc;
+}
+
 // IMPLEMENTATIONS
 }  // namespace tvara::gguf
