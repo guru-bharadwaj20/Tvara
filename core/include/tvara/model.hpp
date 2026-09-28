@@ -125,5 +125,81 @@ inline std::vector<float> feedforward(const LayerWeights& layer,std::span<const 
     return layer.down.multiply(gate);
 }
 
+inline std::vector<float> tensor_floats(const gguf::TensorView& tensor) {
+    const auto& info=tensor.info();const auto bytes=tensor.bytes();
+    std::size_t count=1;for(auto dim:info.dimensions)count*=static_cast<std::size_t>(dim);
+    std::vector<float> out(count);
+    if(info.type==0) {gguf::Reader r(bytes);for(auto& x:out)x=r.f32();}
+    else if(info.type==1)for(std::size_t i=0;i<count;++i)out[i]=quant::half_to_float(quant::u16(bytes,2*i));
+    else if(info.type==2)quant::dequantize_q4_0(bytes,out);
+    else if(info.type==8)quant::dequantize_q8_0(bytes,out);
+    else if(info.type==12)quant::dequantize_q4_k(bytes,out);
+    else throw std::invalid_argument("unsupported native weight type");
+    for(auto x:out)if(!std::isfinite(x))throw std::invalid_argument("nonfinite model weight");
+    return out;
+}
+inline ModelWeights load_weights(const std::filesystem::path& path) {
+    gguf::ModelFile file(path);const auto& doc=file.document();auto shape=gguf::llama_shape(doc);
+    gguf::validate_llama_tensors(doc,shape);
+    ModelWeights weights;
+    weights.config={static_cast<std::size_t>(shape.vocab),static_cast<std::size_t>(shape.hidden),
+                    static_cast<std::size_t>(shape.intermediate),static_cast<std::size_t>(shape.layers),
+                    static_cast<std::size_t>(shape.heads),static_cast<std::size_t>(shape.kv_heads),
+                    static_cast<std::size_t>(shape.context),static_cast<float>(shape.rms_epsilon),static_cast<float>(shape.rope_theta)};
+    if(auto it=doc.metadata.find("tvara.rope.layout");it!=doc.metadata.end()) {
+        auto layout=std::get_if<std::string>(&it->second.data);
+        if(!layout || (*layout!="split" && *layout!="interleaved"))throw std::invalid_argument("invalid RoPE layout");
+        weights.config.interleaved_rope=*layout=="interleaved";
+    }
+    weights.config.validate();
+    auto matrix=[&](const std::string& name) {
+        auto tensor=file.tensor(name);const auto& dims=tensor.info().dimensions;
+        if(dims.size()!=2)throw std::invalid_argument("projection must have rank two");
+        Matrix m(static_cast<std::size_t>(dims[1]),static_cast<std::size_t>(dims[0]));
+        m.values=tensor_floats(tensor);return m;
+    };
+    weights.embedding=matrix("token_embd.weight");weights.final_norm=tensor_floats(file.tensor("output_norm.weight"));
+    if(doc.tensors.contains("output.weight"))weights.output=matrix("output.weight");
+    for(std::size_t i=0;i<weights.config.layers;++i) {
+        auto p="blk."+std::to_string(i)+".";LayerWeights layer;
+        layer.attention_norm=tensor_floats(file.tensor(p+"attn_norm.weight"));
+        layer.feedforward_norm=tensor_floats(file.tensor(p+"ffn_norm.weight"));
+        layer.query=matrix(p+"attn_q.weight");layer.key=matrix(p+"attn_k.weight");layer.value=matrix(p+"attn_v.weight");
+        layer.attention_output=matrix(p+"attn_output.weight");layer.gate=matrix(p+"ffn_gate.weight");
+        layer.up=matrix(p+"ffn_up.weight");layer.down=matrix(p+"ffn_down.weight");weights.layers.push_back(std::move(layer));
+    }
+    return weights;
+}
+inline std::vector<float> execute_token(const ModelWeights& w,SequenceState& state,std::size_t token) {
+    const auto& c=w.config;c.validate();
+    if(token>=c.vocab || state.length>=c.context || w.layers.size()!=c.layers || state.layers.size()!=c.layers)
+        throw std::invalid_argument("invalid sequence token context or layer state");
+    auto x=embedding_lookup(w.embedding,token);
+    try {
+        for(std::size_t i=0;i<c.layers;++i) {
+            auto& cache=state.layers[i];const auto& layer=w.layers[i];
+            if(cache.keys.size()!=state.length*c.kv_width() || cache.values.size()!=cache.keys.size())
+                throw std::invalid_argument("inconsistent layer KV length");
+            auto normalized=rms_norm(x,layer.attention_norm,c.rms_epsilon);
+            auto projected=project_attention(layer,normalized,c);
+            rotary(projected.query,c.heads,c.head_dim(),state.length,c.rope_theta,c.interleaved_rope);
+            rotary(projected.key,c.kv_heads,c.head_dim(),state.length,c.rope_theta,c.interleaved_rope);
+            cache.keys.insert(cache.keys.end(),projected.key.begin(),projected.key.end());
+            cache.values.insert(cache.values.end(),projected.value.begin(),projected.value.end());
+            auto attention=grouped_attention(projected.query,cache.keys,cache.values,state.length+1,c);
+            auto residual=project_attention_output(layer,attention,c);
+            for(std::size_t j=0;j<c.hidden;++j)x[j]+=residual[j];
+            normalized=rms_norm(x,layer.feedforward_norm,c.rms_epsilon);residual=feedforward(layer,normalized,c);
+            for(std::size_t j=0;j<c.hidden;++j)x[j]+=residual[j];
+        }
+        auto normalized=rms_norm(x,w.final_norm,c.rms_epsilon);
+        auto logits=(w.output.rows?w.output:w.embedding).multiply(normalized);
+        ++state.length;return logits;
+    } catch(...) {
+        for(auto& cache:state.layers) {cache.keys.resize(state.length*c.kv_width());cache.values.resize(state.length*c.kv_width());}
+        throw;
+    }
+}
+
 // MODEL_CODE
 }  // namespace tvara
