@@ -53,7 +53,7 @@ Target: Week 1.
 - ✅ T010 — Document stretch goals and known pitfalls. Evidence: [docs/risks.md](docs/risks.md).
 - ✅ T011 — Publish a README with accurate implementation status. Evidence: [README](README.md).
 - ✅ T012 — Create contribution workflow guidance. Evidence: [.github/pull_request_template.md](.github/pull_request_template.md).
-- ✅ T013 — Add an MIT license for original project material.
+- ✅ T013 — Add an MIT license for original project material. Evidence: [docs/licensing.md](docs/licensing.md).
 - ✅ T014 — Publish the phased task timeline.
 - ❌ T015 — Agree on acceptance criteria and owners for the first implementation milestone.
 
