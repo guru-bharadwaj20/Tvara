@@ -55,6 +55,13 @@ void test_output_projection() {
     std::vector<float> x(8,3);auto out=project_attention_output(layer,x,c);for(auto v:out)close(v,6);
 }
 
+void test_feedforward() {
+    auto c=config();LayerWeights layer;layer.gate=Matrix(12,8);layer.up=Matrix(12,8);layer.down=Matrix(8,12);
+    layer.gate.values[0]=1;layer.up.values[0]=2;layer.down.values[0]=3;
+    std::vector<float> x(8,1);auto out=feedforward(layer,x,c);close(out[0],6/(1+std::exp(-1.f)));
+    for(std::size_t i=1;i<out.size();++i)check(out[i]==0);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -65,6 +72,7 @@ int main() {
         test_projections();
         test_attention();
         test_output_projection();
+        test_feedforward();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
