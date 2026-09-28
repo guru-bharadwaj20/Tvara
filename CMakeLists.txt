@@ -44,3 +44,6 @@ if(BUILD_TESTING)
   target_link_libraries(test_model PRIVATE tvara_core)
   add_test(NAME model COMMAND test_model)
 endif()
+
+add_executable(tvara_model_check core/src/model_check.cpp)
+target_link_libraries(tvara_model_check PRIVATE tvara_core)
