@@ -1,0 +1,6 @@
+{
+  "repository": "Qwen/Qwen2.5-0.5B-Instruct",
+  "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+  "artifact": "tokenizer.json",
+  "purpose": "token-ID compatibility only; model weights not downloaded"
+}
