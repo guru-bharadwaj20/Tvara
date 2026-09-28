@@ -74,6 +74,19 @@ void test_tensor_dimensions() {
     Reader invalid(bad); rejects([&]{ read_tensor_info(invalid); });
 }
 
+Bytes one_tensor_file(std::uint64_t offset=0) {
+    Bytes out; integer(out,0x46554747,4); integer(out,3,4); integer(out,1,8); integer(out,0,8);
+    string_bytes(out,"weight"); integer(out,1,4); integer(out,4,8); integer(out,0,4); integer(out,offset,8);
+    out.resize(align_up(out.size(),32)+16);
+    return out;
+}
+void test_alignment() {
+    auto bytes=one_tensor_file(); auto doc=read_document(bytes);
+    check(doc.data_offset%32==0);
+    rejects([]{ align_up(5,3); });
+    auto bad=one_tensor_file(1); rejects([&]{ read_document(bad); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -83,6 +96,7 @@ int main() {
         test_scalars();
         test_metadata();
         test_tensor_dimensions();
+        test_alignment();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
