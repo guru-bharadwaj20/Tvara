@@ -118,3 +118,17 @@ def test_leading_spaces_are_preserved_by_byte_bpe():
     assert prefixed.decode(prefixed.encode(" abc")) == " abc"
     sp = sentencepiece_fixture()
     assert sp.decode(sp.encode("  ab  ")) == "ab"
+
+
+def test_utf8_stream_waits_for_complete_emoji_and_flushes_truncation():
+    from tvara.tokenizer import TokenTextStream
+
+    t = byte_fixture()
+    ids = t.encode("😀")
+    stream = TokenTextStream(t)
+    assert stream.feed(ids[:2]) == ""
+    assert stream.feed(ids[2:], final=True) == "😀"
+    with pytest.raises(ValueError):
+        stream.feed([])
+    truncated = TokenTextStream(t)
+    assert truncated.feed(ids[:1], final=True) == chr(0xFFFD)
