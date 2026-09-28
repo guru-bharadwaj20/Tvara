@@ -54,6 +54,18 @@ void test_q4k_scales() {
     }
 }
 
+void test_q4k() {
+    Bytes bytes(144); half(bytes,0x3800); half(bytes,0x3400,2);
+    std::array<unsigned,8> scales{1,2,3,4,5,6,7,8},mins{8,7,6,5,4,3,2,1};
+    pack_scales(bytes,scales,mins);
+    for(std::size_t i=0;i<128;++i) bytes[16+i]=std::byte((i%16)|(((15-i%16)<<4)));
+    std::vector<float> out(256); dequantize_q4_k(bytes,out);
+    for(std::size_t g=0;g<8;++g) for(std::size_t i=0;i<32;++i) {
+        const float q=static_cast<float>(g%2?15-i%16:i%16);
+        close(out[g*32+i],0.5f*static_cast<float>(scales[g])*q-0.25f*static_cast<float>(mins[g]));
+    }
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -61,6 +73,7 @@ int main() {
         test_q8();
         test_q4();
         test_q4k_scales();
+        test_q4k();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }

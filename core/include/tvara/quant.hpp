@@ -67,5 +67,21 @@ inline std::array<unsigned,2> q4k_scale_min(std::span<const std::byte> scales,st
     return {(q(index+4)&15)|((q(index-4)>>6)<<4), (q(index+4)>>4)|((q(index)>>6)<<4)};
 }
 
+inline void dequantize_q4_k(std::span<const std::byte> bytes,std::span<float> output) {
+    require_layout(bytes,output,144,256);
+    for(std::size_t b=0;b<bytes.size()/144;++b) {
+        const auto block=bytes.subspan(b*144,144);
+        const float d=half_to_float(u16(block)),dmin=half_to_float(u16(block,2));
+        for(std::size_t group=0;group<8;++group) {
+            const auto scale=q4k_scale_min(block.subspan(4,12),group);
+            for(std::size_t i=0;i<32;++i) {
+                const auto packed=std::to_integer<unsigned>(block[16+(group/2)*32+i]);
+                const auto q=(group%2)?(packed>>4):(packed&15);
+                output[b*256+group*32+i]=d*static_cast<float>(scale[0])*static_cast<float>(q)-dmin*static_cast<float>(scale[1]);
+            }
+        }
+    }
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant

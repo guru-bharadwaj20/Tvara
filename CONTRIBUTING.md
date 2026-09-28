@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 64 tasks are completed and 206 are not completed.
+Current status: 65 tasks are completed and 205 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -125,7 +125,7 @@ Target: Weeks 3-5.
 - ✅ T062 — Implement Q8_0 reference dequantization. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ✅ T063 — Implement Q4_0 reference dequantization. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ✅ T064 — Decode Q4_K sub-block scales and minima. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
-- ❌ T065 — Implement Q4_K reference dequantization.
+- ✅ T065 — Implement Q4_K reference dequantization. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ❌ T066 — Implement per-block activation quantization.
 - ❌ T067 — Implement scalar F32 dot products.
 - ❌ T068 — Implement scalar Q8_0 dot products.
