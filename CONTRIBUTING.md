@@ -47,7 +47,7 @@ Target: Week 1.
 - ✅ T004 — Outline planned inference components. Evidence: [docs/components.md](docs/components.md).
 - ✅ T005 — Define reference-based correctness goals. Evidence: [docs/correctness.md](docs/correctness.md).
 - ✅ T006 — Outline performance evaluation metrics. Evidence: [docs/benchmarks.md](docs/benchmarks.md).
-- ✅ T007 — Record the proposed repository layout.
+- ✅ T007 — Record the proposed repository layout. Evidence: [docs/layout.md](docs/layout.md).
 - ✅ T008 — Draft the team schedule and effort estimate.
 - ✅ T009 — Record prior work and research references.
 - ✅ T010 — Document stretch goals and known pitfalls.
