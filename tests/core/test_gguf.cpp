@@ -45,12 +45,22 @@ void test_counts() {
     integer(data,1000001,8); integer(data,0,8);
     Reader reader(data); rejects([&]{ read_header(reader); });
 }
+void test_scalars() {
+    Bytes data; integer(data,255,1); integer(data,std::bit_cast<std::uint32_t>(2.5f),4); integer(data,1,1);
+    Reader r(data);
+    check(std::get<std::int64_t>(read_scalar(r,1).data)==-1);
+    check(std::get<double>(read_scalar(r,6).data)==2.5);
+    check(std::get<bool>(read_scalar(r,7).data));
+    Bytes invalid{std::byte(2)}; Reader bad(invalid); rejects([&]{ read_scalar(bad,7); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
         test_reader();
         test_header();
         test_counts();
+        test_scalars();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {

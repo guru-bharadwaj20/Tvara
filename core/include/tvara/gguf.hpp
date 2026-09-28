@@ -59,5 +59,30 @@ inline Header read_header(Reader& reader) {
     return {version, tensors, metadata};
 }
 
+struct Value {
+    using Array = std::vector<Value>;
+    std::variant<std::uint64_t, std::int64_t, double, bool, std::string, Array> data;
+};
+inline Value read_scalar(Reader& r, std::uint32_t type) {
+    switch (type) {
+        case 0: return {r.uint_le(1)};
+        case 1: return {std::int64_t(std::bit_cast<std::int8_t>(static_cast<std::uint8_t>(r.uint_le(1))))};
+        case 2: return {r.uint_le(2)};
+        case 3: return {std::int64_t(std::bit_cast<std::int16_t>(static_cast<std::uint16_t>(r.uint_le(2))))};
+        case 4: return {r.uint_le(4)};
+        case 5: return {std::int64_t(std::bit_cast<std::int32_t>(static_cast<std::uint32_t>(r.uint_le(4))))};
+        case 6: return {double(r.f32())};
+        case 7: {
+            const auto b = r.uint_le(1);
+            if (b > 1) throw Error("invalid boolean metadata");
+            return {b != 0};
+        }
+        case 10: return {r.uint_le(8)};
+        case 11: return {std::bit_cast<std::int64_t>(r.uint_le(8))};
+        case 12: return {r.f64()};
+        default: throw Error("unsupported scalar metadata type");
+    }
+}
+
 // IMPLEMENTATIONS
 }  // namespace tvara::gguf
