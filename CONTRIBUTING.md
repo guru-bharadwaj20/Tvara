@@ -48,7 +48,7 @@ Target: Week 1.
 - ✅ T005 — Define reference-based correctness goals. Evidence: [docs/correctness.md](docs/correctness.md).
 - ✅ T006 — Outline performance evaluation metrics. Evidence: [docs/benchmarks.md](docs/benchmarks.md).
 - ✅ T007 — Record the proposed repository layout. Evidence: [docs/layout.md](docs/layout.md).
-- ✅ T008 — Draft the team schedule and effort estimate.
+- ✅ T008 — Draft the team schedule and effort estimate. Evidence: [docs/schedule.md](docs/schedule.md).
 - ✅ T009 — Record prior work and research references.
 - ✅ T010 — Document stretch goals and known pitfalls.
 - ✅ T011 — Publish a README with accurate implementation status.
