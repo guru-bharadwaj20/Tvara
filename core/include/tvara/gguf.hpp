@@ -117,6 +117,8 @@ inline Metadata read_metadata(Reader& r, std::uint64_t count) {
 struct TensorInfo {
     std::string name;
     std::vector<std::uint64_t> dimensions;
+    std::uint32_t type = 0;
+    std::uint64_t offset = 0;
 };
 inline TensorInfo read_tensor_info(Reader& r) {
     TensorInfo tensor;
@@ -128,6 +130,8 @@ inline TensorInfo read_tensor_info(Reader& r) {
         if (dim == 0) throw Error("zero GGUF tensor dimension");
         tensor.dimensions.push_back(dim);
     }
+    tensor.type=static_cast<std::uint32_t>(r.uint_le(4));
+    tensor.offset=r.uint_le(8);
     return tensor;
 }
 
