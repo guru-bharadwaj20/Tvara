@@ -85,3 +85,12 @@ def test_unigram_chooses_the_highest_scoring_segmentation():
     assert t.encode("a") == [1, 2]
     assert t.encode("") == []
     assert t.encode("z") == [1, 0]
+
+
+def test_sentencepiece_byte_fallback_decodes_multibyte_character():
+    from tvara.tokenizer import SentencePiece
+
+    words = ("<unk>", chr(0x2581)) + tuple(f"<0x{i:02X}>" for i in range(256))
+    m = TokenizerMetadata("unigram", words, tuple([-1.0] * len(words)), (2, 1) + tuple([6] * 256))
+    t = SentencePiece(m)
+    assert t.decode(t.encode("😀")) == "😀"
