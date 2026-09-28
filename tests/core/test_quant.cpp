@@ -66,6 +66,14 @@ void test_q4k() {
     }
 }
 
+void test_activation_quant() {
+    std::vector<float> x(64);
+    for(std::size_t i=0;i<32;++i) x[i]=static_cast<float>(static_cast<int>(i)-16);
+    auto blocks=quantize_activations(x); check(blocks.size()==2 && blocks[1].scale==0);
+    for(std::size_t i=0;i<32;++i) check(std::abs(x[i]-blocks[0].scale*blocks[0].values[i])<=blocks[0].scale/2+1e-5f);
+    x[3]=std::numeric_limits<float>::infinity(); rejects([&]{ quantize_activations(x); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -74,6 +82,7 @@ int main() {
         test_q4();
         test_q4k_scales();
         test_q4k();
+        test_activation_quant();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
