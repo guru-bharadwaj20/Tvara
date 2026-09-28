@@ -75,5 +75,13 @@ inline void rotary(std::span<float> x,std::size_t heads,std::size_t dim,std::siz
     }
 }
 
+struct Projections { std::vector<float> query,key,value; };
+inline Projections project_attention(const LayerWeights& layer,std::span<const float> normalized,const ModelConfig& c) {
+    c.validate();
+    if(layer.query.rows!=c.hidden || layer.key.rows!=c.kv_width() || layer.value.rows!=c.kv_width())
+        throw std::invalid_argument("attention projection output shape mismatch");
+    return {layer.query.multiply(normalized),layer.key.multiply(normalized),layer.value.multiply(normalized)};
+}
+
 // MODEL_CODE
 }  // namespace tvara

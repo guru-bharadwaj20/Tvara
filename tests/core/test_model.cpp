@@ -35,6 +35,13 @@ void test_rope() {
     close(interleaved[0],x[0]);close(interleaved[1],x[2]);close(interleaved[2],x[1]);close(interleaved[3],x[3]);
 }
 
+void test_projections() {
+    auto c=config();LayerWeights layer;layer.query=Matrix(8,8);layer.key=Matrix(4,8);layer.value=Matrix(4,8);
+    for(std::size_t i=0;i<8;++i)layer.query.values[i*8+i]=1;
+    std::vector<float> x(8,2);auto projected=project_attention(layer,x,c);
+    check(projected.query==x && projected.key.size()==4 && projected.value.size()==4);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -42,6 +49,7 @@ int main() {
         test_embedding();
         test_norm();
         test_rope();
+        test_projections();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
