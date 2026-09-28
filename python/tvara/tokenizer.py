@@ -259,7 +259,48 @@ class SentencePiece(Tokenizer):
         }
 
     def encode(self, text, allow_special=False):
-        raise NotImplementedError("SentencePiece encoding has not been implemented")
+        if not isinstance(text, str):
+            raise TypeError("Tokenizer input must be text")
+        if self.normalizer:
+            text = unicodedata.normalize(self.normalizer, text)
+        if self.remove_extra_whitespace:
+            text = " ".join(text.split())
+        if not text:
+            return []
+        if self.metadata.add_space_prefix:
+            text = " " + text
+        text = text.replace(" ", chr(0x2581))
+        best = [-float("inf")] * (len(text) + 1)
+        paths = [None] * (len(text) + 1)
+        best[0] = 0.0
+        paths[0] = []
+        for start in range(len(text)):
+            if paths[start] is None:
+                continue
+            choices = [
+                (len(piece), [index], score)
+                for piece, index, score in self.pieces
+                if text.startswith(piece, start)
+            ]
+            if not any(length == 1 for length, _, _ in choices):
+                char = text[start]
+                raw = char.encode("utf-8")
+                if all(b in self.byte_ids for b in raw):
+                    fallback = [self.byte_ids[b] for b in raw]
+                elif self.unknown is not None:
+                    fallback = [self.unknown]
+                else:
+                    raise ValueError("Text has no SentencePiece or byte fallback")
+                choices.append((1, fallback, -100.0))
+            for length, ids, score in choices:
+                end = start + length
+                candidate = best[start] + score
+                if candidate > best[end]:
+                    best[end] = candidate
+                    paths[end] = paths[start] + ids
+        if paths[-1] is None:
+            raise ValueError("SentencePiece lattice has no accepting path")
+        return paths[-1]
 
     def token_bytes(self, token):
         return self.vocabulary[token].replace(chr(0x2581), " ").encode("utf-8")

@@ -77,3 +77,11 @@ def test_sentencepiece_vocab_retains_scores_types_and_unknown_id():
     t = sentencepiece_fixture()
     assert t.unknown == 0 and t.metadata.scores[-1] == -0.1
     assert t.ids[chr(0x2581) + "ab"] == 4
+
+
+def test_unigram_chooses_the_highest_scoring_segmentation():
+    t = sentencepiece_fixture()
+    assert t.encode("ab") == [4]
+    assert t.encode("a") == [1, 2]
+    assert t.encode("") == []
+    assert t.encode("z") == [1, 0]
