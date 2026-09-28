@@ -144,6 +144,26 @@ void test_quant_boundaries() {
     check(activation[0].scale==0 && dot_q8_0(q8,activation)==0);
 }
 
+void test_randomized_quant_dots() {
+    std::mt19937 rng(2026);
+    std::uniform_int_distribution<unsigned> byte(0,255),scale(0,63);
+    std::uniform_real_distribution<float> value(-4,4);
+    for(int trial=0;trial<100;++trial) {
+        std::vector<float> input(256);for(auto& x:input) x=value(rng);
+        auto activ=quantize_activations(input);auto x=activation_reference(activ);
+        Bytes q8(34*8),q4(18*8),q4k(144);
+        for(auto& b:q8)b=std::byte(byte(rng));for(auto& b:q4)b=std::byte(byte(rng));
+        for(auto& b:q4k)b=std::byte(byte(rng));
+        for(std::size_t b=0;b<8;++b) {half(q8,0x3800,b*34);half(q4,0xb800,b*18);}
+        half(q4k,0x3400);half(q4k,0x3000,2);
+        std::array<unsigned,8> scales{},mins{};for(auto& s:scales)s=scale(rng);for(auto& s:mins)s=scale(rng);
+        pack_scales(q4k,scales,mins);
+        std::vector<float> w(256);dequantize_q8_0(q8,w);close(dot_q8_0(q8,activ),dot_f32(w,x));
+        dequantize_q4_0(q4,w);close(dot_q4_0(q4,activ),dot_f32(w,x));
+        dequantize_q4_k(q4k,w);close(dot_q4_k(q4k,activ),dot_f32(w,x));
+    }
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -160,6 +180,7 @@ int main() {
         test_matvec();
         test_matmul();
         test_quant_boundaries();
+        test_randomized_quant_dots();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
