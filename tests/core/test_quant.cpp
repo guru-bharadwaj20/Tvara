@@ -115,6 +115,15 @@ void test_q4k_dot() {
     close(dot_q4_k(bytes,q),dot_f32(weights,ref),1e-5f);
 }
 
+void test_matvec() {
+    std::vector<float> weights{1,2,3,4,5,6},x{1,-1,2},out(2);
+    matvec_f32(weights,2,3,x,out); close(out[0],5); close(out[1],11);
+    Bytes q8(68); half(q8,0x3c00);half(q8,0x3c00,34);
+    std::fill(q8.begin()+2,q8.begin()+34,std::byte(1));
+    std::fill(q8.begin()+36,q8.end(),std::byte(2));
+    x.assign(32,1); matvec_quant(q8,2,32,8,x,out); close(out[0],32); close(out[1],64);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -128,6 +137,7 @@ int main() {
         test_q8_dot();
         test_q4_dot();
         test_q4k_dot();
+        test_matvec();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }

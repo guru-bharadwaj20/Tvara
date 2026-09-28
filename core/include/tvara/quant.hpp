@@ -160,5 +160,30 @@ inline float dot_q4_k(std::span<const std::byte> w,std::span<const Q8Activation>
     return static_cast<float>(total);
 }
 
+inline void matvec_f32(std::span<const float> weights,std::size_t rows,std::size_t cols,
+                       std::span<const float> x,std::span<float> out) {
+    if(!rows || !cols || rows>std::numeric_limits<std::size_t>::max()/cols ||
+       weights.size()!=rows*cols || x.size()!=cols || out.size()!=rows)
+        throw std::invalid_argument("matvec dimensions mismatch");
+    for(std::size_t r=0;r<rows;++r) out[r]=dot_f32(weights.subspan(r*cols,cols),x);
+}
+inline void matvec_quant(std::span<const std::byte> weights,std::size_t rows,std::size_t cols,
+                         unsigned type,std::span<const float> x,std::span<float> out) {
+    std::size_t block,width;
+    if(type==2) { block=32;width=18; } else if(type==8) { block=32;width=34; }
+    else if(type==12) { block=256;width=144; } else throw std::invalid_argument("unsupported quantized matrix type");
+    if(!rows || !cols || cols%block || cols/block>std::numeric_limits<std::size_t>::max()/width ||
+       rows>std::numeric_limits<std::size_t>::max()/(cols/block*width))
+        throw std::invalid_argument("invalid quantized matrix dimensions");
+    const auto stride=cols/block*width;
+    if(weights.size()!=rows*stride || x.size()!=cols || out.size()!=rows)
+        throw std::invalid_argument("quantized matvec storage mismatch");
+    auto activation=quantize_activations(x);
+    for(std::size_t r=0;r<rows;++r) {
+        auto row=weights.subspan(r*stride,stride);
+        out[r]=type==2?dot_q4_0(row,activation):type==8?dot_q8_0(row,activation):dot_q4_k(row,activation);
+    }
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant
