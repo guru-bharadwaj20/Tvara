@@ -1,6 +1,6 @@
 # Contributing to Tvara
 
-Tvara is currently in the planning stage. Read [README.md](README.md) and the
+Tvara is in early implementation. Read [README.md](README.md) and the
 [architecture proposal](docs/design.md) before choosing work.
 
 ## Workflow
@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 59 tasks are completed and 211 are not completed.
+Current status: 60 tasks are completed and 210 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -115,7 +115,7 @@ Target: Weeks 3-4.
 - ✅ T057 — Validate expected model tensor names. Evidence: [core/include/tvara/gguf_model.hpp](core/include/tvara/gguf_model.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
 - ✅ T058 — Map architecture metadata to a model configuration. Evidence: [core/include/tvara/gguf_model.hpp](core/include/tvara/gguf_model.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
 - ✅ T059 — Test malformed GGUF fixtures. Evidence: [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
-- ❌ T060 — Document loader errors and supported formats.
+- ✅ T060 — Document loader errors and supported formats. Evidence: [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md), [docs/gguf.md](docs/gguf.md).
 
 ### Phase 05: Quantization and scalar kernels
 

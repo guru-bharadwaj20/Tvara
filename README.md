@@ -18,9 +18,13 @@ speedups or promised parity with mature engines.
 
 ## Project status
 
-Tvara is in the planning stage. This repository contains project documentation;
-the engine, build system, server, and benchmarks are pending implementation.
-There are no installation instructions or runnable commands at this stage.
+Tvara is in early implementation. The portable C++20 build and native GGUF loader
+are available, and the independent NumPy Llama reference passes pinned tiny-model
+logit and greedy-token checks. The native model executor, serving stack, and final
+benchmarks remain under development.
+
+See [local development](docs/development.md) for exercised build/test commands and
+[reference validation](docs/reference-validation.md) for numerical coverage.
 
 ## Planned capabilities
 
