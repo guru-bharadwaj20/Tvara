@@ -35,3 +35,11 @@ def test_byte_mapping_is_bijective_over_all_bytes():
     assert len(forward) == len(reverse) == 256
     assert bytes(reverse[forward[b]] for b in range(256)) == bytes(range(256))
     assert forward[32] == chr(0x120)
+
+
+def test_bpe_rank_order_and_overlapping_pairs():
+    from tvara.tokenizer import merge_bpe
+
+    assert merge_bpe("abc", {("b", "c"): 0, ("a", "b"): 1}) == ["a", "bc"]
+    assert merge_bpe("aaaa", {("a", "a"): 0, ("aa", "aa"): 1}) == ["aaaa"]
+    assert merge_bpe("xyz", {}) == ["x", "y", "z"]

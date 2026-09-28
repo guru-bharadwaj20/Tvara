@@ -98,3 +98,27 @@ def byte_mapping():
             extra += 1
     forward = {b: chr(c) for b, c in zip(byte_values, codepoints)}
     return forward, {char: byte for byte, char in forward.items()}
+
+
+def merge_bpe(symbols, ranks):
+    symbols = list(symbols)
+    while len(symbols) > 1:
+        ranked = [
+            (ranks.get((symbols[i], symbols[i + 1]), float("inf")), i)
+            for i in range(len(symbols) - 1)
+        ]
+        rank, index = min(ranked)
+        if rank == float("inf"):
+            break
+        pair = (symbols[index], symbols[index + 1])
+        merged = []
+        i = 0
+        while i < len(symbols):
+            if i + 1 < len(symbols) and (symbols[i], symbols[i + 1]) == pair:
+                merged.append(symbols[i] + symbols[i + 1])
+                i += 2
+            else:
+                merged.append(symbols[i])
+                i += 1
+        symbols = merged
+    return symbols
