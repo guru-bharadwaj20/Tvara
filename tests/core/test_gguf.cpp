@@ -32,7 +32,7 @@ void test_reader() {
 
 void test_header() {
     for (std::uint32_t version : {2u, 3u}) {
-        Bytes data; integer(data,0x46554747,4); integer(data,version,4);
+        Bytes data; integer(data,0x46554747,4); integer(data,version,4); integer(data,0,8); integer(data,0,8);
         Reader reader(data); check(read_header(reader).version == version);
     }
     Bytes invalid; integer(invalid,0x46554747,4); integer(invalid,1,4);
@@ -40,11 +40,17 @@ void test_header() {
     Bytes wrong(8); Reader bad(wrong); rejects([&]{ read_header(bad); });
 }
 
+void test_counts() {
+    Bytes data; integer(data,0x46554747,4); integer(data,3,4);
+    integer(data,1000001,8); integer(data,0,8);
+    Reader reader(data); rejects([&]{ read_header(reader); });
+}
 // EXTRA_TESTS
 int main() {
     try {
         test_reader();
         test_header();
+        test_counts();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {

@@ -42,12 +42,21 @@ private:
     std::size_t position_ = 0;
 };
 
-struct Header { std::uint32_t version = 0; };
+struct Header {
+    std::uint32_t version = 0;
+    std::uint64_t tensor_count = 0;
+    std::uint64_t metadata_count = 0;
+};
 inline Header read_header(Reader& reader) {
     if (reader.uint_le(4) != 0x46554747) throw Error("invalid GGUF magic or unsupported byte order");
     auto version = static_cast<std::uint32_t>(reader.uint_le(4));
     if (version != 2 && version != 3) throw Error("unsupported GGUF version");
-    return {version};
+    const auto tensors = reader.uint_le(8);
+    const auto metadata = reader.uint_le(8);
+    if (tensors > 1000000 || metadata > 1000000) throw Error("GGUF count limit exceeded");
+    if (tensors > reader.remaining()/24 || metadata > reader.remaining()/13)
+        throw Error("GGUF counts exceed available bytes");
+    return {version, tensors, metadata};
 }
 
 // IMPLEMENTATIONS

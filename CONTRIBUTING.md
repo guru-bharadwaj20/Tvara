@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 47 tasks are completed and 223 are not completed.
+Current status: 48 tasks are completed and 222 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -103,7 +103,7 @@ Target: Weeks 3-4.
 
 - ✅ T046 — Create a bounds-checked binary reader. Evidence: [core/include/tvara/gguf.hpp](core/include/tvara/gguf.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ✅ T047 — Validate GGUF magic and supported versions. Evidence: [core/include/tvara/gguf.hpp](core/include/tvara/gguf.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
-- ❌ T048 — Parse GGUF header counts.
+- ✅ T048 — Parse GGUF header counts. Evidence: [core/include/tvara/gguf.hpp](core/include/tvara/gguf.hpp), [tests/core/test_gguf.cpp](tests/core/test_gguf.cpp).
 - ❌ T049 — Parse scalar metadata types.
 - ❌ T050 — Parse strings and metadata arrays.
 - ❌ T051 — Parse tensor names and dimensions.
