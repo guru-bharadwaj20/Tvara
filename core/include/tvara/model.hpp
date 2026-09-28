@@ -106,5 +106,11 @@ inline std::vector<float> grouped_attention(std::span<const float> q,std::span<c
     return out;
 }
 
+inline std::vector<float> project_attention_output(const LayerWeights& layer,std::span<const float> attention,const ModelConfig& c) {
+    if(layer.attention_output.rows!=c.hidden || layer.attention_output.cols!=c.hidden)
+        throw std::invalid_argument("attention output projection shape mismatch");
+    return layer.attention_output.multiply(attention);
+}
+
 // MODEL_CODE
 }  // namespace tvara
