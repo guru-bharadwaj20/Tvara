@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 21 tasks are completed and 249 are not completed.
+Current status: 22 tasks are completed and 248 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -67,7 +67,7 @@ Target: Weeks 1-2.
 - ✅ T019 — Choose the HTTP serving framework. Evidence: [docs/decisions/0003-server.md](docs/decisions/0003-server.md).
 - ✅ T020 — Create the core source directory structure. Evidence: [.gitignore](.gitignore), [core/include/tvara/tensor.hpp](core/include/tvara/tensor.hpp), [core/src/version.cpp](core/src/version.cpp), [core/include/tvara/version.hpp](core/include/tvara/version.hpp).
 - ✅ T021 — Create the Python reference package. Evidence: [pyproject.toml](pyproject.toml), [python/tvara/__init__.py](python/tvara/__init__.py), [python/tvara/reference/__init__.py](python/tvara/reference/__init__.py).
-- ❌ T022 — Create the test directory structure.
+- ✅ T022 — Create the test directory structure. Evidence: [tests/core/test_tensor.cpp](tests/core/test_tensor.cpp), [tests/python/test_package.py](tests/python/test_package.py).
 - ❌ T023 — Configure a reproducible core build.
 - ❌ T024 — Add a debug build configuration.
 - ❌ T025 — Add an optimized release configuration.
