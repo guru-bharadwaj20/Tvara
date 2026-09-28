@@ -51,7 +51,7 @@ Target: Week 1.
 - ✅ T008 — Draft the team schedule and effort estimate. Evidence: [docs/schedule.md](docs/schedule.md).
 - ✅ T009 — Record prior work and research references. Evidence: [docs/references.md](docs/references.md).
 - ✅ T010 — Document stretch goals and known pitfalls. Evidence: [docs/risks.md](docs/risks.md).
-- ✅ T011 — Publish a README with accurate implementation status.
+- ✅ T011 — Publish a README with accurate implementation status. Evidence: [README](README.md).
 - ✅ T012 — Create contribution workflow guidance.
 - ✅ T013 — Add an MIT license for original project material.
 - ✅ T014 — Publish the phased task timeline.

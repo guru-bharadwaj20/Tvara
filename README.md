@@ -19,7 +19,7 @@ speedups or promised parity with mature engines.
 ## Project status
 
 Tvara is in the planning stage. This repository contains project documentation;
-the engine, build system, server, and benchmarks have not been implemented yet.
+the engine, build system, server, and benchmarks are pending implementation.
 There are no installation instructions or runnable commands at this stage.
 
 ## Planned capabilities
@@ -50,8 +50,8 @@ prerequisites.
 
 ## Documentation and contributions
 
-- [Project proposal](Tvara%20Project%20Idea.md): architecture, evaluation, references,
-  and stretch goals.
+- [Architecture proposal](docs/design.md), [model targets](docs/models.md),
+  [correctness gates](docs/correctness.md), and [benchmark protocol](docs/benchmarks.md).
 - [Contributing guide and timeline](CONTRIBUTING.md): workflow and task status.
 
 See the contributing guide before starting work. Model weights, datasets, and
