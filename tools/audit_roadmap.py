@@ -1,6 +1,8 @@
 """Validate the roadmap's stable IDs, status totals, and evidence links."""
+
 from pathlib import Path
 import re
+
 
 def audit(root: Path) -> tuple[int, int]:
     text = (root / "CONTRIBUTING.md").read_text(encoding="utf-8")
@@ -14,9 +16,10 @@ def audit(root: Path) -> tuple[int, int]:
             if not target.startswith("https://") and not (root / target.split("#")[0]).exists():
                 raise ValueError(f"T{number}: missing evidence file {target}")
     done = sum(mark == chr(0x2705) for mark, _, _ in rows)
-    if f"{done} tasks are completed and {270-done} are not completed" not in text:
+    if f"{done} tasks are completed and {270 - done} are not completed" not in text:
         raise ValueError("Task totals do not match markers")
-    return done, 270-done
+    return done, 270 - done
+
 
 if __name__ == "__main__":
     done, pending = audit(Path(__file__).resolve().parents[1])
