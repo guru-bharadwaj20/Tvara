@@ -94,3 +94,14 @@ def test_sentencepiece_byte_fallback_decodes_multibyte_character():
     m = TokenizerMetadata("unigram", words, tuple([-1.0] * len(words)), (2, 1) + tuple([6] * 256))
     t = SentencePiece(m)
     assert t.decode(t.encode("😀")) == "😀"
+
+
+def test_special_tokens_are_opt_in_and_prefer_longer_matches():
+    from tvara.tokenizer import ByteBPE
+
+    t = byte_fixture()
+    words = list(t.vocabulary) + ["<end>", "<end>long"]
+    t = ByteBPE(words, [("a", "b"), ("ab", "c")], special_ids=[len(words) - 2, len(words) - 1])
+    assert t.encode("abc<end>long", allow_special=True) == [t.ids["abc"], t.ids["<end>long"]]
+    assert t.ids["<end>"] not in t.encode("<end>")
+    assert t.decode([t.ids["<end>"]], skip_special=True) == ""

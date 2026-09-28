@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 83 tasks are completed and 187 are not completed.
+Current status: 84 tasks are completed and 186 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -149,7 +149,7 @@ Target: Weeks 3-5.
 - ✅ T081 — Implement SentencePiece vocabulary loading. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T082 — Implement SentencePiece token encoding. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T083 — Implement special-token recognition. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
-- ❌ T084 — Implement byte-fallback decoding.
+- ✅ T084 — Implement byte-fallback decoding. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ❌ T085 — Handle leading spaces consistently.
 - ❌ T086 — Handle Unicode and split UTF-8 sequences.
 - ❌ T087 — Define beginning and end token policies.

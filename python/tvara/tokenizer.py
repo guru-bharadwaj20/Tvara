@@ -72,6 +72,28 @@ class Tokenizer(ABC):
         ):
             raise ValueError("Invalid special token IDs")
 
+    def special_segments(self, text):
+        import regex
+
+        words = sorted(
+            (self.vocabulary[i] for i in self.special_ids if self.vocabulary[i]),
+            key=len,
+            reverse=True,
+        )
+        if not words:
+            return [(False, text)]
+        expression = regex.compile("|".join(regex.escape(word) for word in words))
+        result = []
+        position = 0
+        for match in expression.finditer(text):
+            if match.start() > position:
+                result.append((False, text[position : match.start()]))
+            result.append((True, match.group()))
+            position = match.end()
+        if position < len(text):
+            result.append((False, text[position:]))
+        return result
+
     @abstractmethod
     def encode(self, text, allow_special=False):
         pass
@@ -167,6 +189,11 @@ class ByteBPE(Tokenizer):
     def encode(self, text, allow_special=False):
         if not isinstance(text, str):
             raise TypeError("Tokenizer input must be text")
+        if allow_special:
+            output = []
+            for special, segment in self.special_segments(text):
+                output.extend([self.ids[segment]] if special else self.encode(segment, False))
+            return output
         if self.normalizer:
             text = unicodedata.normalize(self.normalizer, text)
         if self.add_prefix_space and text and not text.startswith(" "):
@@ -261,6 +288,11 @@ class SentencePiece(Tokenizer):
     def encode(self, text, allow_special=False):
         if not isinstance(text, str):
             raise TypeError("Tokenizer input must be text")
+        if allow_special:
+            output = []
+            for special, segment in self.special_segments(text):
+                output.extend([self.ids[segment]] if special else self.encode(segment, False))
+            return output
         if self.normalizer:
             text = unicodedata.normalize(self.normalizer, text)
         if self.remove_extra_whitespace:
