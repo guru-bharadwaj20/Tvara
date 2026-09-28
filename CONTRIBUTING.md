@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 43 tasks are completed and 227 are not completed.
+Current status: 44 tasks are completed and 226 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -94,7 +94,7 @@ Target: Weeks 1-2.
 - ✅ T041 — Define absolute and relative numerical tolerances. Evidence: [python/tvara/reference/metrics.py](python/tvara/reference/metrics.py), [tests/python/test_metrics.py](tests/python/test_metrics.py).
 - ✅ T042 — Compare reference logits with Hugging Face. Evidence: [tests/python/test_reference_logits.py](tests/python/test_reference_logits.py).
 - ✅ T043 — Create a greedy-generation reference fixture. Evidence: [python/tvara/reference/generation.py](python/tvara/reference/generation.py), [tools/capture_greedy.py](tools/capture_greedy.py), [tests/python/test_greedy.py](tests/python/test_greedy.py).
-- ❌ T044 — Create a perplexity evaluation fixture.
+- ✅ T044 — Create a perplexity evaluation fixture. Evidence: [python/tvara/reference/metrics.py](python/tvara/reference/metrics.py), [tests/python/test_metrics.py](tests/python/test_metrics.py).
 - ❌ T045 — Document reference precision and reproducibility settings.
 
 ### Phase 04: GGUF loading and tensor storage
