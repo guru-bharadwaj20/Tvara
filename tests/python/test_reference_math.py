@@ -54,3 +54,14 @@ def test_grouped_attention_matches_scalar_and_is_causal():
     np.testing.assert_allclose(attention(q[-1:], k, v), expected[-1:], rtol=1e-5, atol=1e-6)
     v[2] *= 100
     np.testing.assert_allclose(attention(q, k, v)[0], expected[0], rtol=1e-5, atol=1e-6)
+
+
+def test_swiglu_matches_direct_expression_and_extreme_values():
+    from tvara.reference.math import swiglu
+
+    g = np.array([-2.0, 0.0, 3.0], dtype=np.float32)
+    u = np.array([1.0, 2.0, 4.0], dtype=np.float32)
+    np.testing.assert_allclose(swiglu(g, u), g / (1 + np.exp(-g)) * u, rtol=1e-6)
+    assert np.isfinite(swiglu(np.array([-1000.0, 1000.0]), np.ones(2))).all()
+    with pytest.raises(ValueError):
+        swiglu(np.ones(2), np.ones(3))
