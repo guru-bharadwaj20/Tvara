@@ -54,6 +54,17 @@ void test_scalars() {
     Bytes invalid{std::byte(2)}; Reader bad(invalid); rejects([&]{ read_scalar(bad,7); });
 }
 
+void test_metadata() {
+    Bytes data; string_bytes(data,"general.name"); integer(data,8,4); string_bytes(data,"fixture");
+    string_bytes(data,"numbers"); integer(data,9,4); integer(data,4,4); integer(data,2,8);
+    integer(data,5,4); integer(data,7,4);
+    Reader r(data); auto values=read_metadata(r,2);
+    check(std::get<std::string>(values.at("general.name").data)=="fixture");
+    const auto& array=std::get<Value::Array>(values.at("numbers").data);
+    check(array.size()==2 && std::get<std::uint64_t>(array[1].data)==7);
+    Bytes bad; integer(bad,100,8); Reader truncated(bad); rejects([&]{ read_string(truncated); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -61,6 +72,7 @@ int main() {
         test_header();
         test_counts();
         test_scalars();
+        test_metadata();
         // RUN_TESTS
         std::cout << "GGUF validation checks passed\n";
     } catch (const std::exception& error) {
