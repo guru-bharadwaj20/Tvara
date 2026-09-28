@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 27 tasks are completed and 243 are not completed.
+Current status: 28 tasks are completed and 242 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -73,7 +73,7 @@ Target: Weeks 1-2.
 - ✅ T025 — Add an optimized release configuration. Evidence: [CMakePresets.json](CMakePresets.json).
 - ✅ T026 — Configure formatting and linting. Evidence: [ruff.toml](ruff.toml).
 - ✅ T027 — Add compiler warnings and sanitizer settings. Evidence: [CMakeLists.txt](CMakeLists.txt).
-- ❌ T028 — Define supported operating systems and CPU targets.
+- ✅ T028 — Define supported operating systems and CPU targets. Evidence: [docs/platforms.md](docs/platforms.md).
 - ❌ T029 — Add a minimal CI build and smoke check.
 - ❌ T030 — Document local development setup commands.
 
