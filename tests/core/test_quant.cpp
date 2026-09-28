@@ -74,6 +74,12 @@ void test_activation_quant() {
     x[3]=std::numeric_limits<float>::infinity(); rejects([&]{ quantize_activations(x); });
 }
 
+void test_float_dot() {
+    std::vector<float> a{1,-2,3},b{4,5,-6}; close(dot_f32(a,b),-24);
+    check(dot_f32({}, {})==0);
+    rejects([&]{ dot_f32(a,std::span<const float>(b).first(2)); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -83,6 +89,7 @@ int main() {
         test_q4k_scales();
         test_q4k();
         test_activation_quant();
+        test_float_dot();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }

@@ -102,5 +102,12 @@ inline std::vector<Q8Activation> quantize_activations(std::span<const float> x) 
     return blocks;
 }
 
+inline float dot_f32(std::span<const float> a,std::span<const float> b) {
+    if(a.size()!=b.size()) throw std::invalid_argument("dot-product dimension mismatch");
+    double sum=0;
+    for(std::size_t i=0;i<a.size();++i) sum+=double(a[i])*double(b[i]);
+    return static_cast<float>(sum);
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant
