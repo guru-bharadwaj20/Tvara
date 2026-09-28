@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 18 tasks are completed and 252 are not completed.
+Current status: 19 tasks are completed and 251 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -64,7 +64,7 @@ Target: Weeks 1-2.
 - ✅ T016 — Choose C++20 or Rust for the core. Evidence: [docs/core-language.md](docs/core-language.md).
 - ✅ T017 — Record the core-language decision and rationale. Evidence: [docs/decisions/0001-core.md](docs/decisions/0001-core.md).
 - ✅ T018 — Choose the Python binding approach. Evidence: [docs/decisions/0002-bindings.md](docs/decisions/0002-bindings.md).
-- ❌ T019 — Choose the HTTP serving framework.
+- ✅ T019 — Choose the HTTP serving framework. Evidence: [docs/decisions/0003-server.md](docs/decisions/0003-server.md).
 - ❌ T020 — Create the core source directory structure.
 - ❌ T021 — Create the Python reference package.
 - ❌ T022 — Create the test directory structure.
