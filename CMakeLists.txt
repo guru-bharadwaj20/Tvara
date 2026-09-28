@@ -47,3 +47,9 @@ endif()
 
 add_executable(tvara_model_check core/src/model_check.cpp)
 target_link_libraries(tvara_model_check PRIVATE tvara_core)
+
+if(BUILD_TESTING)
+  add_executable(test_sampling tests/core/test_sampling.cpp)
+  target_link_libraries(test_sampling PRIVATE tvara_core)
+  add_test(NAME sampling COMMAND test_sampling)
+endif()
