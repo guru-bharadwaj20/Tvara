@@ -72,3 +72,64 @@ def transformer_layer(x, weights, prefix, config, positions):
     norm = rms_norm(x, w("post_attention_layernorm.weight"), config.rms_norm_eps)
     gated = swiglu(norm @ w("mlp.gate_proj.weight").T, norm @ w("mlp.up_proj.weight").T)
     return (x + gated @ w("mlp.down_proj.weight").T).astype(np.float32)
+
+
+class ReferenceModel:
+    def __init__(self, config, weights):
+        self.config = config
+        self.weights = {k: np.asarray(v, dtype=np.float32) for k, v in weights.items()}
+        d = config.hidden_size
+        f = config.intermediate_size
+        kv = d * config.num_key_value_heads // config.num_attention_heads
+        required = {"model.embed_tokens.weight": (config.vocab_size, d), "model.norm.weight": (d,)}
+        if not config.tie_word_embeddings:
+            required["lm_head.weight"] = (config.vocab_size, d)
+        for i in range(config.num_hidden_layers):
+            for name, shape in {
+                "input_layernorm.weight": (d,),
+                "post_attention_layernorm.weight": (d,),
+                "self_attn.q_proj.weight": (d, d),
+                "self_attn.k_proj.weight": (kv, d),
+                "self_attn.v_proj.weight": (kv, d),
+                "self_attn.o_proj.weight": (d, d),
+                "mlp.gate_proj.weight": (f, d),
+                "mlp.up_proj.weight": (f, d),
+                "mlp.down_proj.weight": (d, f),
+            }.items():
+                required[f"model.layers.{i}." + name] = shape
+        for name, shape in required.items():
+            if name not in self.weights or self.weights[name].shape != shape:
+                raise ValueError(f"Missing or malformed model tensor: {name}")
+            if not np.isfinite(self.weights[name]).all():
+                raise ValueError(f"Nonfinite model tensor: {name}")
+
+    @classmethod
+    def from_directory(cls, path):
+        from safetensors.numpy import load_file
+
+        path = Path(path)
+        return cls(
+            Config.from_json(path / "config.json"), load_file(str(path / "model.safetensors"))
+        )
+
+    def forward(self, tokens):
+        ids = np.asarray(tokens)
+        if ids.ndim != 1 or ids.size == 0 or ids.dtype.kind not in "iu":
+            raise ValueError("Tokens must be a nonempty integer sequence")
+        if (
+            ids.min() < 0
+            or ids.max() >= self.config.vocab_size
+            or len(ids) > self.config.max_position_embeddings
+        ):
+            raise ValueError("Token IDs or context length exceed model limits")
+        x = self.weights["model.embed_tokens.weight"][ids].copy()
+        positions = np.arange(len(ids))
+        for i in range(self.config.num_hidden_layers):
+            x = transformer_layer(x, self.weights, f"model.layers.{i}.", self.config, positions)
+        x = rms_norm(x, self.weights["model.norm.weight"], self.config.rms_norm_eps)
+        head = (
+            self.weights["model.embed_tokens.weight"]
+            if self.config.tie_word_embeddings
+            else self.weights["lm_head.weight"]
+        )
+        return (x @ head.T).astype(np.float32)
