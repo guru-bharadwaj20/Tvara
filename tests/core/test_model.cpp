@@ -62,6 +62,19 @@ void test_feedforward() {
     for(std::size_t i=1;i<out.size();++i)check(out[i]==0);
 }
 
+ModelWeights zero_model() {
+    ModelWeights w;w.config=config();w.embedding=Matrix(16,8);std::fill(w.embedding.values.begin(),w.embedding.values.end(),1);
+    w.final_norm.assign(8,1);LayerWeights layer;layer.attention_norm.assign(8,1);layer.feedforward_norm.assign(8,1);
+    layer.query=Matrix(8,8);layer.key=Matrix(4,8);layer.value=Matrix(4,8);layer.attention_output=Matrix(8,8);
+    layer.gate=Matrix(12,8);layer.up=Matrix(12,8);layer.down=Matrix(8,12);w.layers.push_back(std::move(layer));return w;
+}
+void test_residual_executor() {
+    auto w=zero_model();SequenceState state{0,std::vector<LayerCache>(1)};
+    auto logits=execute_token(w,state,1);check(state.length==1 && state.layers[0].keys.size()==4);
+    for(auto value:logits)close(value,8/std::sqrt(1+1e-6f));
+    rejects([&]{execute_token(w,state,16);});check(state.length==1);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -73,6 +86,7 @@ int main() {
         test_attention();
         test_output_projection();
         test_feedforward();
+        test_residual_executor();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
