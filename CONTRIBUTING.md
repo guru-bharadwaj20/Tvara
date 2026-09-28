@@ -1,7 +1,7 @@
 # Contributing to Tvara
 
 Tvara is currently in the planning stage. Read [README.md](README.md) and the
-[project proposal](Tvara%20Project%20Idea.md) before choosing work.
+[architecture proposal](docs/design.md) before choosing work.
 
 ## Workflow
 
@@ -28,14 +28,14 @@ schedule. Phases overlap where contributors can work independently; later featur
 still depend on a validated model executor. Phase 17 includes optional stretch work
 that may extend beyond week 18. Ownership and dates have not been assigned yet.
 
-- ✅ Completed: the deliverable is present in the repository documentation.
+- ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
 Current status: 14 tasks are completed and 256 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
-The original project proposal remains outside these documentation commits as an
-existing local file; the completed proposal tasks refer to that available document.
+The tracked design notes under docs/ replace the unavailable local proposal.
+Completed tasks link to their deliverables; implementation tasks also require checks.
 
 ### Phase 01: Scope and documentation
 
@@ -52,7 +52,7 @@ Target: Week 1.
 - ✅ T009 — Record prior work and research references. Evidence: [docs/references.md](docs/references.md).
 - ✅ T010 — Document stretch goals and known pitfalls. Evidence: [docs/risks.md](docs/risks.md).
 - ✅ T011 — Publish a README with accurate implementation status. Evidence: [README](README.md).
-- ✅ T012 — Create contribution workflow guidance.
+- ✅ T012 — Create contribution workflow guidance. Evidence: [.github/pull_request_template.md](.github/pull_request_template.md).
 - ✅ T013 — Add an MIT license for original project material.
 - ✅ T014 — Publish the phased task timeline.
 - ❌ T015 — Agree on acceptance criteria and owners for the first implementation milestone.
