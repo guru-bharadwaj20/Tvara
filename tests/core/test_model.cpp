@@ -75,6 +75,13 @@ void test_residual_executor() {
     rejects([&]{execute_token(w,state,16);});check(state.length==1);
 }
 
+void test_prefill_decode() {
+    ModelExecutor model(zero_model());auto state=model.new_sequence();std::vector<std::size_t> tokens{1,2,3};
+    auto prefill=model.prefill(tokens,state);check(state.length==3);
+    auto decoded=model.decode(4,state);check(state.length==4 && decoded==prefill);
+    auto full=model.forward(tokens);check(full.size()==48);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -87,6 +94,7 @@ int main() {
         test_output_projection();
         test_feedforward();
         test_residual_executor();
+        test_prefill_decode();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}

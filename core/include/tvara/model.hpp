@@ -201,5 +201,30 @@ inline std::vector<float> execute_token(const ModelWeights& w,SequenceState& sta
     }
 }
 
+class ModelExecutor {
+public:
+    explicit ModelExecutor(ModelWeights weights):weights_(std::move(weights)) {weights_.config.validate();}
+    const ModelConfig& config() const {return weights_.config;}
+    SequenceState new_sequence() const {return {0,std::vector<LayerCache>(config().layers)};}
+    std::vector<float> decode(std::size_t token,SequenceState& state) const {return execute_token(weights_,state,token);}
+    std::vector<float> prefill(std::span<const std::size_t> tokens,SequenceState& state) const {
+        if(tokens.empty() || state.length>config().context || tokens.size()>config().context-state.length)
+            throw std::invalid_argument("invalid prefill length");
+        for(auto token:tokens)if(token>=config().vocab)throw std::invalid_argument("invalid prefill token");
+        std::vector<float> logits;
+        for(auto token:tokens)logits=decode(token,state);
+        return logits;
+    }
+    std::vector<float> forward(std::span<const std::size_t> tokens) const {
+        if(tokens.empty() || tokens.size()>config().context || tokens.size()>std::numeric_limits<std::size_t>::max()/config().vocab)
+            throw std::invalid_argument("invalid full forward length");
+        auto state=new_sequence();std::vector<float> out;out.reserve(tokens.size()*config().vocab);
+        for(auto token:tokens){auto logits=decode(token,state);out.insert(out.end(),logits.begin(),logits.end());}
+        return out;
+    }
+private:
+    ModelWeights weights_;
+};
+
 // MODEL_CODE
 }  // namespace tvara

@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 99 tasks are completed and 171 are not completed.
+Current status: 100 tasks are completed and 170 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -170,7 +170,7 @@ Target: Weeks 4-6.
 - ✅ T097 — Implement attention output projection. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
 - ✅ T098 — Implement SwiGLU feed-forward layers. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
 - ✅ T099 — Implement residual connections and final projection. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
-- ❌ T100 — Implement single-sequence prefill and decode.
+- ✅ T100 — Implement single-sequence prefill and decode. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp), [core/src/model_check.cpp](core/src/model_check.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ❌ T101 — Implement greedy and temperature sampling.
 - ❌ T102 — Implement top-k top-p and min-p filters.
 - ❌ T103 — Implement repetition and frequency penalties.
