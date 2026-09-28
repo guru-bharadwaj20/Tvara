@@ -104,6 +104,17 @@ void test_q4_dot() {
     close(dot_q4_0(bytes,quantized),dot_f32(weights,ref),1e-5f);
 }
 
+void test_q4k_dot() {
+    Bytes bytes(144); half(bytes,0x3800); half(bytes,0x3400,2);
+    std::array<unsigned,8> scales{1,5,9,13,17,33,49,63},mins{3,7,11,15,19,35,51,60};
+    pack_scales(bytes,scales,mins);
+    for(std::size_t i=0;i<128;++i) bytes[16+i]=std::byte(i*11 & 255);
+    std::vector<float> x(256); for(std::size_t i=0;i<x.size();++i) x[i]=std::sin(static_cast<float>(i));
+    auto q=quantize_activations(x); auto ref=activation_reference(q);
+    std::vector<float> weights(256); dequantize_q4_k(bytes,weights);
+    close(dot_q4_k(bytes,q),dot_f32(weights,ref),1e-5f);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -116,6 +127,7 @@ int main() {
         test_float_dot();
         test_q8_dot();
         test_q4_dot();
+        test_q4k_dot();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
