@@ -84,5 +84,35 @@ inline Value read_scalar(Reader& r, std::uint32_t type) {
     }
 }
 
+inline std::string read_string(Reader& r) {
+    const auto count = r.uint_le(8);
+    if (count > 16*1024*1024 || count > r.remaining()) throw Error("GGUF string length exceeds limits");
+    const auto bytes = r.take(static_cast<std::size_t>(count));
+    return {reinterpret_cast<const char*>(bytes.data()), bytes.size()};
+}
+inline Value read_value(Reader& r, std::uint32_t type) {
+    if (type == 8) return {read_string(r)};
+    if (type != 9) return read_scalar(r,type);
+    const auto element_type = static_cast<std::uint32_t>(r.uint_le(4));
+    const auto count = r.uint_le(8);
+    if (element_type == 9 || element_type > 12 || count > 1000000 || count > r.remaining())
+        throw Error("invalid or oversized metadata array");
+    Value::Array values;
+    values.reserve(static_cast<std::size_t>(count));
+    for (std::uint64_t i=0; i<count; ++i) values.push_back(read_value(r,element_type));
+    return {std::move(values)};
+}
+using Metadata = std::map<std::string,Value>;
+inline Metadata read_metadata(Reader& r, std::uint64_t count) {
+    Metadata values;
+    for (std::uint64_t i=0; i<count; ++i) {
+        auto name=read_string(r);
+        auto value=read_value(r,static_cast<std::uint32_t>(r.uint_le(4)));
+        if (name.empty() || !values.emplace(std::move(name),std::move(value)).second)
+            throw Error("empty or duplicate GGUF metadata key");
+    }
+    return values;
+}
+
 // IMPLEMENTATIONS
 }  // namespace tvara::gguf
