@@ -153,3 +153,23 @@ def test_prompt_special_token_policy_does_not_change_raw_encoding():
     assert t.encode("abc") == [t.ids["abc"]]
     with pytest.raises(ValueError):
         encode_prompt(t, "abc", replace(m, bos_id=None))
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "नमस्ते भारत",
+        "ಕನ್ನಡ",
+        "தமிழ்",
+        "తెలుగు",
+        "বাংলা",
+        "😀👨‍👩‍👧‍👦",
+        "\r\n\t  ",
+        "a\x00b",
+        "e\u0301",
+        " café ",
+    ],
+)
+def test_unicode_and_whitespace_roundtrips(text):
+    t = byte_fixture()
+    assert t.decode(t.encode(text), errors="strict") == text
