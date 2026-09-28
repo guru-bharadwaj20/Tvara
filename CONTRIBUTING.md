@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 62 tasks are completed and 208 are not completed.
+Current status: 63 tasks are completed and 207 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -123,7 +123,7 @@ Target: Weeks 3-5.
 
 - ✅ T061 — Implement F16-to-F32 conversion. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ✅ T062 — Implement Q8_0 reference dequantization. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
-- ❌ T063 — Implement Q4_0 reference dequantization.
+- ✅ T063 — Implement Q4_0 reference dequantization. Evidence: [core/include/tvara/quant.hpp](core/include/tvara/quant.hpp), [tests/core/test_quant.cpp](tests/core/test_quant.cpp).
 - ❌ T064 — Decode Q4_K sub-block scales and minima.
 - ❌ T065 — Implement Q4_K reference dequantization.
 - ❌ T066 — Implement per-block activation quantization.

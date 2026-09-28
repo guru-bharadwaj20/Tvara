@@ -48,5 +48,17 @@ inline void dequantize_q8_0(std::span<const std::byte> bytes,std::span<float> ou
     }
 }
 
+inline void dequantize_q4_0(std::span<const std::byte> bytes,std::span<float> output) {
+    require_layout(bytes,output,18,32);
+    for(std::size_t b=0;b<bytes.size()/18;++b) {
+        const auto scale=half_to_float(u16(bytes,b*18));
+        for(std::size_t i=0;i<16;++i) {
+            const auto q=std::to_integer<unsigned>(bytes[b*18+2+i]);
+            output[b*32+i]=scale*static_cast<float>(static_cast<int>(q & 15)-8);
+            output[b*32+i+16]=scale*static_cast<float>(static_cast<int>(q >> 4)-8);
+        }
+    }
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant

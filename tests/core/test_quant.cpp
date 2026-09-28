@@ -28,11 +28,20 @@ void test_q8() {
     rejects([&]{ dequantize_q8_0(std::span<const std::byte>(bytes).first(33),output); });
 }
 
+void test_q4() {
+    Bytes bytes(18); half(bytes,0x3c00); std::vector<float> output(32);
+    for(std::size_t i=0;i<16;++i) bytes[2+i]=std::byte(i | ((15-i)<<4));
+    dequantize_q4_0(bytes,output);
+    for(std::size_t i=0;i<16;++i) { close(output[i],static_cast<float>(static_cast<int>(i)-8));
+        close(output[i+16],static_cast<float>(7-static_cast<int>(i))); }
+}
+
 // EXTRA_TESTS
 int main() {
     try {
         test_half();
         test_q8();
+        test_q4();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
