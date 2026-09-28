@@ -124,6 +124,13 @@ void test_matvec() {
     x.assign(32,1); matvec_quant(q8,2,32,8,x,out); close(out[0],32); close(out[1],64);
 }
 
+void test_matmul() {
+    std::vector<float> a{1,-1,2,2,0,1},w{1,2,3,4,5,6},out(4);
+    matmul_f32(a,w,2,2,3,out);
+    close(out[0],5);close(out[1],11);close(out[2],5);close(out[3],14);
+    rejects([&]{ matmul_f32(a,w,2,2,4,out); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -138,6 +145,7 @@ int main() {
         test_q4_dot();
         test_q4k_dot();
         test_matvec();
+        test_matmul();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
