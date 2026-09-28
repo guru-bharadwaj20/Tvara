@@ -1,5 +1,7 @@
 """Independent tokenizer implementations with explicit supported normalizers."""
 
+from abc import ABC, abstractmethod
+
 from dataclasses import dataclass
 import numpy as np
 
@@ -52,3 +54,34 @@ class TokenizerMetadata:
             bool(metadata.get(prefix + "add_eos_token", False)),
             bool(metadata.get(prefix + "add_space_prefix", True)),
         )
+
+
+class Tokenizer(ABC):
+    def __init__(self, vocabulary, special_ids=()):
+        self.vocabulary = tuple(vocabulary)
+        if not self.vocabulary or len(set(self.vocabulary)) != len(self.vocabulary):
+            raise ValueError("Vocabulary must be nonempty and unique")
+        self.ids = {word: i for i, word in enumerate(self.vocabulary)}
+        self.special_ids = frozenset(special_ids)
+        if any(
+            not isinstance(i, int) or not 0 <= i < len(self.vocabulary) for i in self.special_ids
+        ):
+            raise ValueError("Invalid special token IDs")
+
+    @abstractmethod
+    def encode(self, text, allow_special=False):
+        pass
+
+    @abstractmethod
+    def token_bytes(self, token):
+        pass
+
+    def decode(self, tokens, skip_special=False, errors="replace"):
+        output = []
+        for token in tokens:
+            if not isinstance(token, (int, np.integer)) or not 0 <= token < len(self.vocabulary):
+                raise ValueError("Token ID outside vocabulary")
+            if skip_special and token in self.special_ids:
+                continue
+            output.append(self.token_bytes(int(token)))
+        return b"".join(output).decode("utf-8", errors=errors)
