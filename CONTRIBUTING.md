@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 91 tasks are completed and 179 are not completed.
+Current status: 92 tasks are completed and 178 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -162,7 +162,7 @@ Target: Weeks 3-5.
 Target: Weeks 4-6.
 
 - ✅ T091 — Define model and layer configuration structures. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp), [CMakeLists.txt](CMakeLists.txt).
-- ❌ T092 — Implement embedding lookup.
+- ✅ T092 — Implement embedding lookup. Evidence: [core/include/tvara/model.hpp](core/include/tvara/model.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
 - ❌ T093 — Implement scalar RMSNorm in the core.
 - ❌ T094 — Implement scalar RoPE in the core.
 - ❌ T095 — Implement query key and value projections.

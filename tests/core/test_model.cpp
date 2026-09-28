@@ -14,10 +14,17 @@ void test_configuration() {
     c.heads=3;rejects([&]{c.validate();});
     rejects([]{Matrix bad(std::numeric_limits<std::size_t>::max(),2);});
 }
+void test_embedding() {
+    Matrix table(2,3);table.values={1,2,3,4,5,6};
+    check(embedding_lookup(table,1)==std::vector<float>({4,5,6}));
+    rejects([&]{embedding_lookup(table,2);});
+}
+
 // EXTRA_TESTS
 int main() {
     try {
         test_configuration();
+        test_embedding();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}
