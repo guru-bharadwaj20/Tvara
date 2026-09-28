@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 88 tasks are completed and 182 are not completed.
+Current status: 89 tasks are completed and 181 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -154,7 +154,7 @@ Target: Weeks 3-5.
 - ✅ T086 — Handle Unicode and split UTF-8 sequences. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T087 — Define beginning and end token policies. Evidence: [python/tvara/tokenizer.py](python/tvara/tokenizer.py), [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ✅ T088 — Compare token IDs with reference tokenizers. Evidence: [tests/fixtures/tokenizer-model.json](tests/fixtures/tokenizer-model.json), [tests/python/test_tokenizer_oracle.py](tests/python/test_tokenizer_oracle.py).
-- ❌ T089 — Test Indic text emoji and whitespace fixtures.
+- ✅ T089 — Test Indic text emoji and whitespace fixtures. Evidence: [tests/python/test_tokenizer.py](tests/python/test_tokenizer.py).
 - ❌ T090 — Document tokenizer compatibility limitations.
 
 ### Phase 07: Model executor and sampling
