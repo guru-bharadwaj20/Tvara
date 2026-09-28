@@ -20,10 +20,19 @@ void test_half() {
     check(std::isinf(half_to_float(0x7c00)) && std::isnan(half_to_float(0x7e00)));
     check(std::signbit(half_to_float(0x8000)));
 }
+void test_q8() {
+    Bytes bytes(34); half(bytes,0x3800); std::vector<float> output(32);
+    for(std::size_t i=0;i<32;++i) bytes[2+i]=std::byte(static_cast<unsigned char>(static_cast<int>(i)-16));
+    dequantize_q8_0(bytes,output);
+    for(std::size_t i=0;i<32;++i) close(output[i],0.5f*static_cast<float>(static_cast<int>(i)-16));
+    rejects([&]{ dequantize_q8_0(std::span<const std::byte>(bytes).first(33),output); });
+}
+
 // EXTRA_TESTS
 int main() {
     try {
         test_half();
+        test_q8();
         // RUN_TESTS
         std::cout << "Quantization checks passed\n";
     } catch(const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
