@@ -66,8 +66,9 @@ void test_metadata() {
 }
 
 void test_tensor_dimensions() {
-    Bytes data; string_bytes(data,"weight"); integer(data,2,4); integer(data,32,8); integer(data,4,8);
+    Bytes data; string_bytes(data,"weight"); integer(data,2,4); integer(data,32,8); integer(data,4,8); integer(data,8,4); integer(data,64,8);
     Reader r(data); auto t=read_tensor_info(r);
+    check(t.type==8 && t.offset==64);
     check(t.name=="weight" && t.dimensions==std::vector<std::uint64_t>({32,4}));
     Bytes bad; string_bytes(bad,"weight"); integer(bad,5,4);
     Reader invalid(bad); rejects([&]{ read_tensor_info(invalid); });
