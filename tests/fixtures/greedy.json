@@ -1,0 +1,16 @@
+{
+  "prompt": [
+    1,
+    2,
+    3
+  ],
+  "generated": [
+    18568,
+    1727,
+    8705,
+    3598,
+    27426,
+    4496
+  ],
+  "algorithm": "greedy float32 full prefix"
+}
