@@ -138,5 +138,27 @@ inline float dot_q4_0(std::span<const std::byte> w,std::span<const Q8Activation>
     return static_cast<float>(total);
 }
 
+inline float dot_q4_k(std::span<const std::byte> w,std::span<const Q8Activation> x) {
+    if(w.size()%144 || w.size()/144*8!=x.size()) throw std::invalid_argument("Q4_K dot size mismatch");
+    double total=0;
+    for(std::size_t b=0;b<w.size()/144;++b) {
+        const auto block=w.subspan(b*144,144);
+        const float d=half_to_float(u16(block)),dmin=half_to_float(u16(block,2));
+        for(std::size_t g=0;g<8;++g) {
+            auto sm=q4k_scale_min(block.subspan(4,12),g);
+            std::int32_t products=0,sum=0;
+            const auto& activation=x[b*8+g];
+            for(std::size_t i=0;i<32;++i) {
+                const auto packed=std::to_integer<unsigned>(block[16+(g/2)*32+i]);
+                const auto q=g%2?packed>>4:packed&15;
+                products+=static_cast<std::int32_t>(q)*std::int32_t(activation.values[i]);
+                sum+=activation.values[i];
+            }
+            total+=double(activation.scale)*(double(d)*sm[0]*products-double(dmin)*sm[1]*sum);
+        }
+    }
+    return static_cast<float>(total);
+}
+
 // QUANT_IMPLEMENTATIONS
 }  // namespace tvara::quant
