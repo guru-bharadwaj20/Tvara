@@ -127,3 +127,16 @@ def test_nested_local_refs_and_recursive_null_termination():
     grammar = compile_schema(schema)
     assert accepts(grammar, '{"value":1,"next":{"value":2,"next":null}}')
     assert not accepts(grammar, '{"value":1,"next":true}')
+
+
+def test_string_lengths_and_declared_format_subset():
+    from tvara.schema import compile_schema
+    from tvara.grammar import accepts
+
+    bounded = compile_schema({"type": "string", "minLength": 2, "maxLength": 3})
+    assert accepts(bounded, '"ab"') and accepts(bounded, '"😀é"')
+    assert not accepts(bounded, '"a"') and not accepts(bounded, '"abcd"')
+    email = compile_schema({"type": "string", "format": "email"})
+    assert accepts(email, '"tvara@example.org"') and not accepts(email, '"invalid"')
+    with pytest.raises(ValueError):
+        compile_schema({"type": "string", "format": "date"})
