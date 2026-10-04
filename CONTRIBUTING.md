@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 135 tasks are completed and 135 are not completed.
+Current status: 136 tasks are completed and 134 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -221,7 +221,7 @@ Target: Weeks 6-8.
 
 Target: Weeks 6-9.
 
-- ❌ T136 — Define the supported grammar syntax.
+- ✅ T136 — Define the supported grammar syntax. Evidence: [docs/grammar-syntax.md](docs/grammar-syntax.md).
 - ❌ T137 — Implement grammar lexing.
 - ❌ T138 — Implement EBNF or GBNF parsing.
 - ❌ T139 — Represent productions and terminals.
