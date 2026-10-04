@@ -87,7 +87,11 @@ public:
             throw std::invalid_argument("invalid paged KV append dimensions");
         const auto slot=table.length%g.tokens_per_block;
         if(slot==0){auto block=pool_.allocate();try{table.blocks.push_back(block);}catch(...){pool_.free(block);throw;}}
-        // COPY_ON_WRITE
+        if(slot!=0 && pool_.references(table.blocks.back())>1){
+            const auto original=table.blocks.back(),replacement=pool_.allocate();
+            auto source=pool_.data(original),destination=pool_.data(replacement);std::copy(source.begin(),source.end(),destination.begin());
+            table.blocks.back()=replacement;pool_.release(original);
+        }
         auto block=pool_.data(table.blocks.back());
         for(std::size_t layer=0;layer<g.layers;++layer){
             std::copy_n(keys.begin()+static_cast<std::ptrdiff_t>(layer*g.kv_width()),g.kv_width(),block.begin()+static_cast<std::ptrdiff_t>(kv_offset(g,layer,0,slot)));
