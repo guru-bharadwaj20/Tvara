@@ -112,6 +112,12 @@ public:
         nodes_.at(entry.parent).children.erase(entry.edge.front());nodes_.erase(*candidate);return true;
     }
 
+
+    void reset(){for(const auto& [id,entry]:nodes_)if(id && entry.pins)throw std::logic_error("cannot reset pinned prefix nodes");
+        for(auto& [id,entry]:nodes_){(void)id;if(entry.kv)for(auto block:entry.kv->blocks)cache_.pool().release(block);}
+        nodes_.clear();nodes_.emplace(0,RadixNode{});clock_=0;
+    }
+
 // METHODS
 private:
     PagedCache& cache_;
