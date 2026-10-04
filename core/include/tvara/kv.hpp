@@ -57,6 +57,11 @@ public:
     std::size_t references(BlockHandle handle)const{return validated(handle).references;}
     std::size_t references_by_id(std::size_t id)const{return blocks_.at(id).references;}
 
+void audit()const{
+        std::vector<bool> free_seen(blocks_.size());for(auto id:free_){if(id>=blocks_.size() || free_seen[id] || blocks_[id].references)throw std::logic_error("KV free-list invariant");free_seen[id]=true;}
+        for(std::size_t i=0;i<blocks_.size();++i)if(free_seen[i]!=(blocks_[i].references==0))throw std::logic_error("KV allocation invariant");
+    }
+
 // POOL_CODE
 private:
     const Block& validated(BlockHandle handle)const{
@@ -127,6 +132,16 @@ void truncate(std::uint64_t id,std::size_t length){
         const auto keep=length/geometry().tokens_per_block+(length%geometry().tokens_per_block?1:0);
         for(std::size_t i=keep;i<table.blocks.size();++i)pool_.release(table.blocks[i]);
         table.blocks.resize(keep);table.length=length;
+    }
+
+void audit(std::span<const std::size_t> external={})const{
+        pool_.audit();std::vector<std::size_t> counts(geometry().max_blocks);
+        if(!external.empty() && external.size()!=counts.size())throw std::invalid_argument("external reference counts mismatch");
+        for(const auto& [id,table]:sequences_){(void)id;
+            const auto expected=table.length/geometry().tokens_per_block+(table.length%geometry().tokens_per_block?1:0);
+            if(table.blocks.size()!=expected)throw std::logic_error("KV block table length invariant");
+            for(auto block:table.blocks){pool_.data(block);++counts.at(block.id);}}
+        for(std::size_t i=0;i<counts.size();++i)if(counts[i]+(external.empty()?0:external[i])!=pool_.references_by_id(i))throw std::logic_error("KV reference invariant");
     }
 
 // CACHE_CODE
