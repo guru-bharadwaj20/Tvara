@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 171 tasks are completed and 99 are not completed.
+Current status: 172 tasks are completed and 98 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -287,7 +287,7 @@ Target: Weeks 9-11.
 - ✅ T184 — Implement edge splitting at divergence. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T185 — Attach KV block references to cache nodes. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T186 — Reuse full shared prefix blocks. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp), [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp).
-- ❌ T187 — Handle partial-block reuse safely.
+- ✅ T187 — Handle partial-block reuse safely. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ❌ T188 — Pin nodes used by active sequences.
 - ❌ T189 — Implement leaf access tracking.
 - ❌ T190 — Implement LRU leaf eviction.
