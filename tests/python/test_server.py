@@ -62,3 +62,18 @@ def test_completion_returns_backend_generated_text(client):
         "/v1/completions", json={"model": "fixture", "prompt": "abc", "max_tokens": 3}
     )
     assert result.status_code == 200 and result.json()["choices"][0]["text"] == "hel"
+
+
+def test_chat_contract_and_role_validation(client):
+    result = client.post(
+        "/v1/chat/completions",
+        json={"model": "fixture", "messages": [{"role": "user", "content": "Hi"}], "max_tokens": 5},
+    )
+    assert result.status_code == 200 and result.json()["choices"][0]["message"] == {
+        "role": "assistant",
+        "content": "hello",
+    }
+    assert client.post(
+        "/v1/chat/completions",
+        json={"model": "fixture", "messages": [{"role": "unknown", "content": "Hi"}]},
+    ).status_code in (400, 422)
