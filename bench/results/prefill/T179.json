@@ -1,0 +1,66 @@
+{
+  "scope": "F32 projection kernel only; not end-to-end token generation",
+  "prompts": [
+    {
+      "tokens": 1,
+      "reference_us": 60.1,
+      "blocked_us": 75.6,
+      "blocked_tokens_per_second": 13227.5
+    },
+    {
+      "tokens": 8,
+      "reference_us": 450.4,
+      "blocked_us": 616.2,
+      "blocked_tokens_per_second": 12982.8
+    },
+    {
+      "tokens": 32,
+      "reference_us": 1860.4,
+      "blocked_us": 2774.5,
+      "blocked_tokens_per_second": 11533.6
+    },
+    {
+      "tokens": 128,
+      "reference_us": 8426.2,
+      "blocked_us": 10079.9,
+      "blocked_tokens_per_second": 12698.5
+    },
+    {
+      "tokens": 512,
+      "reference_us": 39100.4,
+      "blocked_us": 55843,
+      "blocked_tokens_per_second": 9168.56
+    }
+  ],
+  "end_to_end_scope": "two-layer synthetic F32 model, sequential prefill, reused executor weights",
+  "model_prompts": [
+    {
+      "tokens": 1,
+      "model_prefill_us": 57,
+      "model_tokens_per_second": 17543.9
+    },
+    {
+      "tokens": 8,
+      "model_prefill_us": 485.4,
+      "model_tokens_per_second": 16481.3
+    },
+    {
+      "tokens": 32,
+      "model_prefill_us": 2555.4,
+      "model_tokens_per_second": 12522.5
+    },
+    {
+      "tokens": 128,
+      "model_prefill_us": 24485.9,
+      "model_tokens_per_second": 5227.5
+    },
+    {
+      "tokens": 512,
+      "model_prefill_us": 329362,
+      "model_tokens_per_second": 1554.52
+    }
+  ],
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
