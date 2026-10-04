@@ -114,3 +114,98 @@ def lex(text):
             continue
         raise ValueError(f"Unsupported grammar character at offset {i}")
     return tokens + [("EOF", "")]
+
+
+def literal(text):
+    return tuple(CharSet(((ord(c), ord(c)),)) for c in text)
+
+
+class Parser:
+    def __init__(self, text):
+        self.tokens = lex(text)
+        self.position = 0
+        self.rules = {}
+        self.generated = 0
+
+    def kind(self):
+        return self.tokens[self.position][0]
+
+    def take(self, kind):
+        if self.kind() != kind:
+            raise ValueError(f"Expected {kind}, received {self.kind()}")
+        value = self.tokens[self.position][1]
+        self.position += 1
+        return value
+
+    def define(self, productions):
+        self.generated += 1
+        name = f"__generated_{self.generated}"
+        self.rules[name] = tuple(productions)
+        return name
+
+    def factor(self):
+        kind = self.kind()
+        if kind == "NAME":
+            symbols = (self.take("NAME"),)
+        elif kind == "LITERAL":
+            symbols = literal(self.take("LITERAL"))
+        elif kind == "CLASS":
+            symbols = (self.take("CLASS"),)
+        elif kind == "(":
+            self.take("(")
+            choices = self.expression(group=True)
+            self.take(")")
+            symbols = (self.define(choices),)
+        else:
+            raise ValueError("Expected a grammar symbol")
+        if self.kind() in ("?", "*", "+"):
+            operator = self.kind()
+            self.take(operator)
+            self.generated += 1
+            name = f"__generated_{self.generated}"
+            if operator == "?":
+                choices = ((), symbols)
+            elif operator == "*":
+                choices = ((), symbols + (name,))
+            else:
+                choices = (symbols, symbols + (name,))
+            self.rules[name] = choices
+            symbols = (name,)
+        return symbols
+
+    def expression(self, group=False):
+        choices = []
+        sequence = ()
+        while True:
+            if group and self.kind() == "NL":
+                self.take("NL")
+                continue
+            if self.kind() == "|":
+                self.take("|")
+                choices.append(sequence)
+                sequence = ()
+                continue
+            if self.kind() in ("NAME", "LITERAL", "CLASS", "("):
+                sequence += self.factor()
+                continue
+            break
+        choices.append(sequence)
+        return tuple(choices)
+
+    def parse(self):
+        while self.kind() != "EOF":
+            if self.kind() in ("NL", ";"):
+                self.position += 1
+                continue
+            name = self.take("NAME")
+            self.take("ASSIGN")
+            if name in self.rules:
+                raise ValueError("Duplicate grammar rule")
+            self.rules[name] = self.expression()
+            if self.kind() not in ("EOF", "NL", ";"):
+                raise ValueError("Expected rule separator")
+        return self.rules
+
+
+def parse_grammar(text):
+    return Parser(text).parse()
