@@ -1,5 +1,7 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+from fastapi.exceptions import RequestValidationError
+
 import anyio
 
 import json
@@ -158,6 +160,16 @@ async def stream_events(backend, ids, options, metadata, chat=False, request=Non
             else:
                 choice.update(text=event.text, logprobs=None)
             yield sse({**metadata, "choices": [choice]})
+    except (RuntimeError, ValueError):
+        yield sse(
+            {
+                "error": {
+                    "message": "Inference failed",
+                    "type": "server_error",
+                    "code": "inference_error",
+                }
+            }
+        )
     finally:
         with anyio.CancelScope(shield=True):
             if hasattr(iterator, "close"):
@@ -280,6 +292,32 @@ def create_app(backend, config=None):
                 }
             },
             status_code=400,
+        )
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request, error):
+        return JSONResponse(
+            {
+                "error": {
+                    "message": "Invalid request fields",
+                    "type": "invalid_request_error",
+                    "code": "validation_error",
+                }
+            },
+            status_code=400,
+        )
+
+    @app.exception_handler(RuntimeError)
+    async def inference_error(request, error):
+        return JSONResponse(
+            {
+                "error": {
+                    "message": "Inference failed",
+                    "type": "server_error",
+                    "code": "inference_error",
+                }
+            },
+            status_code=503,
         )
 
     # ROUTES
