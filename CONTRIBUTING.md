@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 115 tasks are completed and 155 are not completed.
+Current status: 116 tasks are completed and 154 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -191,7 +191,7 @@ Target: Weeks 6-8.
 - ✅ T113 — Design a persistent worker thread pool. Evidence: [core/include/tvara/thread_pool.hpp](core/include/tvara/thread_pool.hpp), [tests/core/test_threads.cpp](tests/core/test_threads.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ✅ T114 — Implement row partitioning for matrix operations. Evidence: [core/include/tvara/thread_pool.hpp](core/include/tvara/thread_pool.hpp), [core/include/tvara/threaded_kernels.hpp](core/include/tvara/threaded_kernels.hpp), [tests/core/test_threads.cpp](tests/core/test_threads.cpp).
 - ✅ T115 — Implement a spin-then-sleep worker barrier. Evidence: [core/include/tvara/thread_pool.hpp](core/include/tvara/thread_pool.hpp), [tests/core/test_threads.cpp](tests/core/test_threads.cpp).
-- ❌ T116 — Allow configurable worker counts.
+- ✅ T116 — Allow configurable worker counts. Evidence: [core/include/tvara/thread_pool.hpp](core/include/tvara/thread_pool.hpp), [tests/core/test_threads.cpp](tests/core/test_threads.cpp).
 - ❌ T117 — Validate SIMD results against scalar kernels.
 - ❌ T118 — Test concurrent worker startup and shutdown.
 - ❌ T119 — Measure dispatch and synchronization overhead.

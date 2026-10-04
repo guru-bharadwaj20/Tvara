@@ -1,5 +1,7 @@
 #pragma once
 #include <atomic>
+#include <algorithm>
+#include <string>
 #include <condition_variable>
 #include <exception>
 #include <functional>
@@ -75,6 +77,12 @@ private:
     std::atomic<std::size_t> remaining_,generation_{0};
     std::mutex mutex_;std::condition_variable changed_;
 };
+
+inline std::size_t parse_thread_count(const std::string& value,std::size_t hardware=std::thread::hardware_concurrency()){
+    if(value.empty())return std::max(std::size_t(1),std::min(hardware,std::size_t(256)));
+    if(value.find_first_not_of("0123456789")!=std::string::npos || value.size()>3)throw std::invalid_argument("invalid worker setting");
+    const auto count=static_cast<std::size_t>(std::stoul(value));if(count<1 || count>256)throw std::invalid_argument("worker count must be 1..256");return count;
+}
 
 // THREAD_CODE
 }
