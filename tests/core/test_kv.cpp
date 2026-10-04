@@ -38,6 +38,10 @@ void test_rollback(){PagedCache cache({1,1,2,2,5});auto id=cache.create_sequence
     cache.truncate(id,3);check(cache.sequence(id).blocks.size()==2 && cache.pool().available()==3);x[0]=9;cache.append(id,x,x);check(cache.read(id,0,3)[0]==9);
     cache.truncate(id,0);check(cache.pool().available()==5);cache.drop(id);}
 
+void test_exhaustion(){PagedCache cache({1,1,2,2,1});auto id=cache.create_sequence();std::vector<float>x(2,1);cache.append(id,x,x);auto branch=cache.fork(id);
+    bool exhausted=false;try{cache.append(branch,x,x);}catch(const CacheExhausted&){exhausted=true;}check(exhausted && cache.sequence(branch).length==1 && cache.pool().references(cache.physical_block(id,0))==2);
+    cache.drop(branch);cache.append(id,x,x);check(cache.sequence(id).length==2);cache.drop(id);check(cache.pool().available()==1);}
+
 // EXTRA_TESTS
 int main(){try{test_geometry();
     test_allocator();
@@ -50,6 +54,7 @@ int main(){try{test_geometry();
         test_copy_on_write();
         test_tail_boundaries();
         test_rollback();
+        test_exhaustion();
         // RUN_TESTS
     std::cout<<"Paged KV checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

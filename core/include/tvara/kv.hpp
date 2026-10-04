@@ -30,6 +30,7 @@ inline std::size_t kv_offset(const CacheGeometry& g,std::size_t layer,std::size_
     if(layer>=g.layers || kind>1 || slot>=g.tokens_per_block)throw std::invalid_argument("KV position outside block");
     return ((layer*2+kind)*g.tokens_per_block+slot)*g.kv_width();
 }
+class CacheExhausted:public std::runtime_error{public:CacheExhausted():std::runtime_error("KV cache exhausted"){} };
 struct BlockHandle {std::size_t id=0;std::uint64_t generation=0;};
 class BlockPool {
     struct Block {std::vector<float> values;std::size_t references=0;std::uint64_t generation=0;};
@@ -40,7 +41,7 @@ public:
         for(std::size_t i=geometry.max_blocks;i>0;--i)free_.push_back(i-1);
     }
     BlockHandle allocate(){
-        if(free_.empty())throw std::runtime_error("KV cache exhausted");
+        if(free_.empty())throw CacheExhausted();
         const auto id=free_.back();auto& block=blocks_[id];
         if(block.generation==std::numeric_limits<std::uint64_t>::max())throw std::runtime_error("KV generation exhausted");
         free_.pop_back();block.references=1;++block.generation;std::fill(block.values.begin(),block.values.end(),0);
