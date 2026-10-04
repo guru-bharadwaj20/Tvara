@@ -1,5 +1,7 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+import anyio
+
 import json
 from fastapi import Request
 from fastapi.responses import StreamingResponse
@@ -145,13 +147,21 @@ async def stream_events(backend, ids, options, metadata, chat=False, request=Non
                 "choices": [{"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}],
             }
         )
-    async for event in iterate_in_threadpool(backend.stream(ids, options)):
-        choice = {"index": 0, "finish_reason": event.finish_reason}
-        if chat:
-            choice["delta"] = {"content": event.text} if event.text else {}
-        else:
-            choice.update(text=event.text, logprobs=None)
-        yield sse({**metadata, "choices": [choice]})
+    iterator = backend.stream(ids, options)
+    try:
+        async for event in iterate_in_threadpool(iterator):
+            if request is not None and await request.is_disconnected():
+                return
+            choice = {"index": 0, "finish_reason": event.finish_reason}
+            if chat:
+                choice["delta"] = {"content": event.text} if event.text else {}
+            else:
+                choice.update(text=event.text, logprobs=None)
+            yield sse({**metadata, "choices": [choice]})
+    finally:
+        with anyio.CancelScope(shield=True):
+            if hasattr(iterator, "close"):
+                await run_in_threadpool(iterator.close)
     yield "data: [DONE]\n\n"
     # STREAM_DONE
 

@@ -130,3 +130,29 @@ def test_model_and_context_limits_reject_invalid_requests(client):
     assert client.post(
         "/v1/completions", json={"model": "fixture", "prompt": "x", "temperature": -1}
     ).status_code in (400, 422)
+
+
+def test_disconnection_closes_backend_iterator_before_more_decode():
+    import asyncio
+    from tvara.server import stream_events, response_metadata
+
+    class Disconnected:
+        async def is_disconnected(self):
+            return True
+
+    backend = FixtureBackend()
+
+    async def consume():
+        return [
+            chunk
+            async for chunk in stream_events(
+                backend,
+                [1],
+                {"max_new_tokens": 5},
+                response_metadata(ServerConfig()),
+                request=Disconnected(),
+            )
+        ]
+
+    assert asyncio.run(consume()) == []
+    assert backend.streams_closed == 1
