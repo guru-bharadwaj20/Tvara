@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 178 tasks are completed and 92 are not completed.
+Current status: 179 tasks are completed and 91 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -294,7 +294,7 @@ Target: Weeks 9-11.
 - ✅ T191 — Release KV references after eviction. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T192 — Coordinate eviction with copy-on-write. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T193 — Test repeated and divergent conversations. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
-- ❌ T194 — Measure hit rate and saved prefill tokens.
+- ✅ T194 — Measure hit rate and saved prefill tokens. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp), [bench/radix_prefix.cpp](bench/radix_prefix.cpp), [tools/run_radix_benchmark.py](tools/run_radix_benchmark.py).
 - ❌ T195 — Document prefix isolation and cache reset behavior.
 
 ### Phase 14: Continuous batching and load evaluation

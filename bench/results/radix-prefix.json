@@ -1,0 +1,12 @@
+{
+  "requests": 10000,
+  "hits": 7500,
+  "saved_prefill_tokens": 60000,
+  "requested_tokens": 80000,
+  "lookup_restore_ns_total": 9330800,
+  "hit_rate": 0.75,
+  "saved_token_fraction": 0.75,
+  "measured_at_utc": "2026-10-13T18:21:07.982568+00:00",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "workload": "synthetic KV, 75% exact repeats, 25% disjoint; measures lookup and reference restoration, not model prefill"
+}
