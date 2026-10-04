@@ -23,3 +23,21 @@ def test_native_model_loads_cpu_weights_and_closes_idempotently(native):
     native.close()
     with pytest.raises(RuntimeError):
         native._check_open()
+
+
+def test_metadata_and_explicit_tokenizer_attachment(native):
+    from tvara.tokenizer import Tokenizer
+
+    metadata = native.metadata
+    assert metadata["general.architecture"] == "llama"
+
+    class Catalog(Tokenizer):
+        def encode(self, text, allow_special=False):
+            return [self.ids[t] for t in text.split()]
+
+        def token_bytes(self, token):
+            return self.vocabulary[token].encode()
+
+    native.attach_tokenizer(Catalog(metadata["tokenizer.ggml.tokens"]))
+    assert native.encode("fixture-2 fixture-7") == [2, 7]
+    assert native.decode_text([2]) == "fixture-2"

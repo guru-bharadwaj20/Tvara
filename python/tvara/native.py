@@ -1,6 +1,7 @@
 """Owned ctypes handles for Tvara's CPU-only native model library."""
 
 import ctypes
+import json
 import os
 from pathlib import Path
 import threading
@@ -55,6 +56,9 @@ class NativeModel:
         self._configure()
 
     def _configure(self):
+        self._library.tvara_model_metadata.argtypes = [ctypes.c_void_p]
+        self._library.tvara_model_metadata.restype = ctypes.c_char_p
+        self._tokenizer = None
         # CONFIGURE_BINDINGS
         pass
 
@@ -80,5 +84,29 @@ class NativeModel:
 
     def __exit__(self, *args):
         self.close()
+
+    @property
+    def metadata(self):
+        with self._lock:
+            self._check_open()
+            raw = self._library.tvara_model_metadata(self._handle)
+            if not raw:
+                self._raise_error()
+            return json.loads(raw.decode("utf-8"))
+
+    def attach_tokenizer(self, tokenizer):
+        if len(tokenizer.vocabulary) != self.vocab_size:
+            raise ValueError("Tokenizer vocabulary does not match model")
+        self._tokenizer = tokenizer
+
+    def encode(self, text, allow_special=False):
+        if self._tokenizer is None:
+            raise ValueError("Attach a validated tokenizer before text encoding")
+        return self._tokenizer.encode(text, allow_special=allow_special)
+
+    def decode_text(self, tokens, skip_special=True):
+        if self._tokenizer is None:
+            raise ValueError("Attach a validated tokenizer before text decoding")
+        return self._tokenizer.decode(tokens, skip_special=skip_special)
 
     # MODEL_METHODS

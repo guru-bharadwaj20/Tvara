@@ -15,6 +15,7 @@ TVARA_API void tvara_model_close(tvara_model* model);
 TVARA_API size_t tvara_model_vocab_size(tvara_model* model);
 TVARA_API size_t tvara_model_context_size(tvara_model* model);
 TVARA_API const char* tvara_last_error(void);
+TVARA_API const char* tvara_model_metadata(tvara_model* model);
 // ABI_FUNCTIONS
 #ifdef __cplusplus
 }
