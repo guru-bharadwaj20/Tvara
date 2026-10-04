@@ -91,6 +91,17 @@ public:
         ++table.length;
     }
 
+std::vector<float> read(std::uint64_t id,std::size_t layer,std::size_t position,bool value=false)const{
+        const auto handle=physical_block(id,position);const auto offset=kv_offset(geometry(),layer,value?1:0,position%geometry().tokens_per_block);
+        auto bytes=pool_.data(handle).subspan(offset,geometry().kv_width());return {bytes.begin(),bytes.end()};
+    }
+    std::vector<float> read_all(std::uint64_t id,std::size_t layer,bool value=false)const{
+        const auto length=sequence(id).length;if(layer>=geometry().layers)throw std::invalid_argument("invalid KV layer");
+        std::vector<float> output;output.reserve(length*geometry().kv_width());
+        for(std::size_t position=0;position<length;++position){auto values=read(id,layer,position,value);output.insert(output.end(),values.begin(),values.end());}
+        return output;
+    }
+
 // CACHE_CODE
 private:
     BlockTable& mutable_sequence(std::uint64_t id){return const_cast<BlockTable&>(std::as_const(*this).sequence(id));}
