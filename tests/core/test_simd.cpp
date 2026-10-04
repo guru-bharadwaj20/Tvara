@@ -50,6 +50,16 @@ void test_vector_rope(){
 #endif
 }
 
+void test_random_simd(){
+    KernelDispatch fast,scalar(true);std::mt19937 rng(2026);std::uniform_int_distribution<unsigned> byte(0,255);
+    for(int trial=0;trial<100;++trial){std::vector<float> x(256);for(auto& v:x)v=static_cast<float>(static_cast<int>(byte(rng))-128)/32;
+        auto a=quant::quantize_activations(x);std::vector<std::byte> q8(34*8),q4(18*8),q4k(144);
+        for(auto& b:q8)b=std::byte(byte(rng));for(auto& b:q4)b=std::byte(byte(rng));for(auto& b:q4k)b=std::byte(byte(rng));
+        for(std::size_t i=0;i<8;++i){q8[i*34]=std::byte(0);q8[i*34+1]=std::byte(0x38);q4[i*18]=std::byte(0);q4[i*18+1]=std::byte(0xb8);}
+        q4k[0]=std::byte(0);q4k[1]=std::byte(0x34);q4k[2]=std::byte(0);q4k[3]=std::byte(0x30);
+        close(fast.q8(q8,a),scalar.q8(q8,a));close(fast.q4(q4,a),scalar.q4(q4,a));close(fast.q4k(q4k,a),scalar.q4k(q4k,a));}
+}
+
 // EXTRA_TESTS
 int main(){try{test_detection();
     test_scalar_dispatch();
@@ -58,5 +68,6 @@ int main(){try{test_detection();
         test_q4k_simd();
         test_vector_norm_activation();
         test_vector_rope();
+        test_random_simd();
         // RUN_TESTS
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
