@@ -18,12 +18,15 @@ void test_append(){PagedCache cache({2,1,4,2,4});auto id=cache.create_sequence()
 void test_reads(){PagedCache cache({1,1,2,2,4});auto id=cache.create_sequence();std::vector<float> keys{1,2},values{3,4};
     for(int i=0;i<3;++i){keys[0]=static_cast<float>(i);cache.append(id,keys,values);}check(cache.read(id,0,2)[0]==2 && cache.read_all(id,0,true)==std::vector<float>({3,4,3,4,3,4}));rejects([&]{cache.read(id,0,3);});}
 
+void test_refs(){BlockPool pool({1,1,2,2,2});auto block=pool.allocate();pool.retain(block);check(pool.references(block)==2);pool.release(block);check(pool.available()==1);pool.release(block);check(pool.available()==2);rejects([&]{pool.release(block);});}
+
 // EXTRA_TESTS
 int main(){try{test_geometry();
     test_allocator();
         test_tables();
         test_append();
         test_reads();
+        test_refs();
         // RUN_TESTS
     std::cout<<"Paged KV checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

@@ -32,7 +32,7 @@ inline std::size_t kv_offset(const CacheGeometry& g,std::size_t layer,std::size_
 }
 struct BlockHandle {std::size_t id=0;std::uint64_t generation=0;};
 class BlockPool {
-    struct Block {std::vector<float> values;bool in_use=false;std::uint64_t generation=0;};
+    struct Block {std::vector<float> values;std::size_t references=0;std::uint64_t generation=0;};
 public:
     explicit BlockPool(CacheGeometry geometry):geometry_(geometry){
         geometry.validate();blocks_.resize(geometry.max_blocks);free_.reserve(geometry.max_blocks);
@@ -43,18 +43,23 @@ public:
         if(free_.empty())throw std::runtime_error("KV cache exhausted");
         const auto id=free_.back();auto& block=blocks_[id];
         if(block.generation==std::numeric_limits<std::uint64_t>::max())throw std::runtime_error("KV generation exhausted");
-        free_.pop_back();block.in_use=true;++block.generation;std::fill(block.values.begin(),block.values.end(),0);
+        free_.pop_back();block.references=1;++block.generation;std::fill(block.values.begin(),block.values.end(),0);
         return {id,block.generation};
     }
-    void free(BlockHandle handle){auto& block=validated(handle);block.in_use=false;free_.push_back(handle.id);}
+    void free(BlockHandle handle){release(handle);}
     std::span<float> data(BlockHandle handle){return validated(handle).values;}
     std::span<const float> data(BlockHandle handle)const{return validated(handle).values;}
     const CacheGeometry& geometry()const{return geometry_;}
     std::size_t available()const{return free_.size();}
-    // POOL_CODE
+    void retain(BlockHandle handle){auto& block=validated(handle);if(block.references==std::numeric_limits<std::size_t>::max())throw std::runtime_error("KV reference overflow");++block.references;}
+    void release(BlockHandle handle){auto& block=validated(handle);if(--block.references==0)free_.push_back(handle.id);}
+    std::size_t references(BlockHandle handle)const{return validated(handle).references;}
+    std::size_t references_by_id(std::size_t id)const{return blocks_.at(id).references;}
+
+// POOL_CODE
 private:
     const Block& validated(BlockHandle handle)const{
-        if(handle.id>=blocks_.size() || !blocks_[handle.id].in_use || blocks_[handle.id].generation!=handle.generation)
+        if(handle.id>=blocks_.size() || !blocks_[handle.id].references || blocks_[handle.id].generation!=handle.generation)
             throw std::invalid_argument("stale or invalid KV handle");
         return blocks_[handle.id];
     }
