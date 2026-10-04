@@ -1,0 +1,10 @@
+{
+  "weight_plain_us": 1980.1,
+  "weight_prefetch_us": 1874.8,
+  "cache_plain_us": 523.7,
+  "cache_prefetch_us": 538.8,
+  "default_prefetch": false,
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
