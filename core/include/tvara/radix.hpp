@@ -96,6 +96,9 @@ public:
     void pin(std::uint64_t id){for(auto cursor=id;cursor;cursor=nodes_.at(cursor).parent){if(nodes_.at(cursor).pins==std::numeric_limits<std::size_t>::max())throw std::overflow_error("prefix pin overflow");}for(auto cursor=id;cursor;cursor=nodes_.at(cursor).parent)++nodes_.at(cursor).pins;}
     void unpin(std::uint64_t id){for(auto cursor=id;cursor;cursor=nodes_.at(cursor).parent)if(!nodes_.at(cursor).pins)throw std::invalid_argument("prefix pin underflow");for(auto cursor=id;cursor;cursor=nodes_.at(cursor).parent)--nodes_.at(cursor).pins;}
 
+
+    void touch(std::uint64_t id){auto& entry=nodes_.at(id);if(clock_==std::numeric_limits<std::uint64_t>::max())throw std::overflow_error("prefix access clock exhausted");entry.accessed=++clock_;}
+
 // METHODS
 private:
     PagedCache& cache_;
