@@ -43,11 +43,14 @@ class Request:
 
 
 class Scheduler:
-    def __init__(self, backend, max_active=8, prefill_chunk=64):
+    def __init__(self, backend, max_active=8, prefill_chunk=64, kv_tokens=4096):
         if type(max_active) is not int or max_active < 1:
             raise ValueError("Invalid active limit")
         if type(prefill_chunk) is not int or prefill_chunk < 1:
             raise ValueError("Invalid prefill chunk")
+        if type(kv_tokens) is not int or kv_tokens < 1:
+            raise ValueError("Invalid KV token budget")
+        self.kv_tokens = kv_tokens
         self.prefill_chunk = prefill_chunk
         self.backend = backend
         self.max_active = max_active
@@ -60,12 +63,18 @@ class Scheduler:
             raise ValueError("Duplicate request ID")
         if request.state is not State.QUEUED:
             raise ValueError("Request already started")
+        if len(request.prompt) + request.max_tokens > self.kv_tokens:
+            raise ValueError("Request exceeds KV reservation")
         self.requests[request.identifier] = request
         self.queue.append(request)
 
     def admit(self):
         while self.queue and len(self.active) < self.max_active:
-            request = self.queue.pop(0)
+            request = self.queue[0]
+            reserved = sum(len(r.prompt) + r.max_tokens for r in self.active)
+            if reserved + len(request.prompt) + request.max_tokens > self.kv_tokens:
+                break
+            self.queue.pop(0)
             if request.state is State.CANCELLED:
                 continue
             try:
