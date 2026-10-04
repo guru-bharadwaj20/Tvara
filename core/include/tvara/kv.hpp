@@ -121,6 +121,13 @@ std::uint64_t fork(std::uint64_t id){
         }catch(...){for(std::size_t i=0;i<retained;++i)pool_.release(copy.blocks[i]);throw;}
     }
 
+void truncate(std::uint64_t id,std::size_t length){
+        auto& table=mutable_sequence(id);if(length>table.length)throw std::invalid_argument("cannot extend KV by truncating");
+        const auto keep=length/geometry().tokens_per_block+(length%geometry().tokens_per_block?1:0);
+        for(std::size_t i=keep;i<table.blocks.size();++i)pool_.release(table.blocks[i]);
+        table.blocks.resize(keep);table.length=length;
+    }
+
 // CACHE_CODE
 private:
     BlockTable& mutable_sequence(std::uint64_t id){return const_cast<BlockTable&>(std::as_const(*this).sequence(id));}
