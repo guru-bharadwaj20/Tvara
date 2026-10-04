@@ -111,3 +111,10 @@ def test_sse_completion_and_chat_chunks(client):
             assert "".join(d["choices"][0]["text"] for d in data) == "hello"
         else:
             assert "".join(d["choices"][0]["delta"].get("content", "") for d in data) == "hello"
+
+
+def test_stream_has_exactly_one_done_marker(client):
+    response = client.post(
+        "/v1/completions", json={"model": "fixture", "prompt": "abc", "stream": True}
+    )
+    assert response.text.endswith("data: [DONE]\n\n") and response.text.count("data: [DONE]") == 1
