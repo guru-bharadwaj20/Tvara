@@ -53,8 +53,12 @@ public:
             auto& child=nodes_.at(found->second);std::size_t common=0;
             while(common<child.edge.size() && offset+common<tokens.size() && child.edge[common]==tokens[offset+common])++common;
             if(common!=child.edge.size()){
-                // SPLIT
-                throw std::invalid_argument("divergent edge requires split support");
+                if(next_==std::numeric_limits<std::uint64_t>::max())throw std::overflow_error("radix ID exhausted");const auto split=++next_;RadixNode middle;middle.id=split;middle.parent=current;
+                middle.pins=child.pins;middle.edge.assign(child.edge.begin(),child.edge.begin()+static_cast<std::ptrdiff_t>(common));
+                child.edge.erase(child.edge.begin(),child.edge.begin()+static_cast<std::ptrdiff_t>(common));
+                middle.children.emplace(child.edge.front(),child.id);child.parent=split;
+                parent.children[tokens[offset]]=split;nodes_.emplace(split,std::move(middle));
+                current=split;offset+=common;continue;
             }
             current=child.id;offset+=common;
         }
