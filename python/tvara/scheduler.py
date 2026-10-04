@@ -102,10 +102,11 @@ class Scheduler:
         # Decode-ready requests advance while other requests prefill one chunk.
         for r in self.active:
             if r.state is State.PREFILL:
-                end = min(len(r.prompt), r.position + self.prefill_chunk)
-                self.backend.prefill(r.identifier, r.prompt[r.position : end])
+                replay = r.prompt + tuple(r.output)
+                end = min(len(replay), r.position + self.prefill_chunk)
+                self.backend.prefill(r.identifier, replay[r.position : end])
                 r.position = end
-                if end == len(r.prompt):
+                if end == len(replay):
                     r.state = State.DECODE
         batch = [r for r in self.active if r.state is State.DECODE and len(r.output) < r.max_tokens]
         if batch:
@@ -150,3 +151,23 @@ class Scheduler:
             victim = min(self.active, key=lambda r: (r.priority, -self.enqueued[r.identifier]))
             self.preempt(victim.identifier)
         self.kv_tokens = new_budget
+
+    def resume(self, identifier):
+        r = self.requests[identifier]
+        if r.state is not State.PREEMPTED:
+            raise ValueError("Request is not preempted")
+        if len(r.prompt) + r.max_tokens > self.kv_tokens:
+            raise ValueError("Insufficient KV reservation")
+        # Replay only tokens already emitted; never sample a second copy.
+        r.state = State.QUEUED
+        self.queue.append(r)
+        self.enqueued[identifier] = self.iteration
+
+    def cancel(self, identifier):
+        r = self.requests[identifier]
+        if r.state in {State.FINISHED, State.CANCELLED, State.FAILED}:
+            return
+        r.state = State.CANCELLED
+        if r in self.queue:
+            self.queue.remove(r)
+        self.reap()

@@ -117,3 +117,18 @@ def test_memory_pressure_preempts_and_releases():
     s.step()
     s.pressure(4)
     assert s.requests["a"].state is State.PREEMPTED and "a" not in b.live
+
+
+def test_resume_and_cancel():
+    b = Backend()
+    s = Scheduler(b)
+    r = Request("a", (1, 2), 3)
+    s.submit(r)
+    s.step()
+    first = list(r.output)
+    s.preempt("a")
+    s.resume("a")
+    s.step()
+    assert r.output[:1] == first and len(r.output) == 2
+    s.cancel("a")
+    assert not b.live and r.state is State.CANCELLED
