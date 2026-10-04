@@ -16,10 +16,13 @@ void test_barrier(){
     check(count.load()==400);
 }
 
+void test_worker_config(){check(parse_thread_count("3")==3);check(parse_thread_count("",0)==1);bool bad=false;try{parse_thread_count("-2");}catch(const std::invalid_argument&){bad=true;}check(bad);}
+
 // EXTRA_TESTS
 int main(){try{test_pool();
     test_partitions();
         test_barrier();
+        test_worker_config();
         // RUN_TESTS
     std::cout<<"Thread checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
