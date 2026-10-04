@@ -65,6 +65,24 @@ public:
         return current;
     }
 
+
+    void attach(std::uint64_t id,std::uint64_t sequence){
+        auto& entry=nodes_.at(id);const auto source=cache_.sequence(sequence);
+        std::size_t depth=0;for(auto cursor=id;cursor;cursor=nodes_.at(cursor).parent)depth+=nodes_.at(cursor).edge.size();
+        if(source.length!=depth)throw std::invalid_argument("token and KV prefix lengths differ");
+        std::size_t retained=0;
+        try{for(auto block:source.blocks){cache_.pool().retain(block);++retained;}}
+        catch(...){for(std::size_t i=0;i<retained;++i)cache_.pool().release(source.blocks[i]);throw;}
+        if(entry.kv)for(auto block:entry.kv->blocks)cache_.pool().release(block);
+        entry.kv=source;
+    }
+    ~RadixCache(){for(auto& [id,entry]:nodes_){(void)id;if(entry.kv)for(auto block:entry.kv->blocks)cache_.pool().release(block);}}
+    std::vector<std::size_t> external_references()const{
+        std::vector<std::size_t> counts(cache_.geometry().max_blocks);
+        for(const auto& [id,entry]:nodes_){(void)id;if(entry.kv)for(auto block:entry.kv->blocks)++counts.at(block.id);}
+        return counts;
+    }
+
 // METHODS
 private:
     PagedCache& cache_;
