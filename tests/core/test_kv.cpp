@@ -11,10 +11,15 @@ void test_allocator(){BlockPool pool({1,1,4,4,2});auto first=pool.allocate();poo
 
 void test_tables(){PagedCache cache({1,1,4,4,4});auto a=cache.create_sequence(),b=cache.create_sequence();check(a!=b && cache.sequence(a).length==0);rejects([&]{cache.physical_block(a,0);});}
 
+void test_append(){PagedCache cache({2,1,4,2,4});auto id=cache.create_sequence();std::vector<float> keys(8,2),values(8,3);for(int i=0;i<3;++i)cache.append(id,keys,values);
+    check(cache.sequence(id).length==3 && cache.sequence(id).blocks.size()==2 && cache.pool().available()==2);
+    auto block=cache.pool().data(cache.physical_block(id,2));check(block[kv_offset(cache.geometry(),1,1,0)]==3);}
+
 // EXTRA_TESTS
 int main(){try{test_geometry();
     test_allocator();
         test_tables();
+        test_append();
         // RUN_TESTS
     std::cout<<"Paged KV checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

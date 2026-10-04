@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 123 tasks are completed and 147 are not completed.
+Current status: 124 tasks are completed and 146 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -204,7 +204,7 @@ Target: Weeks 6-8.
 - ✅ T121 — Define KV block geometry and storage layout. Evidence: [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp), [tests/core/test_kv.cpp](tests/core/test_kv.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ✅ T122 — Implement a physical block allocator. Evidence: [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp), [tests/core/test_kv.cpp](tests/core/test_kv.cpp).
 - ✅ T123 — Implement per-sequence logical block tables. Evidence: [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp), [tests/core/test_kv.cpp](tests/core/test_kv.cpp).
-- ❌ T124 — Append keys and values to allocated blocks.
+- ✅ T124 — Append keys and values to allocated blocks. Evidence: [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp), [tests/core/test_kv.cpp](tests/core/test_kv.cpp).
 - ❌ T125 — Read cached values through block tables.
 - ❌ T126 — Track block reference counts.
 - ❌ T127 — Release blocks at sequence completion.
