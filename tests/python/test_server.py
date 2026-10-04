@@ -118,3 +118,15 @@ def test_stream_has_exactly_one_done_marker(client):
         "/v1/completions", json={"model": "fixture", "prompt": "abc", "stream": True}
     )
     assert response.text.endswith("data: [DONE]\n\n") and response.text.count("data: [DONE]") == 1
+
+
+def test_model_and_context_limits_reject_invalid_requests(client):
+    for body in [
+        {"model": "missing", "prompt": "x"},
+        {"model": "fixture", "prompt": "x" * 128, "max_tokens": 2},
+        {"model": "fixture", "prompt": [256]},
+    ]:
+        assert client.post("/v1/completions", json=body).status_code == 400
+    assert client.post(
+        "/v1/completions", json={"model": "fixture", "prompt": "x", "temperature": -1}
+    ).status_code in (400, 422)

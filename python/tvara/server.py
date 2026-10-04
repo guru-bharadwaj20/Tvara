@@ -159,6 +159,7 @@ async def stream_events(backend, ids, options, metadata, chat=False, request=Non
 # RESPONSE_HELPERS
 def create_app(backend, config=None):
     from fastapi import FastAPI
+    from fastapi.responses import JSONResponse
 
     config = config or ServerConfig()
 
@@ -197,10 +198,22 @@ def create_app(backend, config=None):
         }
 
     async def complete(body, chat=False, request=None):
+        if body.model != config.served_name:
+            raise ValueError("Unknown model")
+        if body.max_tokens > config.max_new_tokens:
+            raise ValueError("Generation limit exceeds server configuration")
         prompt = (
             backend.render_chat([m.model_dump() for m in body.messages]) if chat else body.prompt
         )
+        if isinstance(prompt, str) and len(prompt) > config.max_prompt_chars:
+            raise ValueError("Prompt exceeds configured character limit")
         ids = list(prompt) if isinstance(prompt, list) else backend.encode(prompt)
+        if not ids or any(
+            not isinstance(token, int) or not 0 <= token < backend.vocab_size for token in ids
+        ):
+            raise ValueError("Invalid prompt token IDs")
+        if len(ids) + body.max_tokens > backend.context_size:
+            raise ValueError("Request exceeds model context")
         options = {
             "max_new_tokens": body.max_tokens,
             "temperature": body.temperature,
@@ -245,6 +258,19 @@ def create_app(backend, config=None):
         choice = result["choices"][0]
         choice["message"] = {"role": "assistant", "content": choice.pop("text")}
         return result
+
+    @app.exception_handler(ValueError)
+    async def invalid_request(request, error):
+        return JSONResponse(
+            {
+                "error": {
+                    "message": str(error),
+                    "type": "invalid_request_error",
+                    "code": "invalid_request",
+                }
+            },
+            status_code=400,
+        )
 
     # ROUTES
     return app
