@@ -56,3 +56,16 @@ def test_completion_releases_resources():
         s.submit(Request(str(i), (1,), i))
     s.run()
     assert not b.live and all(r.state is State.FINISHED for r in s.requests.values())
+
+
+def test_prefill_chunk_bounds():
+    b = Backend()
+    s = Scheduler(b, prefill_chunk=2)
+    r = Request("a", (1, 2, 3, 4, 5), 1)
+    s.submit(r)
+    s.step()
+    assert r.position == 2 and not r.output
+    s.step()
+    assert r.position == 4
+    s.step()
+    assert r.state is State.FINISHED

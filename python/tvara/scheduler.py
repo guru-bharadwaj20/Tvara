@@ -43,9 +43,12 @@ class Request:
 
 
 class Scheduler:
-    def __init__(self, backend, max_active=8):
+    def __init__(self, backend, max_active=8, prefill_chunk=64):
         if type(max_active) is not int or max_active < 1:
             raise ValueError("Invalid active limit")
+        if type(prefill_chunk) is not int or prefill_chunk < 1:
+            raise ValueError("Invalid prefill chunk")
+        self.prefill_chunk = prefill_chunk
         self.backend = backend
         self.max_active = max_active
         self.requests = {}
@@ -78,9 +81,11 @@ class Scheduler:
         self.admit()
         for r in self.active:
             if r.state is State.PREFILL:
-                self.backend.prefill(r.identifier, r.prompt)
-                r.position = len(r.prompt)
-                r.state = State.DECODE
+                end = min(len(r.prompt), r.position + self.prefill_chunk)
+                self.backend.prefill(r.identifier, r.prompt[r.position : end])
+                r.position = end
+                if end == len(r.prompt):
+                    r.state = State.DECODE
         batch = [r for r in self.active if r.state is State.DECODE and len(r.output) < r.max_tokens]
         if batch:
             tokens = list(self.backend.decode_batch([r.identifier for r in batch]))
