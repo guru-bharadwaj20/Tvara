@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 148 tasks are completed and 122 are not completed.
+Current status: 149 tasks are completed and 121 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -234,7 +234,7 @@ Target: Weeks 6-9.
 - ✅ T146 — Resolve local schema references. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T147 — Define string-format support and unsupported cases. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T148 — Implement accepting-state and end-token checks. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
-- ❌ T149 — Test valid and invalid character sequences.
+- ✅ T149 — Test valid and invalid character sequences. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ❌ T150 — Document supported JSON Schema features.
 
 ### Phase 11: Streaming server and Python integration
