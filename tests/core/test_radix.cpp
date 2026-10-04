@@ -5,6 +5,7 @@ using namespace tvara;
 int main(){
  CacheGeometry g{1,1,1,4,64};PagedCache cache(g);RadixCache tree(cache,"fixture-model/tokenizer/tenant-a");
  assert(tree.size()==0);assert(tree.node(0).edge.empty());
+assert(tree.lookup(std::vector<std::int32_t>{1,2}).tokens==0);
 // TESTS
  std::cout<<"radix OK\n";
 }
