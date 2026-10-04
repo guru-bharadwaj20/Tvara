@@ -1,0 +1,10 @@
+{
+  "quantized_blocks_once": 22,
+  "max_error": 1.52588e-05,
+  "reused_us": 17.5,
+  "quantization_us": 22.9,
+  "scope": "Q8 kernel API; model loader remains F32",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}

@@ -31,5 +31,22 @@ inline std::vector<float> prefill_blocked(const Matrix& weights,std::span<const 
     return output;
 }
 
+struct ActivationTiles {std::size_t tokens=0,cols=0;std::vector<quant::Q8Activation> blocks;};
+inline ActivationTiles quantize_prefill(std::span<const float> x,std::size_t tokens,std::size_t cols) {
+    if(!tokens || !cols || cols%32 || tokens>std::numeric_limits<std::size_t>::max()/cols || x.size()!=tokens*cols)throw std::invalid_argument("invalid quantized activation shape");
+    ActivationTiles tile{tokens,cols,{}};tile.blocks.reserve(x.size()/32);
+    for(std::size_t t=0;t<tokens;++t){auto row=quant::quantize_activations(x.subspan(t*cols,cols));tile.blocks.insert(tile.blocks.end(),row.begin(),row.end());}
+    return tile;
+}
+inline std::vector<float> prefill_q8(std::span<const std::byte> weights,std::size_t rows,const ActivationTiles& tile,bool scalar=false) {
+    if(!rows || !tile.tokens || !tile.cols || tile.cols%32 || rows>std::numeric_limits<std::size_t>::max()/(tile.cols/32)/34 ||
+       weights.size()!=rows*(tile.cols/32)*34 || tile.tokens>std::numeric_limits<std::size_t>::max()/(tile.cols/32) ||
+       tile.blocks.size()!=tile.tokens*(tile.cols/32) || rows>std::numeric_limits<std::size_t>::max()/tile.tokens)throw std::invalid_argument("invalid Q8 prefill shape");
+    const auto blocks=tile.cols/32,bytes=blocks*34;KernelDispatch dispatch(scalar);std::vector<float> output(tile.tokens*rows);
+    for(std::size_t t=0;t<tile.tokens;++t){auto activation=std::span<const quant::Q8Activation>(tile.blocks).subspan(t*blocks,blocks);
+        for(std::size_t r=0;r<rows;++r)output[t*rows+r]=dispatch.q8(weights.subspan(r*bytes,bytes),activation);}
+    return output;
+}
+
 // PREFILL_CODE
 }
