@@ -25,6 +25,10 @@ void test_completion(){PagedCache cache({1,1,2,2,3});auto id=cache.create_sequen
 void test_sharing(){PagedCache cache({1,1,2,2,3});auto id=cache.create_sequence();std::vector<float>x(2,1);cache.append(id,x,x);auto branch=cache.fork(id);
     check(cache.pool().references(cache.physical_block(id,0))==2 && cache.read(branch,0,0)==x);cache.drop(id);check(cache.read(branch,0,0)==x);cache.drop(branch);check(cache.pool().available()==3);}
 
+void test_copy_on_write(){PagedCache cache({1,1,2,4,4});auto source=cache.create_sequence();std::vector<float>x(2,1);cache.append(source,x,x);auto branch=cache.fork(source);
+    x[0]=9;cache.append(branch,x,x);x[0]=5;cache.append(source,x,x);check(cache.read(branch,0,1)[0]==9 && cache.read(source,0,1)[0]==5);
+    check(cache.physical_block(source,0).id!=cache.physical_block(branch,0).id);cache.drop(source);cache.drop(branch);check(cache.pool().available()==4);}
+
 // EXTRA_TESTS
 int main(){try{test_geometry();
     test_allocator();
@@ -34,6 +38,7 @@ int main(){try{test_geometry();
         test_refs();
         test_completion();
         test_sharing();
+        test_copy_on_write();
         // RUN_TESTS
     std::cout<<"Paged KV checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
