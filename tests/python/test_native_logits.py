@@ -7,7 +7,8 @@ from tvara.reference.metrics import compare_logits
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_native_executor_matches_full_oracle_logits(tmp_path):
+@pytest.mark.parametrize("paged", [False, True])
+def test_native_executor_matches_full_oracle_logits(tmp_path, paged):
     binary = ROOT / "build/debug/tvara_model_check.exe"
     if not binary.exists():
         binary = ROOT / "build/debug/tvara_model_check"
@@ -22,6 +23,7 @@ def test_native_executor_matches_full_oracle_logits(tmp_path):
                     str(binary),
                     str(model),
                     str(output),
+                    *(["--paged"] if paged else []),
                     *(str(int(t)) for t in fixture[f"tokens_{i}"]),
                 ],
                 check=True,
