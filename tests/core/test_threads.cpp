@@ -18,11 +18,20 @@ void test_barrier(){
 
 void test_worker_config(){check(parse_thread_count("3")==3);check(parse_thread_count("",0)==1);bool bad=false;try{parse_thread_count("-2");}catch(const std::invalid_argument&){bad=true;}check(bad);}
 
+void test_worker_lifecycle(){
+    for(int iteration=0;iteration<20;++iteration){ThreadPool pool(3);bool failed=false;
+        try{pool.execute([](std::size_t i){if(i==1)throw std::runtime_error("expected worker exception");});}catch(const std::runtime_error&){failed=true;}check(failed);
+        std::atomic<int> count{0};pool.execute([&](std::size_t){count.fetch_add(1);});check(count.load()==3);
+        failed=false;try{pool.execute([&](std::size_t i){if(i==0)pool.execute([](std::size_t){});});}catch(const std::logic_error&){failed=true;}check(failed);
+    }
+}
+
 // EXTRA_TESTS
 int main(){try{test_pool();
     test_partitions();
         test_barrier();
         test_worker_config();
+        test_worker_lifecycle();
         // RUN_TESTS
     std::cout<<"Thread checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
