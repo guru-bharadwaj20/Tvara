@@ -1,4 +1,4 @@
-from tvara.scheduler import Request, State
+from tvara.scheduler import Request, State, Scheduler
 import pytest
 
 
@@ -7,3 +7,33 @@ def test_lifecycle_contract():
     for args in [("", (1,), 2), ("a", (), 2), ("a", (-1,), 2), ("a", (1,), -1)]:
         with pytest.raises(ValueError):
             Request(*args)
+
+
+class Backend:
+    def __init__(self):
+        self.live = {}
+        self.batches = []
+
+    def create(self, key):
+        self.live[key] = []
+
+    def prefill(self, key, tokens):
+        self.live[key].extend(tokens)
+
+    def decode_batch(self, keys):
+        self.batches.append(tuple(keys))
+        return [len(self.live[k]) % 7 for k in keys]
+
+    def drop(self, key):
+        del self.live[key]
+
+
+def test_admission_limits_and_duplicates():
+    s = Scheduler(Backend(), 1)
+    a = Request("a", (1,), 2)
+    s.submit(a)
+    s.submit(Request("b", (2,), 1))
+    s.admit()
+    assert s.active == [a] and len(s.queue) == 1
+    with pytest.raises(ValueError):
+        s.submit(Request("a", (3,), 1))

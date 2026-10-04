@@ -40,3 +40,36 @@ class Request:
             or self.max_tokens < 0
         ):
             raise ValueError("Invalid scheduler request")
+
+
+class Scheduler:
+    def __init__(self, backend, max_active=8):
+        if type(max_active) is not int or max_active < 1:
+            raise ValueError("Invalid active limit")
+        self.backend = backend
+        self.max_active = max_active
+        self.requests = {}
+        self.active = []
+        self.queue = []
+
+    def submit(self, request):
+        if request.identifier in self.requests:
+            raise ValueError("Duplicate request ID")
+        if request.state is not State.QUEUED:
+            raise ValueError("Request already started")
+        self.requests[request.identifier] = request
+        self.queue.append(request)
+
+    def admit(self):
+        while self.queue and len(self.active) < self.max_active:
+            request = self.queue.pop(0)
+            if request.state is State.CANCELLED:
+                continue
+            try:
+                self.backend.create(request.identifier)
+            except Exception:
+                request.state = State.FAILED
+                request.error = "Backend admission failed"
+                raise
+            request.state = State.PREFILL
+            self.active.append(request)
