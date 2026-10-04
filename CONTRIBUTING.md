@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 197 tasks are completed and 73 are not completed.
+Current status: 198 tasks are completed and 72 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -303,7 +303,7 @@ Target: Weeks 10-14.
 
 - ✅ T196 — Define request lifecycle states. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ✅ T197 — Implement queued request admission. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
-- ❌ T198 — Build iteration-level decode batches.
+- ✅ T198 — Build iteration-level decode batches. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ❌ T199 — Remove completed sequences between iterations.
 - ❌ T200 — Implement configurable prefill chunks.
 - ❌ T201 — Interleave prefill chunks with decode.

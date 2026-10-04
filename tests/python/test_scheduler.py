@@ -37,3 +37,13 @@ def test_admission_limits_and_duplicates():
     assert s.active == [a] and len(s.queue) == 1
     with pytest.raises(ValueError):
         s.submit(Request("a", (3,), 1))
+
+
+def test_iteration_batch():
+    b = Backend()
+    s = Scheduler(b)
+    for k in ["a", "b"]:
+        s.submit(Request(k, (1, 2), 2))
+    s.step()
+    assert b.batches == [("a", "b")]
+    assert all(len(r.output) == 1 for r in s.active)

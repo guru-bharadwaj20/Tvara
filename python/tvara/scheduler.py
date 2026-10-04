@@ -73,3 +73,23 @@ class Scheduler:
                 raise
             request.state = State.PREFILL
             self.active.append(request)
+
+    def step(self):
+        self.admit()
+        for r in self.active:
+            if r.state is State.PREFILL:
+                self.backend.prefill(r.identifier, r.prompt)
+                r.position = len(r.prompt)
+                r.state = State.DECODE
+        batch = [r for r in self.active if r.state is State.DECODE and len(r.output) < r.max_tokens]
+        if batch:
+            tokens = list(self.backend.decode_batch([r.identifier for r in batch]))
+            if len(tokens) != len(batch) or any(type(t) is not int or t < 0 for t in tokens):
+                raise ValueError("Invalid backend batch")
+            for r, token in zip(batch, tokens):
+                r.output.append(token)
+                r.token_times.append(time.perf_counter())
+        for r in self.active:
+            if len(r.output) >= r.max_tokens:
+                r.state = State.FINISHED
+        return bool(self.active or self.queue)
