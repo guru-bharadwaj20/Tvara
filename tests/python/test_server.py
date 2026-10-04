@@ -156,3 +156,11 @@ def test_disconnection_closes_backend_iterator_before_more_decode():
 
     assert asyncio.run(consume()) == []
     assert backend.streams_closed == 1
+
+
+def test_validation_errors_follow_the_error_object_contract(client):
+    response = client.post(
+        "/v1/completions", json={"model": "fixture", "prompt": "x", "unexpected": True}
+    )
+    assert response.status_code == 400 and response.json()["error"]["code"] == "validation_error"
+    assert response.json()["error"]["type"] == "invalid_request_error"
