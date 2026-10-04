@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 165 tasks are completed and 105 are not completed.
+Current status: 166 tasks are completed and 104 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -281,7 +281,7 @@ Target: Weeks 9-11.
 
 Target: Weeks 9-11.
 
-- ❌ T181 — Define radix node and edge structures.
+- ✅ T181 — Define radix node and edge structures. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ❌ T182 — Implement longest-prefix token lookup.
 - ❌ T183 — Implement insertion of token sequences.
 - ❌ T184 — Implement edge splitting at divergence.
