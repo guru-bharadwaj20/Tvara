@@ -39,6 +39,28 @@ public:
         return result;
     }
 
+
+    std::uint64_t insert(std::span<const std::int32_t> tokens){
+        if(tokens.empty())throw std::invalid_argument("cannot cache empty prefix");
+        std::uint64_t current=0;std::size_t offset=0;
+        while(offset<tokens.size()){
+            auto& parent=nodes_.at(current);auto found=parent.children.find(tokens[offset]);
+            if(found==parent.children.end()){
+                if(next_==std::numeric_limits<std::uint64_t>::max())throw std::overflow_error("radix ID exhausted");const auto id=++next_;RadixNode child;child.id=id;child.parent=current;
+                child.edge.assign(tokens.begin()+static_cast<std::ptrdiff_t>(offset),tokens.end());
+                nodes_.emplace(id,std::move(child));parent.children.emplace(tokens[offset],id);return id;
+            }
+            auto& child=nodes_.at(found->second);std::size_t common=0;
+            while(common<child.edge.size() && offset+common<tokens.size() && child.edge[common]==tokens[offset+common])++common;
+            if(common!=child.edge.size()){
+                // SPLIT
+                throw std::invalid_argument("divergent edge requires split support");
+            }
+            current=child.id;offset+=common;
+        }
+        return current;
+    }
+
 // METHODS
 private:
     PagedCache& cache_;
