@@ -145,3 +145,14 @@ def test_seeded_conversation_load():
         s.submit(r)
     s.run()
     assert all(len(r.output) == r.max_tokens for r in a)
+
+
+def test_ttft_matches_monotonic_timestamps():
+    from tvara.scheduler import request_latency
+
+    r = Request("a", (1,), 2)
+    r.submitted = 10
+    r.token_times = [10.5, 10.7]
+    r.output = [2, 3]
+    assert request_latency(r)["ttft_seconds"] == 0.5
+    assert request_latency(Request("b", (1,), 0))["ttft_seconds"] is None

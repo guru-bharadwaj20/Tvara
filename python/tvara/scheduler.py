@@ -218,3 +218,11 @@ def conversation_load(count=16, seed=0, vocab=257):
         )
         for i in range(count)
     ]
+
+
+def request_latency(request):
+    return {
+        "ttft_seconds": request.token_times[0] - request.submitted if request.token_times else None,
+        "tokens": len(request.output),
+        "state": request.state.value,
+    }
