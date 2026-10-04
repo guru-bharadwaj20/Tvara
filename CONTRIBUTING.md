@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 160 tasks are completed and 110 are not completed.
+Current status: 161 tasks are completed and 109 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -251,7 +251,7 @@ Target: Weeks 7-9.
 - ✅ T158 — Implement nonstreaming response serialization. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ✅ T159 — Implement server-sent event streaming. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ✅ T160 — Implement stream completion markers. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
-- ❌ T161 — Validate request fields and generation limits.
+- ✅ T161 — Validate request fields and generation limits. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ❌ T162 — Handle client disconnects and cancellation.
 - ❌ T163 — Return consistent request errors.
 - ❌ T164 — Add local client integration checks.
