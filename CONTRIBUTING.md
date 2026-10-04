@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 174 tasks are completed and 96 are not completed.
+Current status: 175 tasks are completed and 95 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -290,7 +290,7 @@ Target: Weeks 9-11.
 - ✅ T187 — Handle partial-block reuse safely. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T188 — Pin nodes used by active sequences. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T189 — Implement leaf access tracking. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
-- ❌ T190 — Implement LRU leaf eviction.
+- ✅ T190 — Implement LRU leaf eviction. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ❌ T191 — Release KV references after eviction.
 - ❌ T192 — Coordinate eviction with copy-on-write.
 - ❌ T193 — Test repeated and divergent conversations.

@@ -99,6 +99,13 @@ public:
 
     void touch(std::uint64_t id){auto& entry=nodes_.at(id);if(clock_==std::numeric_limits<std::uint64_t>::max())throw std::overflow_error("prefix access clock exhausted");entry.accessed=++clock_;}
 
+
+    std::optional<std::uint64_t> eviction_candidate()const{
+        std::optional<std::uint64_t> result;
+        for(const auto& [id,entry]:nodes_)if(id && entry.children.empty() && !entry.pins && (!result || entry.accessed<nodes_.at(*result).accessed))result=id;
+        return result;
+    }
+
 // METHODS
 private:
     PagedCache& cache_;

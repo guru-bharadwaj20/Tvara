@@ -13,6 +13,7 @@ auto full=tree.reuse(prompt);assert(full.second==4);assert(cache.physical_block(
 auto partial=tree.reuse(prompt,true);assert(partial.second==6);auto old=cache.physical_block(seq,5);float nine=9;cache.append(partial.first,std::span(&nine,1),std::span(&nine,1));assert(cache.physical_block(partial.first,5).id!=old.id);assert(cache.read(seq,0,5)[0]==5);cache.drop(partial.first);cache.audit(tree.external_references());
 tree.pin(a);assert(tree.node(a).pins==1);auto shorter=tree.insert(std::vector<std::int32_t>{1});assert(tree.node(shorter).pins==1);tree.unpin(a);assert(tree.node(shorter).pins==0);bool underflow=false;try{tree.unpin(a);}catch(const std::invalid_argument&){underflow=true;}assert(underflow);
 tree.touch(a);tree.touch(b);assert(tree.node(a).accessed<tree.node(b).accessed);
+assert(tree.eviction_candidate()==a);tree.pin(a);assert(tree.eviction_candidate()==b);tree.unpin(a);
 // TESTS
  std::cout<<"radix OK\n";
 }
