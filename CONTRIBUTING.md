@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 142 tasks are completed and 128 are not completed.
+Current status: 143 tasks are completed and 127 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -228,7 +228,7 @@ Target: Weeks 6-9.
 - ✅ T140 — Validate undefined and recursive rules. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T141 — Implement pushdown-automaton state transitions. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T142 — Implement JSON primitive grammars. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
-- ❌ T143 — Compile object properties and required fields.
+- ✅ T143 — Compile object properties and required fields. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ❌ T144 — Compile bounded arrays and nested objects.
 - ❌ T145 — Compile enums and alternatives.
 - ❌ T146 — Resolve local schema references.

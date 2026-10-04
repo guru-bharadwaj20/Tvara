@@ -58,3 +58,21 @@ def test_json_primitives_reject_invalid_numbers_and_escapes():
         assert accepts(grammar, text), repr(text)
     for text in ["01", "+1", "NaN", '"unterminated', r'"\x00"', r'"\ud800"']:
         assert not accepts(grammar, text), repr(text)
+
+
+def test_object_schema_required_optional_and_property_orders():
+    from tvara.schema import compile_schema
+    from tvara.grammar import accepts
+
+    grammar = compile_schema(
+        {
+            "type": "object",
+            "properties": {"a": {"type": "integer"}, "b": {"type": "boolean"}},
+            "required": ["a"],
+            "additionalProperties": False,
+        }
+    )
+    for text in ['{"a":1}', '{"b":true,"a":-2}', ' { "a": 3, "b": false } ']:
+        assert accepts(grammar, text)
+    for text in ["{}", '{"b":true}', '{"a":"x"}', '{"a":1,"a":2}']:
+        assert not accepts(grammar, text)
