@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 145 tasks are completed and 125 are not completed.
+Current status: 146 tasks are completed and 124 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -231,7 +231,7 @@ Target: Weeks 6-9.
 - ✅ T143 — Compile object properties and required fields. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T144 — Compile bounded arrays and nested objects. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T145 — Compile enums and alternatives. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py), [pyproject.toml](pyproject.toml).
-- ❌ T146 — Resolve local schema references.
+- ✅ T146 — Resolve local schema references. Evidence: [python/tvara/schema.py](python/tvara/schema.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ❌ T147 — Define string-format support and unsupported cases.
 - ❌ T148 — Implement accepting-state and end-token checks.
 - ❌ T149 — Test valid and invalid character sequences.
