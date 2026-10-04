@@ -70,3 +70,9 @@ endif()
 
 add_executable(kernel_overhead bench/kernel_overhead.cpp)
 target_link_libraries(kernel_overhead PRIVATE tvara_core)
+
+if(BUILD_TESTING)
+  add_executable(test_kv tests/core/test_kv.cpp)
+  target_link_libraries(test_kv PRIVATE tvara_core)
+  add_test(NAME kv COMMAND test_kv)
+endif()
