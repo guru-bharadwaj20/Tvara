@@ -152,6 +152,7 @@ async def stream_events(backend, ids, options, metadata, chat=False, request=Non
         else:
             choice.update(text=event.text, logprobs=None)
         yield sse({**metadata, "choices": [choice]})
+    yield "data: [DONE]\n\n"
     # STREAM_DONE
 
 
