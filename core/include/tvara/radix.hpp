@@ -25,6 +25,20 @@ public:
     const RadixNode& node(std::uint64_t id)const{return nodes_.at(id);}
     std::size_t size()const{return nodes_.size()-1;}
     const std::string& isolation()const{return isolation_;}
+
+    PrefixMatch lookup(std::span<const std::int32_t> tokens)const{
+        std::uint64_t current=0;std::size_t offset=0;PrefixMatch result{};
+        while(offset<tokens.size()){
+            const auto& parent=nodes_.at(current);auto it=parent.children.find(tokens[offset]);
+            if(it==parent.children.end())break;
+            const auto& child=nodes_.at(it->second);std::size_t common=0;
+            while(common<child.edge.size() && offset+common<tokens.size() && child.edge[common]==tokens[offset+common])++common;
+            offset+=common;result={child.id,offset};
+            if(common!=child.edge.size())break;current=child.id;
+        }
+        return result;
+    }
+
 // METHODS
 private:
     PagedCache& cache_;
