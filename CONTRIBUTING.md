@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 206 tasks are completed and 64 are not completed.
+Current status: 207 tasks are completed and 63 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -312,7 +312,7 @@ Target: Weeks 10-14.
 - ✅ T204 — Implement preemption under memory pressure. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ✅ T205 — Implement safe request resumption. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ✅ T206 — Build a synthetic conversation load generator. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
-- ❌ T207 — Record time to first token.
+- ✅ T207 — Record time to first token. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ❌ T208 — Record inter-token latency percentiles.
 - ❌ T209 — Compare static and continuous batching throughput.
 - ❌ T210 — Evaluate cancellation fairness and starvation under load.
