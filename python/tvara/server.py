@@ -88,6 +88,26 @@ def create_app(backend, config=None):
     app.state.backend = backend
     app.state.config = config
     app.state.ready = False
+
+    @app.get("/health")
+    async def health():
+        return {"status": "ok", "ready": app.state.ready}
+
+    @app.get("/ready")
+    async def ready():
+        from fastapi.responses import JSONResponse
+
+        return JSONResponse({"ready": app.state.ready}, status_code=200 if app.state.ready else 503)
+
+    @app.get("/v1/models")
+    async def models():
+        return {
+            "object": "list",
+            "data": [
+                {"id": config.served_name, "object": "model", "created": 0, "owned_by": "local"}
+            ],
+        }
+
     # ROUTES
     return app
 
