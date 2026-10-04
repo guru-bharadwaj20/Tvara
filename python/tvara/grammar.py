@@ -351,3 +351,25 @@ exponent ::= [eE] [+-]? [0-9]+
 
 def json_primitive_grammar():
     return Grammar.from_text(JSON_PRIMITIVES)
+
+
+class GrammarMachine:
+    def __init__(self, grammar):
+        self.grammar = grammar
+        self.state = GrammarState.start(grammar)
+
+    @property
+    def end_token_allowed(self):
+        return self.state.accepting(self.grammar)
+
+    def feed(self, text):
+        candidate = self.state
+        for char in text:
+            candidate = candidate.advance(self.grammar, char)
+            if candidate is None:
+                raise ValueError("Text violates the grammar")
+        self.state = candidate
+
+    def finish(self):
+        if not self.end_token_allowed:
+            raise ValueError("Output ended before grammar acceptance")

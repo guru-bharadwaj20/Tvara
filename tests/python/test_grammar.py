@@ -140,3 +140,16 @@ def test_string_lengths_and_declared_format_subset():
     assert accepts(email, '"tvara@example.org"') and not accepts(email, '"invalid"')
     with pytest.raises(ValueError):
         compile_schema({"type": "string", "format": "date"})
+
+
+def test_end_token_is_allowed_only_after_acceptance():
+    from tvara.grammar import Grammar, GrammarMachine
+
+    machine = GrammarMachine(Grammar.from_text('root ::= "abc"'))
+    machine.feed("ab")
+    assert not machine.end_token_allowed
+    with pytest.raises(ValueError):
+        machine.feed("x")
+    machine.feed("c")
+    assert machine.end_token_allowed
+    machine.finish()
