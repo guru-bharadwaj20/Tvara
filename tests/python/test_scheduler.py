@@ -69,3 +69,15 @@ def test_prefill_chunk_bounds():
     assert r.position == 4
     s.step()
     assert r.state is State.FINISHED
+
+
+def test_decode_progress_during_long_prefill():
+    b = Backend()
+    s = Scheduler(b, prefill_chunk=1)
+    a = Request("a", (1,), 4)
+    c = Request("c", (1,) * 10, 1)
+    s.submit(a)
+    s.step()
+    s.submit(c)
+    s.step()
+    assert len(a.output) == 2 and c.position == 1 and not c.output

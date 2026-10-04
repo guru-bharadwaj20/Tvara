@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 200 tasks are completed and 70 are not completed.
+Current status: 201 tasks are completed and 69 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -306,7 +306,7 @@ Target: Weeks 10-14.
 - ✅ T198 — Build iteration-level decode batches. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ✅ T199 — Remove completed sequences between iterations. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ✅ T200 — Implement configurable prefill chunks. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
-- ❌ T201 — Interleave prefill chunks with decode.
+- ✅ T201 — Interleave prefill chunks with decode. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ❌ T202 — Implement KV-aware admission control.
 - ❌ T203 — Define request fairness and priority rules.
 - ❌ T204 — Implement preemption under memory pressure.
