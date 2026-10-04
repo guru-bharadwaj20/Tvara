@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 194 tasks are completed and 76 are not completed.
+Current status: 195 tasks are completed and 75 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -275,7 +275,7 @@ Target: Weeks 9-11.
 - ✅ T177 — Measure numerical error across long contexts. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T177.json](bench/results/prefill/T177.json)..
 - ✅ T178 — Compare fused attention with unfused output. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T178.json](bench/results/prefill/T178.json)..
 - ✅ T179 — Measure prefill throughput across prompt lengths. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T179.json](bench/results/prefill/T179.json)..
-- ❌ T180 — Record accepted optimizations with supporting measurements.
+- ✅ T180 — Record accepted optimizations with supporting measurements. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T180.json](bench/results/prefill/T180.json)..
 
 ### Phase 13: Radix-tree prefix reuse
 
