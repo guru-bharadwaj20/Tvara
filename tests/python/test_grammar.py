@@ -27,3 +27,12 @@ def test_grammar_owns_immutable_production_sequences():
     with pytest.raises(TypeError):
         grammar.rules["root"] = ()
     assert grammar.root == "root"
+
+
+def test_validation_rejects_missing_and_left_recursive_rules():
+    from tvara.grammar import Grammar
+
+    for text in ["root ::= missing", 'root ::= root "a" | ""', 'root ::= ("")*']:
+        with pytest.raises(ValueError):
+            Grammar.from_text(text)
+    Grammar.from_text('root ::= "(" root ")" | ""')
