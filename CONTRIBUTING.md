@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 139 tasks are completed and 131 are not completed.
+Current status: 140 tasks are completed and 130 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -225,7 +225,7 @@ Target: Weeks 6-9.
 - ✅ T137 — Implement grammar lexing. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T138 — Implement EBNF or GBNF parsing. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ✅ T139 — Represent productions and terminals. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
-- ❌ T140 — Validate undefined and recursive rules.
+- ✅ T140 — Validate undefined and recursive rules. Evidence: [python/tvara/grammar.py](python/tvara/grammar.py), [tests/python/test_grammar.py](tests/python/test_grammar.py).
 - ❌ T141 — Implement pushdown-automaton state transitions.
 - ❌ T142 — Implement JSON primitive grammars.
 - ❌ T143 — Compile object properties and required fields.

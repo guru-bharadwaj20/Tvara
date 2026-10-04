@@ -221,6 +221,7 @@ class Grammar:
 
         copied = {name: tuple(tuple(p) for p in choices) for name, choices in self.rules.items()}
         object.__setattr__(self, "rules", MappingProxyType(copied))
+        validate_grammar(self)
 
     @classmethod
     def from_text(cls, text, root="root"):
@@ -228,3 +229,52 @@ class Grammar:
 
     def with_root(self, root):
         return Grammar(dict(self.rules), root)
+
+
+def validate_grammar(grammar):
+    if grammar.root not in grammar.rules or len(grammar.rules) > 16384:
+        raise ValueError("Missing root or excessive grammar rules")
+    for choices in grammar.rules.values():
+        for production in choices:
+            for symbol in production:
+                if (
+                    not isinstance(symbol, (str, CharSet))
+                    or isinstance(symbol, str)
+                    and symbol not in grammar.rules
+                ):
+                    raise ValueError("Undefined or invalid grammar symbol")
+    nullable = set()
+    changed = True
+    while changed:
+        changed = False
+        for name, choices in grammar.rules.items():
+            if name not in nullable and any(
+                all(isinstance(s, str) and s in nullable for s in p) for p in choices
+            ):
+                nullable.add(name)
+                changed = True
+    edges = {name: set() for name in grammar.rules}
+    for name, choices in grammar.rules.items():
+        for production in choices:
+            for symbol in production:
+                if isinstance(symbol, CharSet):
+                    break
+                edges[name].add(symbol)
+                if symbol not in nullable:
+                    break
+    active = set()
+    done = set()
+
+    def visit(name):
+        if name in active:
+            raise ValueError("Left recursion or nullable expansion cycle")
+        if name in done:
+            return
+        active.add(name)
+        for child in edges[name]:
+            visit(child)
+        active.remove(name)
+        done.add(name)
+
+    for name in edges:
+        visit(name)
