@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 150 tasks are completed and 120 are not completed.
+Current status: 151 tasks are completed and 119 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -241,7 +241,7 @@ Target: Weeks 6-9.
 
 Target: Weeks 7-9.
 
-- ❌ T151 — Expose model loading through Python bindings.
+- ✅ T151 — Expose model loading through Python bindings. Evidence: [core/include/tvara/c_api.h](core/include/tvara/c_api.h), [core/src/c_api.cpp](core/src/c_api.cpp), [python/tvara/native.py](python/tvara/native.py), [tests/python/test_native_bindings.py](tests/python/test_native_bindings.py), [CMakeLists.txt](CMakeLists.txt).
 - ❌ T152 — Expose tokenization through Python bindings.
 - ❌ T153 — Expose generation through Python bindings.
 - ❌ T154 — Define server configuration and startup behavior.
