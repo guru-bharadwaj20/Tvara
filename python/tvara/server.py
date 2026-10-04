@@ -1,5 +1,7 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.concurrency import run_in_threadpool
 
@@ -74,6 +76,23 @@ class CompletionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     model: str
     prompt: str | list[int]
+    max_tokens: int = Field(default=16, ge=0)
+    temperature: float = Field(default=0, ge=0, allow_inf_nan=False)
+    top_p: float = Field(default=1, gt=0, le=1, allow_inf_nan=False)
+    seed: int = Field(default=0, ge=0, le=18446744073709551615)
+    stream: bool = False
+
+
+class ChatMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    role: Literal["system", "user", "assistant", "tool"]
+    content: str
+
+
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    model: str
+    messages: list[ChatMessage] = Field(min_length=1)
     max_tokens: int = Field(default=16, ge=0)
     temperature: float = Field(default=0, ge=0, allow_inf_nan=False)
     top_p: float = Field(default=1, gt=0, le=1, allow_inf_nan=False)
@@ -156,6 +175,13 @@ def create_app(backend, config=None):
     @app.post("/v1/completions")
     async def completions(body: CompletionRequest):
         return await complete(body)
+
+    @app.post("/v1/chat/completions")
+    async def chat_completions(body: ChatRequest):
+        result = await complete(body, chat=True)
+        choice = result["choices"][0]
+        choice["message"] = {"role": "assistant", "content": choice.pop("text")}
+        return result
 
     # ROUTES
     return app

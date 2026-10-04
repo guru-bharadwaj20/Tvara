@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 156 tasks are completed and 114 are not completed.
+Current status: 157 tasks are completed and 113 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -247,7 +247,7 @@ Target: Weeks 7-9.
 - ✅ T154 — Define server configuration and startup behavior. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ✅ T155 — Implement model health and readiness checks. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ✅ T156 — Implement the completions request contract. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
-- ❌ T157 — Implement the chat-completions request contract.
+- ✅ T157 — Implement the chat-completions request contract. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ❌ T158 — Implement nonstreaming response serialization.
 - ❌ T159 — Implement server-sent event streaming.
 - ❌ T160 — Implement stream completion markers.
