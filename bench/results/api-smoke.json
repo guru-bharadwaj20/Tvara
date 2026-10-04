@@ -1,0 +1,8 @@
+{
+  "executed_at_utc": "2026-10-13T17:27:07.733274+00:00",
+  "backend": "real C++ CPU executor",
+  "model": "seeded random-weight 257-token fixture; not pretrained",
+  "http_status": 200,
+  "sse_done": true,
+  "completion_tokens": 3
+}
