@@ -62,5 +62,25 @@ private:
     CacheGeometry geometry_;std::vector<Block> blocks_;std::vector<std::size_t> free_;
 };
 
+struct BlockTable {std::vector<BlockHandle> blocks;std::size_t length=0;};
+class PagedCache {
+public:
+    explicit PagedCache(CacheGeometry geometry):pool_(geometry){}
+    std::uint64_t create_sequence(){if(next_==std::numeric_limits<std::uint64_t>::max())throw std::runtime_error("sequence ID exhausted");const auto id=++next_;sequences_.emplace(id,BlockTable{});return id;}
+    const BlockTable& sequence(std::uint64_t id)const{
+        auto it=sequences_.find(id);if(it==sequences_.end())throw std::invalid_argument("unknown KV sequence");return it->second;
+    }
+    BlockHandle physical_block(std::uint64_t id,std::size_t position)const{
+        const auto& table=sequence(id);if(position>=table.length)throw std::invalid_argument("KV position beyond sequence");return table.blocks.at(position/geometry().tokens_per_block);
+    }
+    const CacheGeometry& geometry()const{return pool_.geometry();}
+    BlockPool& pool(){return pool_;}
+    const BlockPool& pool()const{return pool_;}
+    // CACHE_CODE
+private:
+    BlockTable& mutable_sequence(std::uint64_t id){return const_cast<BlockTable&>(std::as_const(*this).sequence(id));}
+    BlockPool pool_;std::map<std::uint64_t,BlockTable> sequences_;std::uint64_t next_=0;
+};
+
 // KV_CODE
 }
