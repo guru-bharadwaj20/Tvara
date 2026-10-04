@@ -93,3 +93,17 @@ def test_kv_admission():
     assert all(r.state is State.FINISHED for r in s.requests.values())
     with pytest.raises(ValueError):
         s.submit(Request("c", (1,) * 5, 0))
+
+
+def test_priority_and_aging():
+    s = Scheduler(Backend(), 1)
+    s.submit(Request("low", (1,), 1))
+    s.submit(Request("high", (1,), 1, priority=2))
+    s.admit()
+    assert s.active[0].identifier == "high"
+    s.iteration = 32
+    s.reap()
+    s.active[0].state = State.FINISHED
+    s.reap()
+    s.admit()
+    assert s.active[0].identifier == "low"
