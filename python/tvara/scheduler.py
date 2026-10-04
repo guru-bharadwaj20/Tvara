@@ -78,7 +78,9 @@ class Scheduler:
             self.active.append(request)
 
     def step(self):
+        self.reap()
         self.admit()
+        # Decode-ready requests advance while other requests prefill one chunk.
         for r in self.active:
             if r.state is State.PREFILL:
                 end = min(len(r.prompt), r.position + self.prefill_chunk)
