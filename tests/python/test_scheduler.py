@@ -81,3 +81,15 @@ def test_decode_progress_during_long_prefill():
     s.submit(c)
     s.step()
     assert len(a.output) == 2 and c.position == 1 and not c.output
+
+
+def test_kv_admission():
+    s = Scheduler(Backend(), kv_tokens=4)
+    s.submit(Request("a", (1, 2), 2))
+    s.submit(Request("b", (1,), 1))
+    s.admit()
+    assert len(s.active) == 1
+    s.run()
+    assert all(r.state is State.FINISHED for r in s.requests.values())
+    with pytest.raises(ValueError):
+        s.submit(Request("c", (1,) * 5, 0))

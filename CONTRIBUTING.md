@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 201 tasks are completed and 69 are not completed.
+Current status: 202 tasks are completed and 68 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -307,7 +307,7 @@ Target: Weeks 10-14.
 - ✅ T199 — Remove completed sequences between iterations. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ✅ T200 — Implement configurable prefill chunks. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ✅ T201 — Interleave prefill chunks with decode. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
-- ❌ T202 — Implement KV-aware admission control.
+- ✅ T202 — Implement KV-aware admission control. Evidence: [python/tvara/scheduler.py](python/tvara/scheduler.py), [tests/python/test_scheduler.py](tests/python/test_scheduler.py).
 - ❌ T203 — Define request fairness and priority rules.
 - ❌ T204 — Implement preemption under memory pressure.
 - ❌ T205 — Implement safe request resumption.
