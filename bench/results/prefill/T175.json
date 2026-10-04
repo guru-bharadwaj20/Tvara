@@ -1,0 +1,9 @@
+{
+  "max_double_error": 1.81899e-12,
+  "scalar_us_10000": 187203,
+  "dispatch_us_10000": 205986,
+  "avx2": true,
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
