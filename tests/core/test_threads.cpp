@@ -10,9 +10,16 @@ void test_partitions(){
     ThreadPool pool(4);std::vector<float> w(21,1),x(3,2),out(7);threaded_matvec(pool,w,7,3,x,out);for(auto v:out)check(v==6);
 }
 
+void test_barrier(){
+    ThreadPool pool(4);SpinBarrier barrier(4);std::atomic<int> count{0};
+    pool.execute([&](std::size_t){for(int iteration=0;iteration<100;++iteration){count.fetch_add(1);barrier.arrive_and_wait();check(count.load()==(iteration+1)*4);barrier.arrive_and_wait();}});
+    check(count.load()==400);
+}
+
 // EXTRA_TESTS
 int main(){try{test_pool();
     test_partitions();
+        test_barrier();
         // RUN_TESTS
     std::cout<<"Thread checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
