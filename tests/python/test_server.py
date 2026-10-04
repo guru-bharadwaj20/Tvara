@@ -55,3 +55,10 @@ def test_health_and_readiness_identify_the_fixture_backend(client):
     assert client.get("/health").json() == {"status": "ok", "ready": True}
     assert client.get("/ready").status_code == 200
     assert client.get("/v1/models").json()["data"][0]["id"] == "fixture"
+
+
+def test_completion_returns_backend_generated_text(client):
+    result = client.post(
+        "/v1/completions", json={"model": "fixture", "prompt": "abc", "max_tokens": 3}
+    )
+    assert result.status_code == 200 and result.json()["choices"][0]["text"] == "hel"

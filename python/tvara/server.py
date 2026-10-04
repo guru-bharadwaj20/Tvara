@@ -1,5 +1,8 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+from pydantic import BaseModel, ConfigDict, Field
+from starlette.concurrency import run_in_threadpool
+
 import argparse
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -67,7 +70,31 @@ class NativeBackend:
         self.model.close()
 
 
+class CompletionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    model: str
+    prompt: str | list[int]
+    max_tokens: int = Field(default=16, ge=0)
+    temperature: float = Field(default=0, ge=0, allow_inf_nan=False)
+    top_p: float = Field(default=1, gt=0, le=1, allow_inf_nan=False)
+    seed: int = Field(default=0, ge=0, le=18446744073709551615)
+    stream: bool = False
+
+
 # REQUEST_TYPES
+def collect_output(backend, ids, options):
+    text = []
+    tokens = 0
+    reason = "length"
+    for event in backend.stream(ids, options):
+        text.append(event.text)
+        if event.token is not None:
+            tokens += 1
+        if event.finish_reason:
+            reason = event.finish_reason
+    return {"text": "".join(text), "tokens": tokens, "finish_reason": reason}
+
+
 # RESPONSE_HELPERS
 def create_app(backend, config=None):
     from fastapi import FastAPI
@@ -107,6 +134,28 @@ def create_app(backend, config=None):
                 {"id": config.served_name, "object": "model", "created": 0, "owned_by": "local"}
             ],
         }
+
+    async def complete(body, chat=False):
+        prompt = (
+            backend.render_chat([m.model_dump() for m in body.messages]) if chat else body.prompt
+        )
+        ids = list(prompt) if isinstance(prompt, list) else backend.encode(prompt)
+        options = {
+            "max_new_tokens": body.max_tokens,
+            "temperature": body.temperature,
+            "seed": body.seed,
+            "top_p": body.top_p,
+        }
+        result = await run_in_threadpool(collect_output, backend, ids, options)
+        return {
+            "choices": [
+                {"index": 0, "text": result["text"], "finish_reason": result["finish_reason"]}
+            ]
+        }
+
+    @app.post("/v1/completions")
+    async def completions(body: CompletionRequest):
+        return await complete(body)
 
     # ROUTES
     return app
