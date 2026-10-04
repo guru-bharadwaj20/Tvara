@@ -54,6 +54,20 @@ class SchemaCompiler:
             return self.memo[id(schema)]
         name = self.new()
         self.memo[id(schema)] = name
+        if "$ref" in schema:
+            if set(schema) - {
+                "$ref",
+                "$defs",
+                "definitions",
+                "title",
+                "description",
+                "$schema",
+                "$id",
+            }:
+                raise ValueError("Reference sibling constraints unsupported")
+            target = self.resolve(schema["$ref"])
+            self.rules[name] = ((self.node(target),),)
+            return name
         if "enum" in schema or "const" in schema:
             from jsonschema import Draft202012Validator
 
@@ -173,6 +187,25 @@ class SchemaCompiler:
                 prefix += (literal(",") + ("ws",) if i else ()) + (child, "ws")
             content = self.new(((), prefix + (tail,)) if minimum == 0 else (prefix + (tail,),))
         return (literal("[") + ("ws", content) + literal("]"),)
+
+    def resolve(self, reference):
+        from urllib.parse import unquote
+
+        if not isinstance(reference, str) or not reference.startswith("#"):
+            raise ValueError("Only local schema references are supported")
+        fragment = unquote(reference[1:])
+        if fragment and not fragment.startswith("/"):
+            raise ValueError("Invalid local reference")
+        target = self.source
+        for part in fragment.split("/")[1:] if fragment else []:
+            key = part.replace("~1", "/").replace("~0", "~")
+            try:
+                target = target[int(key)] if isinstance(target, list) else target[key]
+            except (KeyError, ValueError, IndexError, TypeError) as error:
+                raise ValueError("Unresolved local schema reference") from error
+        if not isinstance(target, (dict, bool)):
+            raise ValueError("Reference target is not a schema")
+        return target
 
 
 def compile_schema(schema):

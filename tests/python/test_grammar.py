@@ -105,3 +105,25 @@ def test_enum_and_anyof_restrict_to_valid_literals():
     grammar = compile_schema({"anyOf": [{"enum": ["red", "blue"]}, {"type": "integer"}]})
     assert accepts(grammar, '"red"') and accepts(grammar, "42")
     assert not accepts(grammar, '"green"') and not accepts(grammar, "false")
+
+
+def test_nested_local_refs_and_recursive_null_termination():
+    from tvara.schema import compile_schema
+    from tvara.grammar import accepts
+
+    schema = {
+        "$defs": {
+            "Node": {
+                "type": "object",
+                "properties": {
+                    "value": {"type": "integer"},
+                    "next": {"anyOf": [{"$ref": "#/$defs/Node"}, {"type": "null"}]},
+                },
+                "required": ["value", "next"],
+            }
+        },
+        "$ref": "#/$defs/Node",
+    }
+    grammar = compile_schema(schema)
+    assert accepts(grammar, '{"value":1,"next":{"value":2,"next":null}}')
+    assert not accepts(grammar, '{"value":1,"next":true}')
