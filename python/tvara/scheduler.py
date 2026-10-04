@@ -50,6 +50,8 @@ class Scheduler:
             raise ValueError("Invalid prefill chunk")
         if type(kv_tokens) is not int or kv_tokens < 1:
             raise ValueError("Invalid KV token budget")
+        self.iteration = 0
+        self.enqueued = {}
         self.kv_tokens = kv_tokens
         self.prefill_chunk = prefill_chunk
         self.backend = backend
@@ -67,8 +69,15 @@ class Scheduler:
             raise ValueError("Request exceeds KV reservation")
         self.requests[request.identifier] = request
         self.queue.append(request)
+        self.enqueued[request.identifier] = self.iteration
 
     def admit(self):
+        self.queue.sort(
+            key=lambda r: (
+                -(r.priority + (self.iteration - self.enqueued[r.identifier]) // 8),
+                self.enqueued[r.identifier],
+            )
+        )
         while self.queue and len(self.active) < self.max_active:
             request = self.queue[0]
             reserved = sum(len(r.prompt) + r.max_tokens for r in self.active)
@@ -87,6 +96,7 @@ class Scheduler:
             self.active.append(request)
 
     def step(self):
+        self.iteration += 1
         self.reap()
         self.admit()
         # Decode-ready requests advance while other requests prefill one chunk.
