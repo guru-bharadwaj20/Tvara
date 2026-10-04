@@ -1,5 +1,10 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+import json
+from fastapi import Request
+from fastapi.responses import StreamingResponse
+from starlette.concurrency import iterate_in_threadpool
+
 import time
 import uuid
 
@@ -126,6 +131,30 @@ def response_metadata(config, chat=False):
     }
 
 
+def sse(data):
+    return "data: " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n\n"
+
+
+async def stream_events(backend, ids, options, metadata, chat=False, request=None):
+    metadata = dict(metadata)
+    if chat:
+        metadata["object"] = "chat.completion.chunk"
+        yield sse(
+            {
+                **metadata,
+                "choices": [{"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}],
+            }
+        )
+    async for event in iterate_in_threadpool(backend.stream(ids, options)):
+        choice = {"index": 0, "finish_reason": event.finish_reason}
+        if chat:
+            choice["delta"] = {"content": event.text} if event.text else {}
+        else:
+            choice.update(text=event.text, logprobs=None)
+        yield sse({**metadata, "choices": [choice]})
+    # STREAM_DONE
+
+
 # RESPONSE_HELPERS
 def create_app(backend, config=None):
     from fastapi import FastAPI
@@ -166,7 +195,7 @@ def create_app(backend, config=None):
             ],
         }
 
-    async def complete(body, chat=False):
+    async def complete(body, chat=False, request=None):
         prompt = (
             backend.render_chat([m.model_dump() for m in body.messages]) if chat else body.prompt
         )
@@ -177,6 +206,14 @@ def create_app(backend, config=None):
             "seed": body.seed,
             "top_p": body.top_p,
         }
+        if body.stream:
+            return StreamingResponse(
+                stream_events(
+                    backend, ids, options, response_metadata(config, chat), chat, request
+                ),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+            )
         result = await run_in_threadpool(collect_output, backend, ids, options)
         return {
             **response_metadata(config, chat),
@@ -196,12 +233,14 @@ def create_app(backend, config=None):
         }
 
     @app.post("/v1/completions")
-    async def completions(body: CompletionRequest):
-        return await complete(body)
+    async def completions(body: CompletionRequest, request: Request):
+        return await complete(body, request=request)
 
     @app.post("/v1/chat/completions")
-    async def chat_completions(body: ChatRequest):
-        result = await complete(body, chat=True)
+    async def chat_completions(body: ChatRequest, request: Request):
+        result = await complete(body, chat=True, request=request)
+        if body.stream:
+            return result
         choice = result["choices"][0]
         choice["message"] = {"role": "assistant", "content": choice.pop("text")}
         return result

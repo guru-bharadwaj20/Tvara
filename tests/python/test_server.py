@@ -87,3 +87,27 @@ def test_nonstreaming_envelope_records_actual_token_usage(client):
         result["id"].startswith("cmpl-") and result["model"] == "fixture" and result["created"] > 0
     )
     assert result["usage"] == {"prompt_tokens": 3, "completion_tokens": 3, "total_tokens": 6}
+
+
+def test_sse_completion_and_chat_chunks(client):
+    import json
+
+    for route, body in [
+        ("/v1/completions", {"prompt": "abc"}),
+        ("/v1/chat/completions", {"messages": [{"role": "user", "content": "Hi"}]}),
+    ]:
+        response = client.post(
+            route, json={"model": "fixture", "max_tokens": 5, "stream": True, **body}
+        )
+        assert response.headers["content-type"].startswith("text/event-stream")
+        data = [
+            json.loads(line[6:])
+            for line in response.text.splitlines()
+            if line.startswith("data: ") and line != "data: [DONE]"
+        ]
+        assert data[-1]["choices"][0]["finish_reason"] == "stop"
+        key = "text" if route == "/v1/completions" else "delta"
+        if key == "text":
+            assert "".join(d["choices"][0]["text"] for d in data) == "hello"
+        else:
+            assert "".join(d["choices"][0]["delta"].get("content", "") for d in data) == "hello"
