@@ -46,5 +46,18 @@ size_t tvara_model_vocab_size(tvara_model* model){if(!model){error_message="clos
 size_t tvara_model_context_size(tvara_model* model){if(!model){error_message="closed model";return 0;}return model->executor.config().context;}
 const char* tvara_last_error(void){return error_message.c_str();}
 const char* tvara_model_metadata(tvara_model* model){if(!model){error_message="closed model";return nullptr;}return model->metadata.c_str();}
+uint64_t tvara_sequence_create(tvara_model* model){
+    error_message.clear();try{if(!model)throw std::invalid_argument("closed model");std::lock_guard lock(model->mutex);return model->executor.cache().create_sequence();}
+    catch(const std::exception& e){failure(e);return 0;}catch(...){error_message="unknown native error";return 0;}
+}
+int tvara_sequence_decode(tvara_model* model,uint64_t sequence,uint32_t token,float* output,size_t count){
+    error_message.clear();try{if(!model || !output || count!=model->executor.config().vocab)throw std::invalid_argument("invalid logit output buffer");
+        std::lock_guard lock(model->mutex);auto logits=model->executor.decode(sequence,token);std::copy(logits.begin(),logits.end(),output);return 0;}
+    catch(const std::exception& e){failure(e);return -1;}catch(...){error_message="unknown native error";return -1;}
+}
+int tvara_sequence_drop(tvara_model* model,uint64_t sequence){
+    error_message.clear();try{if(!model)throw std::invalid_argument("closed model");std::lock_guard lock(model->mutex);model->executor.cache().drop(sequence);return 0;}
+    catch(const std::exception& e){failure(e);return -1;}catch(...){error_message="unknown native error";return -1;}
+}
 // ABI_IMPLEMENTATIONS
 }

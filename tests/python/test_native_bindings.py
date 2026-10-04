@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[2]
 def native():
     binary = ROOT / "build/debug/tvara_capi.dll"
     if not binary.exists():
+        binary = ROOT / "build/debug/libtvara_capi.dll"
+    if not binary.exists():
         binary = ROOT / "build/debug/libtvara_capi.so"
     model = ROOT / "models/tiny-llama/reference.gguf"
     if not binary.exists() or not model.exists():
@@ -41,3 +43,16 @@ def test_metadata_and_explicit_tokenizer_attachment(native):
     native.attach_tokenizer(Catalog(metadata["tokenizer.ggml.tokens"]))
     assert native.encode("fixture-2 fixture-7") == [2, 7]
     assert native.decode_text([2]) == "fixture-2"
+
+
+def test_native_generation_matches_greedy_oracle_and_releases_sequences(native):
+    import json
+
+    fixture = json.loads((ROOT / "tests/fixtures/greedy.json").read_text())
+    assert native.generate(fixture["prompt"], max_new_tokens=6) == fixture["generated"]
+    first = native.generate([1, 2], max_new_tokens=3, temperature=1, seed=42)
+    assert first == native.generate([1, 2], max_new_tokens=3, temperature=1, seed=42)
+    stream = native.iter_tokens([1, 2], max_new_tokens=4)
+    next(stream)
+    stream.close()
+    assert native.generate([1, 2], max_new_tokens=1)
