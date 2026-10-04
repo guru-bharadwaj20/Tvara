@@ -209,3 +209,22 @@ class Parser:
 
 def parse_grammar(text):
     return Parser(text).parse()
+
+
+@dataclass(frozen=True)
+class Grammar:
+    rules: dict
+    root: str = "root"
+
+    def __post_init__(self):
+        from types import MappingProxyType
+
+        copied = {name: tuple(tuple(p) for p in choices) for name, choices in self.rules.items()}
+        object.__setattr__(self, "rules", MappingProxyType(copied))
+
+    @classmethod
+    def from_text(cls, text, root="root"):
+        return cls(parse_grammar(text), root)
+
+    def with_root(self, root):
+        return Grammar(dict(self.rules), root)

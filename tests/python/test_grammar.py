@@ -18,3 +18,12 @@ def test_parser_desugars_groups_and_repetition():
     assert "root" in rules and len(rules) > 1
     with pytest.raises(ValueError):
         parse_grammar('root = ("a";')
+
+
+def test_grammar_owns_immutable_production_sequences():
+    from tvara.grammar import Grammar
+
+    grammar = Grammar.from_text('root ::= "a"')
+    with pytest.raises(TypeError):
+        grammar.rules["root"] = ()
+    assert grammar.root == "root"
