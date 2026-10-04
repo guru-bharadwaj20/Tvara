@@ -23,5 +23,25 @@ inline std::vector<float> online_attention(std::span<const float> q,std::span<co
         auto head=state.finish();std::copy(head.begin(),head.end(),output.begin()+static_cast<std::ptrdiff_t>(h*dim));}
     return output;
 }
+inline std::vector<float> fused_paged_attention(std::span<const float> q,const PagedCache& cache,std::uint64_t sequence,std::size_t layer,const ModelConfig& c,
+    std::span<const float> tail_key={},std::span<const float> tail_value={},std::size_t visible=std::numeric_limits<std::size_t>::max(),bool scalar=false,bool prefetch=false) {
+    c.validate();const auto& g=cache.geometry();const auto& table=cache.sequence(sequence);const auto width=c.kv_width(),dim=c.head_dim();
+    if(q.size()!=c.hidden || g.kv_heads!=c.kv_heads || g.head_dim!=dim || layer>=g.layers || tail_key.size()!=tail_value.size() ||
+       (!tail_key.empty() && tail_key.size()!=width) || table.length>c.context || (!tail_key.empty() && table.length==c.context))throw std::invalid_argument("invalid fused attention shape");
+    const auto total=table.length+(tail_key.empty()?0:1);visible=std::min(visible,total);
+    if(!visible)throw std::invalid_argument("empty fused attention");
+    std::vector<float> output(c.hidden);const auto cached=std::min(visible,table.length);
+    for(std::size_t h=0;h<c.heads;++h){OnlineAttention state(dim);const auto kh=h/(c.heads/c.kv_heads);auto query=q.subspan(h*dim,dim);
+        for(std::size_t block=0;block<table.blocks.size() && block*g.tokens_per_block<cached;++block){auto data=cache.pool().data(table.blocks[block]);
+            const auto count=std::min(g.tokens_per_block,cached-block*g.tokens_per_block);
+            for(std::size_t slot=0;slot<count;++slot){auto key=data.subspan(kv_offset(g,layer,0,slot)+kh*dim,dim);auto value=data.subspan(kv_offset(g,layer,1,slot)+kh*dim,dim);
+                // SCORE_CODE
+                (void)scalar;(void)prefetch;double score=0;for(std::size_t i=0;i<dim;++i)score+=double(query[i])*key[i];
+                state.update(score/std::sqrt(double(dim)),value);}}
+        if(visible>table.length){double score=0;for(std::size_t i=0;i<dim;++i)score+=double(query[i])*tail_key[kh*dim+i];state.update(score/std::sqrt(double(dim)),tail_value.subspan(kh*dim,dim));}
+        auto head=state.finish();std::copy(head.begin(),head.end(),output.begin()+static_cast<std::ptrdiff_t>(h*dim));}
+    return output;
+}
+
 // ATTENTION_CODE
 }
