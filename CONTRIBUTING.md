@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 180 tasks are completed and 90 are not completed.
+Current status: 181 tasks are completed and 89 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -261,7 +261,7 @@ Target: Weeks 7-9.
 
 Target: Weeks 9-11.
 
-- ❌ T166 — Create separate prefill and decode benchmark cases.
+- ✅ T166 — Create separate prefill and decode benchmark cases. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T166.json](bench/results/prefill/T166.json)..
 - ❌ T167 — Implement cache-blocked prefill matrix multiplication.
 - ❌ T168 — Reuse quantized activation tiles.
 - ❌ T169 — Tune prefill tile dimensions.

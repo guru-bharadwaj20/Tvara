@@ -1,0 +1,9 @@
+{
+  "tokens": 64,
+  "decode_us": 60,
+  "prefill_us": 3747,
+  "scope": "projection kernel, not end-to-end model",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
