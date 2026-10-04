@@ -1,4 +1,5 @@
 #include "tvara/model.hpp"
+#include "tvara/generation.hpp"
 #include <functional>
 #include <iostream>
 
@@ -82,6 +83,13 @@ void test_prefill_decode() {
     auto full=model.forward(tokens);check(full.size()==48);
 }
 
+void test_generation() {
+    ModelExecutor model(zero_model());std::vector<std::size_t> prompt{1,2};GenerationOptions options;options.max_new_tokens=5;
+    options.eos=0;check(generate(model,prompt,options)==std::vector<std::size_t>({0}));
+    options.eos.reset();options.temperature=1;options.seed=42;
+    auto first=generate(model,prompt,options);check(first==generate(model,prompt,options) && first.size()==5);
+}
+
 // EXTRA_TESTS
 int main() {
     try {
@@ -95,6 +103,7 @@ int main() {
         test_feedforward();
         test_residual_executor();
         test_prefill_decode();
+        test_generation();
         // RUN_TESTS
         std::cout << "Native model checks passed\n";
     }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}

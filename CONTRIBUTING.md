@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 103 tasks are completed and 167 are not completed.
+Current status: 104 tasks are completed and 166 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -174,7 +174,7 @@ Target: Weeks 4-6.
 - ✅ T101 — Implement greedy and temperature sampling. Evidence: [core/include/tvara/sampling.hpp](core/include/tvara/sampling.hpp), [tests/core/test_sampling.cpp](tests/core/test_sampling.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ✅ T102 — Implement top-k top-p and min-p filters. Evidence: [core/include/tvara/sampling.hpp](core/include/tvara/sampling.hpp), [tests/core/test_sampling.cpp](tests/core/test_sampling.cpp).
 - ✅ T103 — Implement repetition and frequency penalties. Evidence: [core/include/tvara/sampling.hpp](core/include/tvara/sampling.hpp), [tests/core/test_sampling.cpp](tests/core/test_sampling.cpp).
-- ❌ T104 — Implement seeded generation and stopping rules.
+- ✅ T104 — Implement seeded generation and stopping rules. Evidence: [core/include/tvara/generation.hpp](core/include/tvara/generation.hpp), [tests/core/test_model.cpp](tests/core/test_model.cpp).
 - ❌ T105 — Validate core logits and greedy output against references.
 
 ### Phase 08: SIMD kernels and CPU threading
