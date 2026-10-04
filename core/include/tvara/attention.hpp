@@ -45,6 +45,15 @@ inline double attention_dot(std::span<const float> a,std::span<const float> b,bo
     return attention_dot_scalar(a,b);
 }
 
+
+inline void prefetch_read(const float* data){
+#if defined(__GNUC__) || defined(__clang__)
+    __builtin_prefetch(data,0,1);
+#else
+    (void)data;
+#endif
+}
+
 inline std::vector<float> fused_paged_attention(std::span<const float> q,const PagedCache& cache,std::uint64_t sequence,std::size_t layer,const ModelConfig& c,
     std::span<const float> tail_key={},std::span<const float> tail_value={},std::size_t visible=std::numeric_limits<std::size_t>::max(),bool scalar=false,bool prefetch=false) {
     c.validate();const auto& g=cache.geometry();const auto& table=cache.sequence(sequence);const auto width=c.kv_width(),dim=c.head_dim();
@@ -64,6 +73,7 @@ inline std::vector<float> fused_paged_attention(std::span<const float> q,const P
         for(std::size_t block=0;block<table.blocks.size() && block*g.tokens_per_block<cached;++block){auto data=cache.pool().data(table.blocks[block]);
             const auto count=std::min(g.tokens_per_block,cached-block*g.tokens_per_block);
             for(std::size_t slot=0;slot<count;++slot){auto key=data.subspan(kv_offset(g,layer,0,slot)+kh*dim,dim);auto value=data.subspan(kv_offset(g,layer,1,slot)+kh*dim,dim);
+                if(prefetch && slot+1<count){prefetch_read(key.data()+width);prefetch_read(value.data()+width);}
                 // SCORE_CODE
                 (void)prefetch;double score=score_dot(query,key);
                 state.update(score/std::sqrt(double(dim)),value);}}

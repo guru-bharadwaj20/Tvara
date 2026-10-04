@@ -48,5 +48,17 @@ inline std::vector<float> prefill_q8(std::span<const std::byte> weights,std::siz
     return output;
 }
 
+inline std::vector<float> prefill_weight_prefetch(const Matrix& w,std::span<const float> x,std::size_t tokens,bool prefetch){
+    prefill_shapes(w,x,tokens);std::vector<float> out(tokens*w.rows);
+    for(std::size_t t=0;t<tokens;++t)for(std::size_t r=0;r<w.rows;++r){
+#if defined(__GNUC__) || defined(__clang__)
+        if(prefetch && r+1<w.rows)__builtin_prefetch(w.values.data()+(r+1)*w.cols,0,1);
+#else
+        (void)prefetch;
+#endif
+        double sum=0;for(std::size_t k=0;k<w.cols;++k)sum+=double(x[t*w.cols+k])*w.values[r*w.cols+k];out[t*w.rows+r]=static_cast<float>(sum);}
+    return out;
+}
+
 // PREFILL_CODE
 }
