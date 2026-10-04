@@ -14,6 +14,7 @@ auto partial=tree.reuse(prompt,true);assert(partial.second==6);auto old=cache.ph
 tree.pin(a);assert(tree.node(a).pins==1);auto shorter=tree.insert(std::vector<std::int32_t>{1});assert(tree.node(shorter).pins==1);tree.unpin(a);assert(tree.node(shorter).pins==0);bool underflow=false;try{tree.unpin(a);}catch(const std::invalid_argument&){underflow=true;}assert(underflow);
 tree.touch(a);tree.touch(b);assert(tree.node(a).accessed<tree.node(b).accessed);
 assert(tree.eviction_candidate()==a);tree.pin(a);assert(tree.eviction_candidate()==b);tree.unpin(a);
+tree.pin(b);assert(tree.evict_one());assert(!tree.node(b).edge.empty());tree.unpin(b);cache.audit(tree.external_references());
 // TESTS
  std::cout<<"radix OK\n";
 }

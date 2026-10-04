@@ -106,6 +106,12 @@ public:
         return result;
     }
 
+
+    bool evict_one(){auto candidate=eviction_candidate();if(!candidate)return false;
+        auto& entry=nodes_.at(*candidate);if(entry.kv)for(auto block:entry.kv->blocks)cache_.pool().release(block);
+        nodes_.at(entry.parent).children.erase(entry.edge.front());nodes_.erase(*candidate);return true;
+    }
+
 // METHODS
 private:
     PagedCache& cache_;
