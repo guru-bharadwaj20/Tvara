@@ -111,7 +111,7 @@ class SchemaCompiler:
         elif kind == "array":
             choices = self.array(schema)
         elif kind == "string":
-            choices = (("string",),)
+            choices = self.string(schema)
         elif kind == "integer":
             choices = (literal("-") + ("integer",), ("integer",))
         elif kind == "number":
@@ -206,6 +206,33 @@ class SchemaCompiler:
         if not isinstance(target, (dict, bool)):
             raise ValueError("Reference target is not a schema")
         return target
+
+    def string(self, schema):
+        minimum = schema.get("minLength", 0)
+        maximum = schema.get("maxLength")
+        if (
+            not isinstance(minimum, int)
+            or minimum < 0
+            or minimum > 64
+            or maximum is not None
+            and (not isinstance(maximum, int) or maximum < minimum or maximum > 64)
+        ):
+            raise ValueError("String bounds must be 0..64")
+        if "format" in schema:
+            if schema["format"] == "email":
+                value = "tvara@example.org"
+            elif schema["format"] == "uuid":
+                value = "00000000-0000-4000-8000-000000000000"
+            else:
+                raise ValueError("Supported string formats are email and uuid")
+            if len(value) < minimum or maximum is not None and len(value) > maximum:
+                raise ValueError("Format with these length bounds is unsupported")
+            return (literal(json.dumps(value)),)
+        if maximum is None:
+            content = self.new((("char",) * minimum + ("chars",),))
+        else:
+            content = self.new(tuple(("char",) * n for n in range(minimum, maximum + 1)))
+        return (literal('"') + (content,) + literal('"'),)
 
 
 def compile_schema(schema):
