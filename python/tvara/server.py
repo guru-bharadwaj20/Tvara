@@ -1,5 +1,8 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+import time
+import uuid
+
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -114,6 +117,15 @@ def collect_output(backend, ids, options):
     return {"text": "".join(text), "tokens": tokens, "finish_reason": reason}
 
 
+def response_metadata(config, chat=False):
+    return {
+        "id": ("chatcmpl-" if chat else "cmpl-") + uuid.uuid4().hex,
+        "object": "chat.completion" if chat else "text_completion",
+        "created": int(time.time()),
+        "model": config.served_name,
+    }
+
+
 # RESPONSE_HELPERS
 def create_app(backend, config=None):
     from fastapi import FastAPI
@@ -167,9 +179,20 @@ def create_app(backend, config=None):
         }
         result = await run_in_threadpool(collect_output, backend, ids, options)
         return {
+            **response_metadata(config, chat),
             "choices": [
-                {"index": 0, "text": result["text"], "finish_reason": result["finish_reason"]}
-            ]
+                {
+                    "index": 0,
+                    "text": result["text"],
+                    "finish_reason": result["finish_reason"],
+                    "logprobs": None,
+                }
+            ],
+            "usage": {
+                "prompt_tokens": len(ids),
+                "completion_tokens": result["tokens"],
+                "total_tokens": len(ids) + result["tokens"],
+            },
         }
 
     @app.post("/v1/completions")

@@ -77,3 +77,13 @@ def test_chat_contract_and_role_validation(client):
         "/v1/chat/completions",
         json={"model": "fixture", "messages": [{"role": "unknown", "content": "Hi"}]},
     ).status_code in (400, 422)
+
+
+def test_nonstreaming_envelope_records_actual_token_usage(client):
+    result = client.post(
+        "/v1/completions", json={"model": "fixture", "prompt": "abc", "max_tokens": 3}
+    ).json()
+    assert (
+        result["id"].startswith("cmpl-") and result["model"] == "fixture" and result["created"] > 0
+    )
+    assert result["usage"] == {"prompt_tokens": 3, "completion_tokens": 3, "total_tokens": 6}
