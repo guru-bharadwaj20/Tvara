@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 112 tasks are completed and 158 are not completed.
+Current status: 113 tasks are completed and 157 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -188,7 +188,7 @@ Target: Weeks 6-8.
 - ✅ T110 — Implement AVX2 Q4_K dot products. Evidence: [core/include/tvara/simd.hpp](core/include/tvara/simd.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
 - ✅ T111 — Vectorize normalization and activation operations. Evidence: [core/include/tvara/simd.hpp](core/include/tvara/simd.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
 - ✅ T112 — Implement vectorized RoPE. Evidence: [core/include/tvara/simd.hpp](core/include/tvara/simd.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
-- ❌ T113 — Design a persistent worker thread pool.
+- ✅ T113 — Design a persistent worker thread pool. Evidence: [core/include/tvara/thread_pool.hpp](core/include/tvara/thread_pool.hpp), [tests/core/test_threads.cpp](tests/core/test_threads.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ❌ T114 — Implement row partitioning for matrix operations.
 - ❌ T115 — Implement a spin-then-sleep worker barrier.
 - ❌ T116 — Allow configurable worker counts.
