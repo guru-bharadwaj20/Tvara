@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 182 tasks are completed and 88 are not completed.
+Current status: 183 tasks are completed and 87 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -263,7 +263,7 @@ Target: Weeks 9-11.
 
 - ✅ T166 — Create separate prefill and decode benchmark cases. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T166.json](bench/results/prefill/T166.json)..
 - ✅ T167 — Implement cache-blocked prefill matrix multiplication. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T167.json](bench/results/prefill/T167.json)..
-- ❌ T168 — Reuse quantized activation tiles.
+- ✅ T168 — Reuse quantized activation tiles. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T168.json](bench/results/prefill/T168.json)..
 - ❌ T169 — Tune prefill tile dimensions.
 - ❌ T170 — Implement online softmax reference attention.
 - ❌ T171 — Implement fused paged attention.
