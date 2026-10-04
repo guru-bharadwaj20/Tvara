@@ -107,6 +107,8 @@ std::vector<float> read(std::uint64_t id,std::size_t layer,std::size_t position,
         return output;
     }
 
+void drop(std::uint64_t id){auto& table=mutable_sequence(id);for(auto block:table.blocks)pool_.release(block);sequences_.erase(id);}
+
 // CACHE_CODE
 private:
     BlockTable& mutable_sequence(std::uint64_t id){return const_cast<BlockTable&>(std::as_const(*this).sequence(id));}
