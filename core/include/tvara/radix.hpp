@@ -83,6 +83,15 @@ public:
         return counts;
     }
 
+
+    std::pair<std::uint64_t,std::size_t> reuse(std::span<const std::int32_t> tokens,bool partial=false){
+        auto match=lookup(tokens);
+        if(!match.node || !nodes_.at(match.node).kv)return {cache_.create_sequence(),0};
+        std::size_t length=match.tokens;
+        if(!partial)length-=length%cache_.geometry().tokens_per_block;
+        return {cache_.import_sequence(*nodes_.at(match.node).kv,length),length};
+    }
+
 // METHODS
 private:
     PagedCache& cache_;
