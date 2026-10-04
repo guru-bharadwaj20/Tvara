@@ -42,6 +42,9 @@ void test_exhaustion(){PagedCache cache({1,1,2,2,1});auto id=cache.create_sequen
     bool exhausted=false;try{cache.append(branch,x,x);}catch(const CacheExhausted&){exhausted=true;}check(exhausted && cache.sequence(branch).length==1 && cache.pool().references(cache.physical_block(id,0))==2);
     cache.drop(branch);cache.append(id,x,x);check(cache.sequence(id).length==2);cache.drop(id);check(cache.pool().available()==1);}
 
+void test_invariants(){PagedCache cache({1,1,2,3,8});auto id=cache.create_sequence();std::vector<float>x(2,1);
+    for(int i=0;i<7;++i){cache.append(id,x,x);cache.audit();}auto branch=cache.fork(id);cache.audit();cache.append(branch,x,x);cache.audit();cache.truncate(branch,2);cache.audit();cache.drop(branch);cache.audit();cache.drop(id);cache.audit();}
+
 // EXTRA_TESTS
 int main(){try{test_geometry();
     test_allocator();
@@ -55,6 +58,7 @@ int main(){try{test_geometry();
         test_tail_boundaries();
         test_rollback();
         test_exhaustion();
+        test_invariants();
         // RUN_TESTS
     std::cout<<"Paged KV checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
