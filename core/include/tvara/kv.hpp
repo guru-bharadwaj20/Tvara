@@ -109,6 +109,14 @@ std::vector<float> read(std::uint64_t id,std::size_t layer,std::size_t position,
 
 void drop(std::uint64_t id){auto& table=mutable_sequence(id);for(auto block:table.blocks)pool_.release(block);sequences_.erase(id);}
 
+std::uint64_t fork(std::uint64_t id){
+        const auto copy=sequence(id);std::size_t retained=0;
+        try{for(auto block:copy.blocks){pool_.retain(block);++retained;}
+            if(next_==std::numeric_limits<std::uint64_t>::max())throw std::runtime_error("sequence ID exhausted");
+            const auto result=++next_;sequences_.emplace(result,copy);return result;
+        }catch(...){for(std::size_t i=0;i<retained;++i)pool_.release(copy.blocks[i]);throw;}
+    }
+
 // CACHE_CODE
 private:
     BlockTable& mutable_sequence(std::uint64_t id){return const_cast<BlockTable&>(std::as_const(*this).sequence(id));}

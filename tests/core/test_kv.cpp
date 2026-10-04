@@ -22,6 +22,9 @@ void test_refs(){BlockPool pool({1,1,2,2,2});auto block=pool.allocate();pool.ret
 
 void test_completion(){PagedCache cache({1,1,2,2,3});auto id=cache.create_sequence();std::vector<float> x(2,1);for(int i=0;i<3;++i)cache.append(id,x,x);check(cache.pool().available()==1);cache.drop(id);check(cache.pool().available()==3);rejects([&]{cache.sequence(id);});}
 
+void test_sharing(){PagedCache cache({1,1,2,2,3});auto id=cache.create_sequence();std::vector<float>x(2,1);cache.append(id,x,x);auto branch=cache.fork(id);
+    check(cache.pool().references(cache.physical_block(id,0))==2 && cache.read(branch,0,0)==x);cache.drop(id);check(cache.read(branch,0,0)==x);cache.drop(branch);check(cache.pool().available()==3);}
+
 // EXTRA_TESTS
 int main(){try{test_geometry();
     test_allocator();
@@ -30,6 +33,7 @@ int main(){try{test_geometry();
         test_reads();
         test_refs();
         test_completion();
+        test_sharing();
         // RUN_TESTS
     std::cout<<"Paged KV checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
