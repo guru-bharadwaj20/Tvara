@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 168 tasks are completed and 102 are not completed.
+Current status: 169 tasks are completed and 101 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -284,7 +284,7 @@ Target: Weeks 9-11.
 - ✅ T181 — Define radix node and edge structures. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ✅ T182 — Implement longest-prefix token lookup. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T183 — Implement insertion of token sequences. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
-- ❌ T184 — Implement edge splitting at divergence.
+- ✅ T184 — Implement edge splitting at divergence. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ❌ T185 — Attach KV block references to cache nodes.
 - ❌ T186 — Reuse full shared prefix blocks.
 - ❌ T187 — Handle partial-block reuse safely.
