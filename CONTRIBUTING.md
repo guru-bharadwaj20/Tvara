@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 119 tasks are completed and 151 are not completed.
+Current status: 120 tasks are completed and 150 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -195,7 +195,7 @@ Target: Weeks 6-8.
 - ✅ T117 — Validate SIMD results against scalar kernels. Evidence: [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
 - ✅ T118 — Test concurrent worker startup and shutdown. Evidence: [tests/core/test_threads.cpp](tests/core/test_threads.cpp).
 - ✅ T119 — Measure dispatch and synchronization overhead. Evidence: [bench/kernel_overhead.cpp](bench/kernel_overhead.cpp), [tools/run_kernel_overhead.py](tools/run_kernel_overhead.py), [CMakeLists.txt](CMakeLists.txt).
-- ❌ T120 — Document alignment and instruction-set requirements.
+- ✅ T120 — Document alignment and instruction-set requirements. Evidence: [docs/cpu-kernels.md](docs/cpu-kernels.md).
 
 ### Phase 09: Paged KV cache
 
