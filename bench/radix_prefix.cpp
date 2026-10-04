@@ -1,0 +1,4 @@
+#include "tvara/radix.hpp"
+#include <chrono>
+#include <iostream>
+int main(){using namespace tvara;CacheGeometry g{1,1,1,4,128};PagedCache cache(g);RadixCache tree(cache,"benchmark-fixture");std::vector<std::int32_t> prefix{1,2,3,4,5,6,7,8};auto s=cache.create_sequence();float one=1;for(auto token:prefix){(void)token;cache.append(s,std::span(&one,1),std::span(&one,1));}tree.attach(tree.insert(prefix),s);std::size_t hits=0,saved=0,total=0;auto begin=std::chrono::steady_clock::now();for(int i=0;i<10000;++i){auto query=prefix;if(i%4==0)query[0]=99;auto restored=tree.reuse(query);hits+=restored.second!=0;saved+=restored.second;total+=query.size();cache.drop(restored.first);}auto ns=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now()-begin).count();std::cout<<"{\"requests\":10000,\"hits\":"<<hits<<",\"saved_prefill_tokens\":"<<saved<<",\"requested_tokens\":"<<total<<",\"lookup_restore_ns_total\":"<<ns<<"}\n";cache.drop(s);}
