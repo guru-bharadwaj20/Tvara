@@ -132,3 +132,16 @@ def test_resume_and_cancel():
     assert r.output[:1] == first and len(r.output) == 2
     s.cancel("a")
     assert not b.live and r.state is State.CANCELLED
+
+
+def test_seeded_conversation_load():
+    from tvara.scheduler import conversation_load
+
+    a = conversation_load()
+    b = conversation_load()
+    assert [(r.prompt, r.max_tokens) for r in a] == [(r.prompt, r.max_tokens) for r in b]
+    s = Scheduler(Backend(), max_active=3, prefill_chunk=2)
+    for r in a:
+        s.submit(r)
+    s.run()
+    assert all(len(r.output) == r.max_tokens for r in a)
