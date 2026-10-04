@@ -77,6 +77,30 @@ TVARA_AVX2 inline float dot_q4k_avx2(std::span<const std::byte> w,std::span<cons
 }
 #endif
 
+#if TVARA_AVX2_AVAILABLE
+TVARA_AVX2 inline std::vector<float> rms_norm_avx2(std::span<const float> x,std::span<const float> w,float epsilon) {
+    if(x.empty() || x.size()!=w.size() || !std::isfinite(epsilon) || epsilon<=0)throw std::invalid_argument("AVX2 RMSNorm dimensions");
+    __m256d accum=_mm256_setzero_pd();std::size_t i=0;
+    for(;i+4<=x.size();i+=4){auto v=_mm256_cvtps_pd(_mm_loadu_ps(x.data()+i));accum=_mm256_add_pd(accum,_mm256_mul_pd(v,v));}
+    alignas(32) double partial[4];_mm256_store_pd(partial,accum);double sum=std::accumulate(partial,partial+4,0.0);
+    for(;i<x.size();++i)sum+=double(x[i])*x[i];
+    float inverse=static_cast<float>(1/std::sqrt(sum/static_cast<double>(x.size())+epsilon));
+    std::vector<float> out(x.size());i=0;auto factor=_mm256_set1_ps(inverse);
+    for(;i+8<=x.size();i+=8)_mm256_storeu_ps(out.data()+i,_mm256_mul_ps(_mm256_mul_ps(_mm256_loadu_ps(x.data()+i),factor),_mm256_loadu_ps(w.data()+i)));
+    for(;i<x.size();++i)out[i]=x[i]*inverse*w[i];return out;
+}
+TVARA_AVX2 inline void swiglu_avx2(std::span<float> gate,std::span<const float> up) {
+    if(gate.size()!=up.size())throw std::invalid_argument("AVX2 SwiGLU dimensions");
+    std::size_t i=0;alignas(32) float sigmoid[8];
+    for(;i+8<=gate.size();i+=8){
+        for(std::size_t j=0;j<8;++j){float g=gate[i+j],small=std::exp(-std::abs(g));sigmoid[j]=g>=0?1/(1+small):small/(1+small);}
+        auto factor=_mm256_mul_ps(_mm256_load_ps(sigmoid),_mm256_loadu_ps(up.data()+i));
+        _mm256_storeu_ps(gate.data()+i,_mm256_mul_ps(_mm256_loadu_ps(gate.data()+i),factor));
+    }
+    for(;i<gate.size();++i){float g=gate[i],small=std::exp(-std::abs(g));gate[i]*=(g>=0?1/(1+small):small/(1+small))*up[i];}
+}
+#endif
+
 // SIMD_CODE
 struct KernelDispatch {
     using Dot=float(*)(std::span<const std::byte>,std::span<const quant::Q8Activation>);

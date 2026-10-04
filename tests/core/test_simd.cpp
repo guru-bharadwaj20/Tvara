@@ -32,11 +32,21 @@ void test_q4k_simd(){
     auto a=quant::quantize_activations(x);KernelDispatch dispatch;close(dispatch.q4k(w,a),quant::dot_q4_k(w,a));
 }
 
+void test_vector_norm_activation(){
+#if TVARA_AVX2_AVAILABLE
+    if(!use_avx2())return;
+    std::vector<float> x(35),w(35,1),up(35,2);for(std::size_t i=0;i<x.size();++i)x[i]=std::sin(static_cast<float>(i));
+    auto reference=rms_norm(x,w,1e-6f),actual=rms_norm_avx2(x,w,1e-6f);for(std::size_t i=0;i<x.size();++i)close(actual[i],reference[i]);
+    auto gate=x;swiglu_avx2(gate,up);for(std::size_t i=0;i<x.size();++i)close(gate[i],x[i]*2/(1+std::exp(-x[i])));
+#endif
+}
+
 // EXTRA_TESTS
 int main(){try{test_detection();
     test_scalar_dispatch();
         test_q8_simd();
         test_q4_simd();
         test_q4k_simd();
+        test_vector_norm_activation();
         // RUN_TESTS
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
