@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 105 tasks are completed and 165 are not completed.
+Current status: 106 tasks are completed and 164 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -181,7 +181,7 @@ Target: Weeks 4-6.
 
 Target: Weeks 6-8.
 
-- ❌ T106 — Implement runtime CPU feature detection.
+- ✅ T106 — Implement runtime CPU feature detection. Evidence: [core/include/tvara/cpu.hpp](core/include/tvara/cpu.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp), [CMakeLists.txt](CMakeLists.txt).
 - ❌ T107 — Retain a portable scalar dispatch path.
 - ❌ T108 — Implement AVX2 Q8_0 dot products.
 - ❌ T109 — Implement AVX2 Q4_0 dot products.
