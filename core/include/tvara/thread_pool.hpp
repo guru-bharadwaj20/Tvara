@@ -52,5 +52,11 @@ private:
     std::shared_ptr<const std::function<void(std::size_t)>> callback_;
     std::exception_ptr error_;
 };
+inline std::pair<std::size_t,std::size_t> partition_rows(std::size_t rows,std::size_t index,std::size_t workers) {
+    if(!workers || index>=workers)throw std::invalid_argument("invalid row partition");
+    const auto base=rows/workers,remainder=rows%workers;
+    const auto start=base*index+std::min(index,remainder);return {start,start+base+(index<remainder?1:0)};
+}
+
 // THREAD_CODE
 }
