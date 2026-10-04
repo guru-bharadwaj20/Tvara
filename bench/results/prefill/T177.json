@@ -1,0 +1,32 @@
+{
+  "contexts": [
+    {
+      "positions": 1,
+      "fused_unfused_error": 0,
+      "fused_online_error": 0
+    },
+    {
+      "positions": 127,
+      "fused_unfused_error": 1.78814e-07,
+      "fused_online_error": 0
+    },
+    {
+      "positions": 1024,
+      "fused_unfused_error": 1.19209e-07,
+      "fused_online_error": 0
+    },
+    {
+      "positions": 4097,
+      "fused_unfused_error": 1.19209e-07,
+      "fused_online_error": 0
+    },
+    {
+      "positions": 8192,
+      "fused_unfused_error": 1.19209e-07,
+      "fused_online_error": 0
+    }
+  ],
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
