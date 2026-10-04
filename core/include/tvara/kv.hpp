@@ -144,6 +144,19 @@ void audit(std::span<const std::size_t> external={})const{
         for(std::size_t i=0;i<counts.size();++i)if(counts[i]+(external.empty()?0:external[i])!=pool_.references_by_id(i))throw std::logic_error("KV reference invariant");
     }
 
+
+    std::uint64_t import_sequence(const BlockTable& source,std::size_t length){
+        if(length>source.length)throw std::invalid_argument("prefix exceeds snapshot");
+        const auto count=length/geometry().tokens_per_block+(length%geometry().tokens_per_block?1:0);
+        if(source.blocks.size()<count)throw std::invalid_argument("invalid prefix snapshot");
+        BlockTable table;table.length=length;table.blocks.assign(source.blocks.begin(),source.blocks.begin()+static_cast<std::ptrdiff_t>(count));
+        std::size_t retained=0;
+        try{for(auto handle:table.blocks){pool_.retain(handle);++retained;}
+            if(next_==std::numeric_limits<std::uint64_t>::max())throw std::runtime_error("sequence ID exhausted");
+            auto id=++next_;sequences_.emplace(id,std::move(table));return id;
+        }catch(...){for(std::size_t i=0;i<retained;++i)pool_.release(source.blocks[i]);throw;}
+    }
+
 // CACHE_CODE
 private:
     BlockTable& mutable_sequence(std::uint64_t id){return const_cast<BlockTable&>(std::as_const(*this).sequence(id));}
