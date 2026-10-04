@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 109 tasks are completed and 161 are not completed.
+Current status: 110 tasks are completed and 160 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -185,7 +185,7 @@ Target: Weeks 6-8.
 - ✅ T107 — Retain a portable scalar dispatch path. Evidence: [core/include/tvara/simd.hpp](core/include/tvara/simd.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
 - ✅ T108 — Implement AVX2 Q8_0 dot products. Evidence: [core/include/tvara/simd.hpp](core/include/tvara/simd.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
 - ✅ T109 — Implement AVX2 Q4_0 dot products. Evidence: [core/include/tvara/simd.hpp](core/include/tvara/simd.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
-- ❌ T110 — Implement AVX2 Q4_K dot products.
+- ✅ T110 — Implement AVX2 Q4_K dot products. Evidence: [core/include/tvara/simd.hpp](core/include/tvara/simd.hpp), [tests/core/test_simd.cpp](tests/core/test_simd.cpp).
 - ❌ T111 — Vectorize normalization and activation operations.
 - ❌ T112 — Implement vectorized RoPE.
 - ❌ T113 — Design a persistent worker thread pool.
