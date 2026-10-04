@@ -54,6 +54,41 @@ class SchemaCompiler:
             return self.memo[id(schema)]
         name = self.new()
         self.memo[id(schema)] = name
+        if "enum" in schema or "const" in schema:
+            from jsonschema import Draft202012Validator
+
+            candidate_schema = dict(schema)
+            for key in ("$defs", "definitions"):
+                if key in self.source:
+                    candidate_schema.setdefault(key, self.source[key])
+            validator = Draft202012Validator(candidate_schema)
+            values = schema.get("enum", [schema.get("const")])
+            valid = [value for value in values if validator.is_valid(value)]
+            if not valid:
+                raise ValueError("Enum has no valid values")
+            self.rules[name] = tuple(
+                literal(json.dumps(v, ensure_ascii=True, allow_nan=False, separators=(",", ":")))
+                for v in valid
+            )
+            return name
+        if "anyOf" in schema or isinstance(schema.get("type"), list):
+            if "anyOf" in schema:
+                outer = set(schema) - {
+                    "anyOf",
+                    "title",
+                    "description",
+                    "$defs",
+                    "definitions",
+                    "$schema",
+                    "$id",
+                }
+                if outer:
+                    raise ValueError("anyOf with sibling constraints is unsupported")
+                alternatives = schema["anyOf"]
+            else:
+                alternatives = [{**schema, "type": kind} for kind in schema["type"]]
+            self.rules[name] = tuple((self.node(item),) for item in alternatives)
+            return name
         kind = schema.get(
             "type", "object" if "properties" in schema or "required" in schema else None
         )

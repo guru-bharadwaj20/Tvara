@@ -96,3 +96,12 @@ def test_bounded_nested_array_schema():
     )
     assert accepts(grammar, '[{"x":1},{"x":2}]')
     assert not accepts(grammar, "[]") and not accepts(grammar, '[{"x":1},{"x":2},{"x":3}]')
+
+
+def test_enum_and_anyof_restrict_to_valid_literals():
+    from tvara.schema import compile_schema
+    from tvara.grammar import accepts
+
+    grammar = compile_schema({"anyOf": [{"enum": ["red", "blue"]}, {"type": "integer"}]})
+    assert accepts(grammar, '"red"') and accepts(grammar, "42")
+    assert not accepts(grammar, '"green"') and not accepts(grammar, "false")
