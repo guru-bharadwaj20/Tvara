@@ -49,3 +49,9 @@ def test_configuration_rejects_invalid_ports():
         ServerConfig(port=0)
     with pytest.raises(ValueError):
         ServerConfig(max_prompt_chars=0)
+
+
+def test_health_and_readiness_identify_the_fixture_backend(client):
+    assert client.get("/health").json() == {"status": "ok", "ready": True}
+    assert client.get("/ready").status_code == 200
+    assert client.get("/v1/models").json()["data"][0]["id"] == "fixture"
