@@ -278,3 +278,55 @@ def validate_grammar(grammar):
 
     for name in edges:
         visit(name)
+
+
+class GrammarLimitError(ValueError):
+    pass
+
+
+def closure(grammar, stacks, max_depth=256, max_states=8192):
+    pending = list(stacks)
+    seen = set()
+    frontier = set()
+    while pending:
+        stack = pending.pop()
+        if stack in seen:
+            continue
+        seen.add(stack)
+        if len(stack) > max_depth or len(seen) > max_states:
+            raise GrammarLimitError("Grammar state/stack limit exceeded")
+        if not stack or isinstance(stack[0], CharSet):
+            frontier.add(stack)
+            continue
+        for production in grammar.rules[stack[0]]:
+            pending.append(production + stack[1:])
+    return frozenset(frontier)
+
+
+@dataclass(frozen=True)
+class GrammarState:
+    stacks: frozenset
+
+    @classmethod
+    def start(cls, grammar):
+        return cls(frozenset({(grammar.root,)}))
+
+    def advance(self, grammar, char):
+        if len(char) != 1:
+            raise ValueError("Grammar transitions consume one character")
+        remaining = frozenset(
+            stack[1:] for stack in closure(grammar, self.stacks) if stack and stack[0].matches(char)
+        )
+        return GrammarState(remaining) if remaining else None
+
+    def accepting(self, grammar):
+        return () in closure(grammar, self.stacks)
+
+
+def accepts(grammar, text):
+    state = GrammarState.start(grammar)
+    for char in text:
+        state = state.advance(grammar, char)
+        if state is None:
+            return False
+    return state.accepting(grammar)
