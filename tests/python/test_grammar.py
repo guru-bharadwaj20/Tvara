@@ -48,3 +48,13 @@ def test_pushdown_nesting_and_repetition_acceptance():
         assert not accepts(grammar, text)
     repeated = Grammar.from_text('root ::= [a-c]+ "!"?')
     assert accepts(repeated, "abc!") and not accepts(repeated, "")
+
+
+def test_json_primitives_reject_invalid_numbers_and_escapes():
+    from tvara.grammar import json_primitive_grammar, accepts
+
+    grammar = json_primitive_grammar()
+    for text in ["null", " true ", "-1.2e+3", '"hello"', '"😀"', r'"a\nb"']:
+        assert accepts(grammar, text), repr(text)
+    for text in ["01", "+1", "NaN", '"unterminated', r'"\x00"', r'"\ud800"']:
+        assert not accepts(grammar, text), repr(text)
