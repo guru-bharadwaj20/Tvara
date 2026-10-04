@@ -153,3 +153,35 @@ def test_end_token_is_allowed_only_after_acceptance():
     machine.feed("c")
     assert machine.end_token_allowed
     machine.finish()
+
+
+def test_schema_outputs_pass_an_independent_validator():
+    import json
+    from jsonschema import Draft202012Validator, FormatChecker
+    from tvara.schema import compile_schema
+    from tvara.grammar import accepts
+
+    cases = [
+        (
+            {
+                "type": "object",
+                "properties": {"x": {"type": "integer"}},
+                "required": ["x"],
+                "additionalProperties": False,
+            },
+            '{"x":-2}',
+        ),
+        ({"type": "array", "items": {"enum": [1, 2]}, "minItems": 1, "maxItems": 2}, "[1,2]"),
+        ({"type": "string", "minLength": 2, "maxLength": 3}, '"😀a"'),
+        ({"type": "string", "format": "uuid"}, '"00000000-0000-4000-8000-000000000000"'),
+    ]
+    for schema, text in cases:
+        assert accepts(compile_schema(schema), text)
+        Draft202012Validator(schema, format_checker=FormatChecker()).validate(json.loads(text))
+    for schema in [
+        {"type": "integer", "minimum": 2},
+        {"type": "array", "uniqueItems": True},
+        {"$ref": "https://example.org/schema"},
+    ]:
+        with pytest.raises(ValueError):
+            compile_schema(schema)

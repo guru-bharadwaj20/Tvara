@@ -22,6 +22,7 @@ class SchemaCompiler:
         self.rules = parse_grammar(JSON_PRIMITIVES)
         self.counter = 0
         self.memo = {}
+        self.retained = []
         self.rules.update(
             extra_rules(r"""generic-object ::= "{" ws (string ws ":" ws value ws ("," ws string ws ":" ws value ws)*)? "}"
 """)
@@ -52,6 +53,7 @@ class SchemaCompiler:
             raise ValueError("Schema must be an object or boolean")
         if id(schema) in self.memo:
             return self.memo[id(schema)]
+        self.retained.append(schema)
         name = self.new()
         self.memo[id(schema)] = name
         if "$ref" in schema:
@@ -236,4 +238,70 @@ class SchemaCompiler:
 
 
 def compile_schema(schema):
+    validate_supported_schema(schema)
     return SchemaCompiler(schema).compile()
+
+
+def validate_supported_schema(schema):
+    from jsonschema import Draft202012Validator, SchemaError
+
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as error:
+        raise ValueError("Invalid JSON Schema") from error
+    annotations = {
+        "title",
+        "description",
+        "default",
+        "examples",
+        "$schema",
+        "$id",
+        "deprecated",
+        "readOnly",
+        "writeOnly",
+        "$comment",
+    }
+    supported = {
+        "type",
+        "properties",
+        "required",
+        "additionalProperties",
+        "$defs",
+        "definitions",
+        "$ref",
+        "anyOf",
+        "enum",
+        "const",
+        "items",
+        "minItems",
+        "maxItems",
+        "minLength",
+        "maxLength",
+        "minProperties",
+        "maxProperties",
+        "format",
+    }
+
+    def check(node):
+        if isinstance(node, bool):
+            return
+        if not isinstance(node, dict):
+            raise ValueError("Invalid schema node")
+        if "$ref" in node and not node["$ref"].startswith("#"):
+            raise ValueError("External schema references are unsupported")
+        if not ("enum" in node or "const" in node) and set(node) - supported - annotations:
+            raise ValueError(
+                "Unsupported schema keywords: "
+                + ", ".join(sorted(set(node) - supported - annotations))
+            )
+        for key in ("properties", "$defs", "definitions"):
+            for child in node.get(key, {}).values():
+                check(child)
+        for child in node.get("anyOf", []):
+            check(child)
+        if "items" in node:
+            check(node["items"])
+        if isinstance(node.get("additionalProperties"), dict):
+            check(node["additionalProperties"])
+
+    check(schema)
