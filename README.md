@@ -20,8 +20,8 @@ speedups or promised parity with mature engines.
 
 Tvara is in early implementation. The portable C++20 build and native GGUF loader
 are available, and the independent NumPy Llama reference passes pinned tiny-model
-logit and greedy-token checks. The native model executor, serving stack, and final
-benchmarks remain under development.
+logit and greedy-token checks. The scalar native model executor now passes tiny-checkpoint logit checks. Serving,
+optimized execution, and final benchmarks remain under development.
 
 See [local development](docs/development.md) for exercised build/test commands and
 [reference validation](docs/reference-validation.md) for numerical coverage.
