@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 130 tasks are completed and 140 are not completed.
+Current status: 131 tasks are completed and 139 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -211,7 +211,7 @@ Target: Weeks 6-8.
 - ✅ T128 — Implement shared-block ownership. Evidence: [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp), [tests/core/test_kv.cpp](tests/core/test_kv.cpp).
 - ✅ T129 — Implement copy-on-write for divergent sequences. Evidence: [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp), [tests/core/test_kv.cpp](tests/core/test_kv.cpp).
 - ✅ T130 — Handle partially filled tail blocks. Evidence: [tests/core/test_kv.cpp](tests/core/test_kv.cpp).
-- ❌ T131 — Implement truncation for generation rollback.
+- ✅ T131 — Implement truncation for generation rollback. Evidence: [core/include/tvara/kv.hpp](core/include/tvara/kv.hpp), [tests/core/test_kv.cpp](tests/core/test_kv.cpp).
 - ❌ T132 — Handle cache exhaustion predictably.
 - ❌ T133 — Test allocation and release invariants.
 - ❌ T134 — Compare cached decode with uncached reference output.

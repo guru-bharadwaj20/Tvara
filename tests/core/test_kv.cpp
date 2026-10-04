@@ -34,6 +34,10 @@ void test_tail_boundaries(){PagedCache cache({1,1,2,2,5});auto source=cache.crea
     check(cache.pool().references(shared)==2 && cache.sequence(branch).blocks.size()==2 && cache.sequence(source).length==2);
     cache.drop(branch);cache.drop(source);check(cache.pool().available()==5);}
 
+void test_rollback(){PagedCache cache({1,1,2,2,5});auto id=cache.create_sequence();std::vector<float>x(2,1);for(int i=0;i<5;++i)cache.append(id,x,x);
+    cache.truncate(id,3);check(cache.sequence(id).blocks.size()==2 && cache.pool().available()==3);x[0]=9;cache.append(id,x,x);check(cache.read(id,0,3)[0]==9);
+    cache.truncate(id,0);check(cache.pool().available()==5);cache.drop(id);}
+
 // EXTRA_TESTS
 int main(){try{test_geometry();
     test_allocator();
@@ -45,6 +49,7 @@ int main(){try{test_geometry();
         test_sharing();
         test_copy_on_write();
         test_tail_boundaries();
+        test_rollback();
         // RUN_TESTS
     std::cout<<"Paged KV checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
