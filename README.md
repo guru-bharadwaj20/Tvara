@@ -20,7 +20,7 @@ speedups or promised parity with mature engines.
 
 Tvara is in early implementation. The portable C++20 build and native GGUF loader
 are available, and the independent NumPy Llama reference passes pinned tiny-model
-logit and greedy-token checks. The scalar native model executor now passes tiny-checkpoint logit checks. Serving,
+logit and greedy-token checks. The scalar native model executor now passes tiny-checkpoint logit checks. A local completions API and SSE streaming are available; native chat templates,
 optimized execution, and final benchmarks remain under development.
 
 See [local development](docs/development.md) for exercised build/test commands and
@@ -51,6 +51,12 @@ No performance results are available yet.
 The proposal estimates 18 weeks for a team of four. This is a planning target,
 not a delivery commitment; overlapping work depends on staffing and completed
 prerequisites.
+
+## Local development
+
+See [development commands](docs/development.md), [native bindings](docs/native-bindings.md),
+and [API setup](docs/api.md). Current inference validation uses tiny/random fixtures;
+no pretrained throughput or quality results are claimed.
 
 ## Documentation and contributions
 

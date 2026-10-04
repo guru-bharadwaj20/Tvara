@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 164 tasks are completed and 106 are not completed.
+Current status: 165 tasks are completed and 105 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -255,7 +255,7 @@ Target: Weeks 7-9.
 - ✅ T162 — Handle client disconnects and cancellation. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ✅ T163 — Return consistent request errors. Evidence: [python/tvara/server.py](python/tvara/server.py), [tests/python/test_server.py](tests/python/test_server.py).
 - ✅ T164 — Add local client integration checks. Evidence: [tools/make_api_fixture.py](tools/make_api_fixture.py), [tools/smoke_api.py](tools/smoke_api.py).
-- ❌ T165 — Document runnable API examples after validation.
+- ✅ T165 — Document runnable API examples after validation. Evidence: [docs/api.md](docs/api.md), [README.md](README.md).
 
 ### Phase 12: Prefill and attention optimization
 
