@@ -23,6 +23,28 @@ inline std::vector<float> online_attention(std::span<const float> q,std::span<co
         auto head=state.finish();std::copy(head.begin(),head.end(),output.begin()+static_cast<std::ptrdiff_t>(h*dim));}
     return output;
 }
+
+#if TVARA_AVX2_AVAILABLE
+// Widen products before summing, preserving the scalar double-product reference.
+TVARA_AVX2 inline double attention_dot_avx2(std::span<const float> a,std::span<const float> b){
+    __m256d acc=_mm256_setzero_pd();std::size_t i=0;
+    for(;i+4<=a.size();i+=4){auto x=_mm256_cvtps_pd(_mm_loadu_ps(a.data()+i)),y=_mm256_cvtps_pd(_mm_loadu_ps(b.data()+i));acc=_mm256_add_pd(acc,_mm256_mul_pd(x,y));}
+    double lanes[4];_mm256_storeu_pd(lanes,acc);double sum=lanes[0]+lanes[1]+lanes[2]+lanes[3];for(;i<a.size();++i)sum+=double(a[i])*b[i];return sum;
+}
+#endif
+inline double attention_dot_scalar(std::span<const float> a,std::span<const float> b){
+    double sum=0;for(std::size_t i=0;i<a.size();++i)sum+=double(a[i])*b[i];return sum;
+}
+inline double attention_dot(std::span<const float> a,std::span<const float> b,bool scalar=false){
+    if(a.size()!=b.size())throw std::invalid_argument("attention dot size mismatch");
+#if TVARA_AVX2_AVAILABLE
+    if(use_avx2(scalar))return attention_dot_avx2(a,b);
+#else
+    (void)scalar;
+#endif
+    return attention_dot_scalar(a,b);
+}
+
 inline std::vector<float> fused_paged_attention(std::span<const float> q,const PagedCache& cache,std::uint64_t sequence,std::size_t layer,const ModelConfig& c,
     std::span<const float> tail_key={},std::span<const float> tail_value={},std::size_t visible=std::numeric_limits<std::size_t>::max(),bool scalar=false,bool prefetch=false) {
     c.validate();const auto& g=cache.geometry();const auto& table=cache.sequence(sequence);const auto width=c.kv_width(),dim=c.head_dim();
@@ -30,15 +52,22 @@ inline std::vector<float> fused_paged_attention(std::span<const float> q,const P
        (!tail_key.empty() && tail_key.size()!=width) || table.length>c.context || (!tail_key.empty() && table.length==c.context))throw std::invalid_argument("invalid fused attention shape");
     const auto total=table.length+(tail_key.empty()?0:1);visible=std::min(visible,total);
     if(!visible)throw std::invalid_argument("empty fused attention");
+    using ScoreDot=double(*)(std::span<const float>,std::span<const float>);
+    ScoreDot score_dot=attention_dot_scalar;
+#if TVARA_AVX2_AVAILABLE
+    if(use_avx2(scalar))score_dot=attention_dot_avx2;
+#else
+    (void)scalar;
+#endif
     std::vector<float> output(c.hidden);const auto cached=std::min(visible,table.length);
     for(std::size_t h=0;h<c.heads;++h){OnlineAttention state(dim);const auto kh=h/(c.heads/c.kv_heads);auto query=q.subspan(h*dim,dim);
         for(std::size_t block=0;block<table.blocks.size() && block*g.tokens_per_block<cached;++block){auto data=cache.pool().data(table.blocks[block]);
             const auto count=std::min(g.tokens_per_block,cached-block*g.tokens_per_block);
             for(std::size_t slot=0;slot<count;++slot){auto key=data.subspan(kv_offset(g,layer,0,slot)+kh*dim,dim);auto value=data.subspan(kv_offset(g,layer,1,slot)+kh*dim,dim);
                 // SCORE_CODE
-                (void)scalar;(void)prefetch;double score=0;for(std::size_t i=0;i<dim;++i)score+=double(query[i])*key[i];
+                (void)prefetch;double score=score_dot(query,key);
                 state.update(score/std::sqrt(double(dim)),value);}}
-        if(visible>table.length){double score=0;for(std::size_t i=0;i<dim;++i)score+=double(query[i])*tail_key[kh*dim+i];state.update(score/std::sqrt(double(dim)),tail_value.subspan(kh*dim,dim));}
+        if(visible>table.length){double score=score_dot(query,tail_key.subspan(kh*dim,dim));state.update(score/std::sqrt(double(dim)),tail_value.subspan(kh*dim,dim));}
         auto head=state.finish();std::copy(head.begin(),head.end(),output.begin()+static_cast<std::ptrdiff_t>(h*dim));}
     return output;
 }

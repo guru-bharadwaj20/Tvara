@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 189 tasks are completed and 81 are not completed.
+Current status: 190 tasks are completed and 80 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -270,7 +270,7 @@ Target: Weeks 9-11.
 - ✅ T172 — Support grouped-query heads in fused attention. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T172.json](bench/results/prefill/T172.json)..
 - ✅ T173 — Handle causal masks within prompt chunks. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T173.json](bench/results/prefill/T173.json)..
 - ✅ T174 — Handle partial KV blocks in attention. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T174.json](bench/results/prefill/T174.json)..
-- ❌ T175 — Vectorize attention reductions.
+- ✅ T175 — Vectorize attention reductions. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T175.json](bench/results/prefill/T175.json)..
 - ❌ T176 — Add weight and cache prefetch experiments.
 - ❌ T177 — Measure numerical error across long contexts.
 - ❌ T178 — Compare fused attention with unfused output.
