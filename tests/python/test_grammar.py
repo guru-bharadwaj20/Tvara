@@ -76,3 +76,23 @@ def test_object_schema_required_optional_and_property_orders():
         assert accepts(grammar, text)
     for text in ["{}", '{"b":true}', '{"a":"x"}', '{"a":1,"a":2}']:
         assert not accepts(grammar, text)
+
+
+def test_bounded_nested_array_schema():
+    from tvara.schema import compile_schema
+    from tvara.grammar import accepts
+
+    grammar = compile_schema(
+        {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"x": {"type": "integer"}},
+                "required": ["x"],
+            },
+            "minItems": 1,
+            "maxItems": 2,
+        }
+    )
+    assert accepts(grammar, '[{"x":1},{"x":2}]')
+    assert not accepts(grammar, "[]") and not accepts(grammar, '[{"x":1},{"x":2},{"x":3}]')

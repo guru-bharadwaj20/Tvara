@@ -26,7 +26,11 @@ class SchemaCompiler:
             extra_rules(r"""generic-object ::= "{" ws (string ws ":" ws value ws ("," ws string ws ":" ws value ws)*)? "}"
 """)
         )
-        self.rules["value"] += (("generic-object",),)
+        self.rules.update(
+            extra_rules(r"""generic-array ::= "[" ws (value ws ("," ws value ws)*)? "]"
+""")
+        )
+        self.rules["value"] += (("generic-object",), ("generic-array",))
 
     def new(self, choices=()):
         self.counter += 1
@@ -55,6 +59,8 @@ class SchemaCompiler:
         )
         if kind == "object":
             choices = self.object(schema)
+        elif kind == "array":
+            choices = self.array(schema)
         elif kind == "string":
             choices = (("string",),)
         elif kind == "integer":
@@ -103,6 +109,35 @@ class SchemaCompiler:
                     )
             self.rules[state] = tuple(choices)
         return (literal("{") + ("ws", states[0]) + literal("}"),)
+
+    def array(self, schema):
+        minimum = schema.get("minItems", 0)
+        maximum = schema.get("maxItems")
+        if (
+            not isinstance(minimum, int)
+            or minimum < 0
+            or minimum > 64
+            or maximum is not None
+            and (not isinstance(maximum, int) or maximum < minimum or maximum > 64)
+        ):
+            raise ValueError("Array bounds must be 0..64")
+        child = self.node(schema.get("items", {}))
+        if maximum is not None:
+            choices = []
+            for length in range(minimum, maximum + 1):
+                sequence = ()
+                for i in range(length):
+                    sequence += (literal(",") + ("ws",) if i else ()) + (child, "ws")
+                choices.append(sequence)
+            content = self.new(choices)
+        else:
+            tail = self.new()
+            self.rules[tail] = ((), literal(",") + ("ws", child, "ws", tail))
+            prefix = ()
+            for i in range(max(1, minimum)):
+                prefix += (literal(",") + ("ws",) if i else ()) + (child, "ws")
+            content = self.new(((), prefix + (tail,)) if minimum == 0 else (prefix + (tail,),))
+        return (literal("[") + ("ws", content) + literal("]"),)
 
 
 def compile_schema(schema):
