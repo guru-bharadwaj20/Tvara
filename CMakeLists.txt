@@ -67,3 +67,6 @@ if(BUILD_TESTING)
   target_link_libraries(test_threads PRIVATE tvara_core)
   add_test(NAME threads COMMAND test_threads)
 endif()
+
+add_executable(kernel_overhead bench/kernel_overhead.cpp)
+target_link_libraries(kernel_overhead PRIVATE tvara_core)
