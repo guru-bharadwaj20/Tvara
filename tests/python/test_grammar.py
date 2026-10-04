@@ -36,3 +36,15 @@ def test_validation_rejects_missing_and_left_recursive_rules():
         with pytest.raises(ValueError):
             Grammar.from_text(text)
     Grammar.from_text('root ::= "(" root ")" | ""')
+
+
+def test_pushdown_nesting_and_repetition_acceptance():
+    from tvara.grammar import Grammar, accepts
+
+    grammar = Grammar.from_text('root ::= "(" root ")" root | ""')
+    for text in ["", "()", "(())()"]:
+        assert accepts(grammar, text)
+    for text in ["(", ")(", "(()"]:
+        assert not accepts(grammar, text)
+    repeated = Grammar.from_text('root ::= [a-c]+ "!"?')
+    assert accepts(repeated, "abc!") and not accepts(repeated, "")
