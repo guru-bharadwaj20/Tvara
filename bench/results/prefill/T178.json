@@ -1,0 +1,10 @@
+{
+  "tokens": 73,
+  "layers": 2,
+  "max_logit_error": 2.38419e-07,
+  "fused_attention_us": 57.8,
+  "gathered_unfused_attention_us": 98.6,
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
