@@ -47,3 +47,12 @@ def test_iteration_batch():
     s.step()
     assert b.batches == [("a", "b")]
     assert all(len(r.output) == 1 for r in s.active)
+
+
+def test_completion_releases_resources():
+    b = Backend()
+    s = Scheduler(b, 1)
+    for i in range(3):
+        s.submit(Request(str(i), (1,), i))
+    s.run()
+    assert not b.live and all(r.state is State.FINISHED for r in s.requests.values())
