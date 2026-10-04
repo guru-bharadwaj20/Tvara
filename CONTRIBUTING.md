@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 176 tasks are completed and 94 are not completed.
+Current status: 177 tasks are completed and 93 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -292,7 +292,7 @@ Target: Weeks 9-11.
 - ✅ T189 — Implement leaf access tracking. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T190 — Implement LRU leaf eviction. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ✅ T191 — Release KV references after eviction. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
-- ❌ T192 — Coordinate eviction with copy-on-write.
+- ✅ T192 — Coordinate eviction with copy-on-write. Evidence: [core/include/tvara/radix.hpp](core/include/tvara/radix.hpp), [tests/core/test_radix.cpp](tests/core/test_radix.cpp).
 - ❌ T193 — Test repeated and divergent conversations.
 - ❌ T194 — Measure hit rate and saved prefill tokens.
 - ❌ T195 — Document prefix isolation and cache reset behavior.

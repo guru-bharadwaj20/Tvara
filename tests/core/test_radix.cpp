@@ -15,6 +15,7 @@ tree.pin(a);assert(tree.node(a).pins==1);auto shorter=tree.insert(std::vector<st
 tree.touch(a);tree.touch(b);assert(tree.node(a).accessed<tree.node(b).accessed);
 assert(tree.eviction_candidate()==a);tree.pin(a);assert(tree.eviction_candidate()==b);tree.unpin(a);
 tree.pin(b);assert(tree.evict_one());assert(!tree.node(b).edge.empty());tree.unpin(b);cache.audit(tree.external_references());
+auto c=tree.insert(prompt);tree.attach(c,seq);auto survivor=tree.reuse(prompt,true);tree.touch(b);assert(tree.evict_one());assert(cache.sequence(survivor.first).length==6);cache.append(survivor.first,std::span(&nine,1),std::span(&nine,1));assert(cache.read(seq,0,5)[0]==5);cache.drop(survivor.first);cache.audit(tree.external_references());
 // TESTS
  std::cout<<"radix OK\n";
 }
