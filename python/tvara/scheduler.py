@@ -93,3 +93,17 @@ class Scheduler:
             if len(r.output) >= r.max_tokens:
                 r.state = State.FINISHED
         return bool(self.active or self.queue)
+
+    def reap(self):
+        for r in list(self.active):
+            if r.state in {State.FINISHED, State.CANCELLED, State.FAILED}:
+                self.backend.drop(r.identifier)
+                self.active.remove(r)
+
+    def run(self, max_iterations=100000):
+        for _ in range(max_iterations):
+            self.step()
+            self.reap()
+            if not self.active and not self.queue:
+                return
+        raise RuntimeError("Scheduler iteration budget exhausted")
