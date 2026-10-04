@@ -1,0 +1,33 @@
+{
+  "candidates": [
+    {
+      "tokens": 1,
+      "outputs": 8,
+      "inner": 32,
+      "us": 5385.7
+    },
+    {
+      "tokens": 4,
+      "outputs": 16,
+      "inner": 64,
+      "us": 4325.3
+    },
+    {
+      "tokens": 8,
+      "outputs": 16,
+      "inner": 64,
+      "us": 5755.7
+    },
+    {
+      "tokens": 16,
+      "outputs": 32,
+      "inner": 128,
+      "us": 4248.3
+    }
+  ],
+  "reference_us": 4360.3,
+  "policy": "retain explicit tiles; no global winner from one shape",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
