@@ -43,5 +43,11 @@ inline std::vector<float> fused_paged_attention(std::span<const float> q,const P
     return output;
 }
 
+inline std::vector<float> fused_prompt_attention(std::span<const float> queries,const PagedCache& cache,std::uint64_t sequence,std::size_t layer,std::size_t start,std::size_t count,const ModelConfig& c){
+    c.validate();const auto length=cache.sequence(sequence).length;
+    if(!count || start>=length || count>length-start || count>std::numeric_limits<std::size_t>::max()/c.hidden || queries.size()!=count*c.hidden)throw std::invalid_argument("invalid causal prompt chunk");
+    std::vector<float> output;output.reserve(queries.size());for(std::size_t i=0;i<count;++i){auto row=fused_paged_attention(queries.subspan(i*c.hidden,c.hidden),cache,sequence,layer,c,{},{},start+i+1);output.insert(output.end(),row.begin(),row.end());}return output;
+}
+
 // ATTENTION_CODE
 }
