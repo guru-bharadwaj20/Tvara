@@ -18,9 +18,17 @@ void test_q8_simd(){
     close(dispatch.q8(w,a),quant::dot_q8_0(w,a));
 }
 
+void test_q4_simd(){
+    std::vector<std::byte> w(18);w[0]=std::byte(0);w[1]=std::byte(0xbc);
+    for(std::size_t i=0;i<16;++i)w[i+2]=std::byte(i|(i<<4));
+    std::vector<float> x(32);for(std::size_t i=0;i<32;++i)x[i]=std::cos(static_cast<float>(i));
+    auto a=quant::quantize_activations(x);KernelDispatch dispatch;close(dispatch.q4(w,a),quant::dot_q4_0(w,a));
+}
+
 // EXTRA_TESTS
 int main(){try{test_detection();
     test_scalar_dispatch();
         test_q8_simd();
+        test_q4_simd();
         // RUN_TESTS
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
