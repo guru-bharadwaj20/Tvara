@@ -58,5 +58,23 @@ inline std::pair<std::size_t,std::size_t> partition_rows(std::size_t rows,std::s
     const auto start=base*index+std::min(index,remainder);return {start,start+base+(index<remainder?1:0)};
 }
 
+class SpinBarrier {
+public:
+    explicit SpinBarrier(std::size_t count):count_(count),remaining_(count){if(!count)throw std::invalid_argument("empty barrier");}
+    void arrive_and_wait(){
+        const auto seen=generation_.load(std::memory_order_acquire);
+        if(remaining_.fetch_sub(1,std::memory_order_acq_rel)==1){
+            {std::lock_guard lock(mutex_);remaining_.store(count_,std::memory_order_relaxed);generation_.fetch_add(1,std::memory_order_release);}
+            changed_.notify_all();return;
+        }
+        for(int spin=0;spin<64;++spin){if(generation_.load(std::memory_order_acquire)!=seen)return;std::this_thread::yield();}
+        std::unique_lock lock(mutex_);changed_.wait(lock,[&]{return generation_.load(std::memory_order_acquire)!=seen;});
+    }
+private:
+    const std::size_t count_;
+    std::atomic<std::size_t> remaining_,generation_{0};
+    std::mutex mutex_;std::condition_variable changed_;
+};
+
 // THREAD_CODE
 }
