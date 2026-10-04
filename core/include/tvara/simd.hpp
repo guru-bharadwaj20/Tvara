@@ -101,6 +101,28 @@ TVARA_AVX2 inline void swiglu_avx2(std::span<float> gate,std::span<const float> 
 }
 #endif
 
+#if TVARA_AVX2_AVAILABLE
+TVARA_AVX2 inline void rotary_avx2(std::span<float> x,std::size_t heads,std::size_t dim,std::size_t position,float theta,bool interleaved) {
+    if(!heads || !dim || dim%2 || heads>std::numeric_limits<std::size_t>::max()/dim || x.size()!=heads*dim ||
+       !std::isfinite(theta) || theta<=0)throw std::invalid_argument("AVX2 RoPE dimensions");
+    alignas(32) float left[8],right[8],cosine[8],sine[8];
+    for(std::size_t h=0;h<heads;++h){std::size_t i=0;
+        for(;i+8<=dim/2;i+=8){
+            for(std::size_t j=0;j<8;++j){const auto a=h*dim+(interleaved?2*(i+j):i+j),b=h*dim+(interleaved?2*(i+j)+1:i+j+dim/2);
+                left[j]=x[a];right[j]=x[b];float angle=static_cast<float>(position)/std::pow(theta,static_cast<float>(2*(i+j))/static_cast<float>(dim));
+                cosine[j]=std::cos(angle);sine[j]=std::sin(angle);}
+            auto a=_mm256_load_ps(left),b=_mm256_load_ps(right),c=_mm256_load_ps(cosine),s=_mm256_load_ps(sine);
+            _mm256_store_ps(left,_mm256_sub_ps(_mm256_mul_ps(a,c),_mm256_mul_ps(b,s)));
+            _mm256_store_ps(right,_mm256_add_ps(_mm256_mul_ps(b,c),_mm256_mul_ps(a,s)));
+            for(std::size_t j=0;j<8;++j){x[h*dim+(interleaved?2*(i+j):i+j)]=left[j];x[h*dim+(interleaved?2*(i+j)+1:i+j+dim/2)]=right[j];}
+        }
+        for(;i<dim/2;++i){auto a=h*dim+(interleaved?2*i:i),b=h*dim+(interleaved?2*i+1:i+dim/2);
+            float angle=static_cast<float>(position)/std::pow(theta,static_cast<float>(2*i)/static_cast<float>(dim)),c=std::cos(angle),s=std::sin(angle),l=x[a],r=x[b];
+            x[a]=l*c-r*s;x[b]=r*c+l*s;}
+    }
+}
+#endif
+
 // SIMD_CODE
 struct KernelDispatch {
     using Dot=float(*)(std::span<const std::byte>,std::span<const quant::Q8Activation>);

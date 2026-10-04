@@ -41,6 +41,15 @@ void test_vector_norm_activation(){
 #endif
 }
 
+void test_vector_rope(){
+#if TVARA_AVX2_AVAILABLE
+    if(!use_avx2())return;
+    for(bool layout:{false,true}){std::vector<float> x(72);for(std::size_t i=0;i<x.size();++i)x[i]=static_cast<float>(i)/10;
+        auto ref=x;rotary(ref,2,36,7,10000,layout);rotary_avx2(x,2,36,7,10000,layout);
+        for(std::size_t i=0;i<x.size();++i)close(x[i],ref[i]);}
+#endif
+}
+
 // EXTRA_TESTS
 int main(){try{test_detection();
     test_scalar_dispatch();
@@ -48,5 +57,6 @@ int main(){try{test_detection();
         test_q4_simd();
         test_q4k_simd();
         test_vector_norm_activation();
+        test_vector_rope();
         // RUN_TESTS
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
