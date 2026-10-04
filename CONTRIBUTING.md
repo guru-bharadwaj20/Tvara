@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 186 tasks are completed and 84 are not completed.
+Current status: 187 tasks are completed and 83 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -267,7 +267,7 @@ Target: Weeks 9-11.
 - ✅ T169 — Tune prefill tile dimensions. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T169.json](bench/results/prefill/T169.json)..
 - ✅ T170 — Implement online softmax reference attention. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T170.json](bench/results/prefill/T170.json)..
 - ✅ T171 — Implement fused paged attention. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T171.json](bench/results/prefill/T171.json)..
-- ❌ T172 — Support grouped-query heads in fused attention.
+- ✅ T172 — Support grouped-query heads in fused attention. Evidence: Native numerical assertions and measured evidence: [bench/results/prefill/T172.json](bench/results/prefill/T172.json)..
 - ❌ T173 — Handle causal masks within prompt chunks.
 - ❌ T174 — Handle partial KV blocks in attention.
 - ❌ T175 — Vectorize attention reductions.
