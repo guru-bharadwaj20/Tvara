@@ -133,3 +133,20 @@ class Scheduler:
             if not self.active and not self.queue:
                 return
         raise RuntimeError("Scheduler iteration budget exhausted")
+
+    def preempt(self, identifier):
+        r = self.requests[identifier]
+        if r not in self.active or r.state not in {State.PREFILL, State.DECODE}:
+            raise ValueError("Request is not preemptible")
+        self.backend.drop(identifier)
+        self.active.remove(r)
+        r.state = State.PREEMPTED
+        r.position = 0
+
+    def pressure(self, new_budget):
+        if type(new_budget) is not int or new_budget < 1:
+            raise ValueError("Invalid KV budget")
+        while sum(len(r.prompt) + r.max_tokens for r in self.active) > new_budget:
+            victim = min(self.active, key=lambda r: (r.priority, -self.enqueued[r.identifier]))
+            self.preempt(victim.identifier)
+        self.kv_tokens = new_budget

@@ -107,3 +107,13 @@ def test_priority_and_aging():
     s.reap()
     s.admit()
     assert s.active[0].identifier == "low"
+
+
+def test_memory_pressure_preempts_and_releases():
+    b = Backend()
+    s = Scheduler(b, kv_tokens=8)
+    s.submit(Request("a", (1,), 3))
+    s.submit(Request("b", (2,), 3, priority=1))
+    s.step()
+    s.pressure(4)
+    assert s.requests["a"].state is State.PREEMPTED and "a" not in b.live
