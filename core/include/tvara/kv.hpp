@@ -76,7 +76,22 @@ public:
     const CacheGeometry& geometry()const{return pool_.geometry();}
     BlockPool& pool(){return pool_;}
     const BlockPool& pool()const{return pool_;}
-    // CACHE_CODE
+    void append(std::uint64_t id,std::span<const float> keys,std::span<const float> values){
+        auto& table=mutable_sequence(id);const auto& g=geometry();
+        if(keys.size()!=g.layers*g.kv_width() || values.size()!=keys.size() || table.length>=g.max_blocks*g.tokens_per_block)
+            throw std::invalid_argument("invalid paged KV append dimensions");
+        const auto slot=table.length%g.tokens_per_block;
+        if(slot==0){auto block=pool_.allocate();try{table.blocks.push_back(block);}catch(...){pool_.free(block);throw;}}
+        // COPY_ON_WRITE
+        auto block=pool_.data(table.blocks.back());
+        for(std::size_t layer=0;layer<g.layers;++layer){
+            std::copy_n(keys.begin()+static_cast<std::ptrdiff_t>(layer*g.kv_width()),g.kv_width(),block.begin()+static_cast<std::ptrdiff_t>(kv_offset(g,layer,0,slot)));
+            std::copy_n(values.begin()+static_cast<std::ptrdiff_t>(layer*g.kv_width()),g.kv_width(),block.begin()+static_cast<std::ptrdiff_t>(kv_offset(g,layer,1,slot)));
+        }
+        ++table.length;
+    }
+
+// CACHE_CODE
 private:
     BlockTable& mutable_sequence(std::uint64_t id){return const_cast<BlockTable&>(std::as_const(*this).sequence(id));}
     BlockPool pool_;std::map<std::uint64_t,BlockTable> sequences_;std::uint64_t next_=0;
