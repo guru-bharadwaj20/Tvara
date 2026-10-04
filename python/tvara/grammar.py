@@ -330,3 +330,24 @@ def accepts(grammar, text):
         if state is None:
             return False
     return state.accepting(grammar)
+
+
+JSON_PRIMITIVES = r"""
+root ::= ws value ws
+ws ::= [ \t\r\n]*
+value ::= string | number | "true" | "false" | "null"
+string ::= "\"" chars "\""
+chars ::= char chars | ""
+char ::= [^"\\\x00-\x1f\ud800-\udfff] | "\\" escape
+escape ::= ["\\/bfnrt] | "u" unicode-safe
+unicode-safe ::= [0-9a-cA-Ce-fE-F] hex hex hex | [dD] [0-7] hex hex
+hex ::= [0-9a-fA-F]
+number ::= "-"? integer fraction? exponent?
+integer ::= "0" | [1-9] [0-9]*
+fraction ::= "." [0-9]+
+exponent ::= [eE] [+-]? [0-9]+
+"""
+
+
+def json_primitive_grammar():
+    return Grammar.from_text(JSON_PRIMITIVES)
