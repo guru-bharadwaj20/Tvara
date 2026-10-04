@@ -171,3 +171,50 @@ class Scheduler:
         if r in self.queue:
             self.queue.remove(r)
         self.reap()
+
+
+class NativeSchedulerBackend:
+    """Serial native execution with iteration batching; no parallel GEMM claim."""
+
+    def __init__(self, model):
+        self.model = model
+        self.sequences = {}
+        self.pending = {}
+
+    def create(self, key):
+        self.sequences[key] = self.model._new_sequence()
+
+    def prefill(self, key, tokens):
+        for token in tokens:
+            self.pending[key] = self.model.logits(self.sequences[key], token)
+
+    def decode_batch(self, keys):
+        result = []
+        for key in keys:
+            logits = self.pending[key]
+            if not __import__("numpy").isfinite(logits).all():
+                raise ValueError("Nonfinite model logits")
+            token = int(logits.argmax())
+            result.append(token)
+            self.pending[key] = self.model.logits(self.sequences[key], token)
+        return result
+
+    def drop(self, key):
+        self.model._drop_sequence(self.sequences.pop(key))
+        self.pending.pop(key, None)
+
+
+def conversation_load(count=16, seed=0, vocab=257):
+    import random
+
+    if count < 1 or vocab < 1:
+        raise ValueError("Invalid synthetic workload")
+    rng = random.Random(seed)
+    return [
+        Request(
+            f"conversation-{i}",
+            tuple(rng.randrange(vocab) for _ in range(rng.randint(1, 12))),
+            rng.randint(1, 8),
+        )
+        for i in range(count)
+    ]
