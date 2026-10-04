@@ -1,0 +1,13 @@
+{
+  "workers": 2,
+  "repetitions": 1000,
+  "noop_worker_us": 66.4835,
+  "q8_dot_ns": 15.087,
+  "avx2_dispatch": true,
+  "checksum": 0,
+  "executed_at_utc": "2026-10-13T16:29:05.949585+00:00",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "processor": "Intel64 Family 6 Model 61 Stepping 4, GenuineIntel",
+  "build": "Release",
+  "limitation": "single local microbenchmark run; not model throughput or a comparative speed claim"
+}
