@@ -370,3 +370,49 @@ def propose_lookup(draft, length, rng, constraint=None):
         if token == draft.identity.eos_id or (constraint is not None and constraint.ended):
             break
     return proposals
+
+
+@dataclass
+class DraftController:
+    length: int = 4
+    minimum: int = 1
+    maximum: int = 16
+    acceptance_ema: float = 0.5
+
+    def __post_init__(self):
+        if not 1 <= self.minimum <= self.length <= self.maximum <= 64:
+            raise ValueError("Invalid adaptive draft bounds")
+
+    def observe(self, result):
+        if not 0 <= result.accepted <= result.proposed:
+            raise ValueError("Invalid speculative outcome")
+        if not result.proposed:
+            return self.length
+        ratio = result.accepted / result.proposed
+        self.acceptance_ema = 0.75 * self.acceptance_ema + 0.25 * ratio
+        if self.acceptance_ema > 0.8:
+            self.length = min(self.maximum, self.length + 1)
+        elif self.acceptance_ema < 0.4:
+            self.length = max(self.minimum, self.length - 1)
+        return self.length
+
+
+def speculative_generate(
+    draft, target, max_new_tokens, rng, controller=None, constraint=None, proposer=None
+):
+    if not isinstance(max_new_tokens, int) or max_new_tokens < 0:
+        raise ValueError("Invalid generation length")
+    controller = controller or DraftController()
+    output = []
+    while len(output) < max_new_tokens:
+        remaining = max_new_tokens - len(output)
+        result = speculative_step(
+            draft, target, min(controller.length, remaining - 1), rng, constraint, proposer
+        )
+        controller.observe(result)
+        output.extend(result.tokens)
+        if output and (
+            output[-1] == target.identity.eos_id or (constraint is not None and constraint.ended)
+        ):
+            break
+    return output
