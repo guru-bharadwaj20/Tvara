@@ -1,5 +1,7 @@
 """Vocabulary masks over immutable grammar states; one constraint per generation."""
 
+from collections import OrderedDict
+
 from dataclasses import dataclass, field
 from .grammar import GrammarState  # noqa: F401
 
@@ -107,6 +109,9 @@ class MaskEngine:
             raise ValueError("Invalid mask cache bound")
         self.max_entries = max_entries
         self.precomputed = {}
+        self.cache = OrderedDict()
+        self.hits = 0
+        self.misses = 0
 
     def compute(self, state):
         ids = list(trie_allowed(self.trie, self.grammar, state))
@@ -123,4 +128,16 @@ class MaskEngine:
             self.precomputed[state] = self.compute(state)
 
     def mask(self, state):
-        return self.precomputed.get(state) or self.compute(state)
+        if state in self.precomputed:
+            self.hits += 1
+            return self.precomputed[state]
+        if state in self.cache:
+            self.hits += 1
+            self.cache.move_to_end(state)
+            return self.cache[state]
+        self.misses += 1
+        result = self.compute(state)
+        self.cache[state] = result
+        if len(self.cache) > self.max_entries:
+            self.cache.popitem(last=False)
+        return result

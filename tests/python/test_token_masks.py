@@ -65,3 +65,14 @@ def test_precomputation_bound_and_eos():
     assert e.compute(done).ids() == (1,)
     with pytest.raises(ValueError):
         e.precompute([done])
+
+
+def test_lru_eviction_and_cache_identity():
+    g = grammar('"ab"')
+    s = m.ByteState(GrammarState.start(g))
+    e = m.MaskEngine([b"a", b"b"], g, max_entries=1)
+    first = e.mask(s)
+    assert e.mask(s) is first and e.hits == 1
+    after = m.advance_byte(g, s, 97)
+    assert e.mask(after).ids() == (1,)
+    assert len(e.cache) == 1 and s not in e.cache
