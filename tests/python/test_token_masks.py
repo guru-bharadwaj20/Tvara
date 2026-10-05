@@ -193,3 +193,19 @@ def test_tool_signatures_become_name_and_argument_constraints():
     assert not accepts(g, '{"name":"other","arguments":{"city":"Paris"}}')
     with pytest.raises(ValueError):
         tool_response_format(tools, "auto")
+
+
+def test_seeded_trie_masks_match_naive_scan_after_unicode_transitions():
+    rng = np.random.default_rng(225)
+    vocab = [
+        bytes(rng.integers(0, 256, size=int(rng.integers(1, 5)), dtype=np.uint8))
+        for _ in range(200)
+    ]
+    vocab += [b"a", b"b", "€".encode(), b"\xe2", b"\x82", b"\xac"]
+    g = grammar("[ab€]*")
+    state = m.ByteState(GrammarState.start(g))
+    trie = m.VocabularyTrie(vocab)
+    for byte in "a€b".encode():
+        assert m.trie_allowed(trie, g, state) == m.naive_allowed(vocab, g, state)
+        state = m.advance_byte(g, state, byte)
+        assert state is not None
