@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 249 tasks are completed and 21 are not completed.
+Current status: 250 tasks are completed and 20 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -372,7 +372,7 @@ Target: Weeks 15-16; stretch work after core validation.
 - ✅ T249 — Implement ARM NEON quantized dot products. Evidence: Executable numerical checks and capability evidence: [bench/results/variants/T249.json](bench/results/variants/T249.json)..
 - ❌ T250 — Validate an ARM build and reference output. Evidence: Pending: ARM compiler/emulator/hardware unavailable. [Validation harness](tests/core/variant_t250.cpp) and [local capability evidence](bench/results/variants/T250.json) document the blocker..
 - ✅ T251 — Prototype quantized KV storage. Evidence: [python/tvara/quantized_kv.py](python/tvara/quantized_kv.py), [tests/python/test_variant_t251.py](tests/python/test_variant_t251.py).
-- ❌ T252 — Measure quantized KV quality and memory tradeoffs.
+- ✅ T252 — Measure quantized KV quality and memory tradeoffs. Evidence: [tools/bench_quantized_kv.py](tools/bench_quantized_kv.py), [docs/quantized-kv.md](docs/quantized-kv.md).
 - ❌ T253 — Prototype mixture-of-experts routing.
 - ❌ T254 — Prototype tree-based speculative verification.
 - ❌ T255 — Assess WebAssembly SIMD build feasibility.

@@ -1,0 +1,38 @@
+{
+  "scope": "synthetic KV attention and linear logit projection; no pretrained-model perplexity claim",
+  "measurements": [
+    {
+      "context": 128,
+      "float_bytes": 65536,
+      "int8_bytes": 18432,
+      "memory_ratio": 0.28125,
+      "maximum_kv_error": 0.019007503986358643,
+      "attention_max_error": 0.0024775564670562744,
+      "projected_logit_max_error": 0.002035990357398987,
+      "projected_argmax_agreement": true,
+      "encode_us": 48694.9
+    },
+    {
+      "context": 512,
+      "float_bytes": 262144,
+      "int8_bytes": 73728,
+      "memory_ratio": 0.28125,
+      "maximum_kv_error": 0.017470598220825195,
+      "attention_max_error": 0.0014969632029533386,
+      "projected_logit_max_error": 0.0023906826972961426,
+      "projected_argmax_agreement": true,
+      "encode_us": 147842.4
+    },
+    {
+      "context": 4096,
+      "float_bytes": 2097152,
+      "int8_bytes": 589824,
+      "memory_ratio": 0.28125,
+      "maximum_kv_error": 0.01923670992255211,
+      "attention_max_error": 0.0004485473036766052,
+      "projected_logit_max_error": 0.0004929378628730774,
+      "projected_argmax_agreement": true,
+      "encode_us": 923690.5
+    }
+  ]
+}
