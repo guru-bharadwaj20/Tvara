@@ -265,3 +265,23 @@ def test_constraint_filters_draft_and_target_and_commits_only_output():
     result = speculative_step(draft, target, 2, np.random.default_rng(4), constraint)
     assert result.tokens == (1, 1, 1)
     assert constraint.state == (1, 1, 1)
+
+
+def test_lookup_proposals_have_exact_deterministic_probabilities():
+    from tvara.speculative import propose_lookup
+
+    model = ToyModel(np.ones(5))
+    model.identity = TokenizerIdentity(tuple(bytes([i]) for i in range(5)), "lookup-fixture-v1")
+    model.history = [1, 2, 3, 4, 1, 2]
+    proposals = propose_lookup(model, 3, np.random.default_rng(0))
+    assert [p.token for p in proposals] == [3, 4]
+    for p in proposals:
+        assert p.distribution[p.token] == 1 and p.distribution.sum() == 1
+
+
+def test_prompt_lookup_returns_only_observed_continuations():
+    from tvara.speculative import prompt_lookup
+
+    assert prompt_lookup([1, 2, 3, 4, 1, 2], 3, 2) == [3, 4]
+    assert prompt_lookup([1, 2, 3], 4, 2) == []
+    assert prompt_lookup([1, 1, 1, 1], 2, 3) == [1]
