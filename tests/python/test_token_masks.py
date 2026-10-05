@@ -76,3 +76,15 @@ def test_lru_eviction_and_cache_identity():
     after = m.advance_byte(g, s, 97)
     assert e.mask(after).ids() == (1,)
     assert len(e.cache) == 1 and s not in e.cache
+
+
+def test_recursive_stack_masks_match_independent_vocabulary_scan():
+    g = Grammar.from_text('root ::= "(" root ")" | "x"')
+    vocab = [b"(", b"x", b")", b"(x)", b"xx", b"))"]
+    e = m.MaskEngine(vocab, g)
+    state = m.ByteState(GrammarState.start(g))
+    for byte in b"((x))":
+        assert e.mask(state).ids() == m.naive_allowed(vocab, g, state)
+        state = m.advance_byte(g, state, byte)
+    assert state.grammar_state.accepting(g)
+    assert e.mask(state).ids() == ()
