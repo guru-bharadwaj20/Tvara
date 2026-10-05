@@ -144,4 +144,94 @@ def variant_gate(gate, up, config):
     return (activation * np.asarray(up, dtype=np.float32)).astype(np.float32)
 
 
+class VariantReferenceModel:
+    def __init__(self, config, weights):
+        self.config = config
+        self.weights = {k: np.asarray(v, dtype=np.float32) for k, v in weights.items()}
+        h, d = config.hidden_size, config.head_dim
+        q = config.num_attention_heads * d
+        kv = config.num_key_value_heads * d
+        f = config.intermediate_size
+        required = {"model.embed_tokens.weight": (config.vocab_size, h), "model.norm.weight": (h,)}
+        if not config.tie_word_embeddings:
+            required["lm_head.weight"] = (config.vocab_size, h)
+        for i in range(config.num_hidden_layers):
+            prefix = f"model.layers.{i}."
+            shapes = {
+                "input_layernorm.weight": (h,),
+                "post_attention_layernorm.weight": (h,),
+                "self_attn.q_proj.weight": (q, h),
+                "self_attn.k_proj.weight": (kv, h),
+                "self_attn.v_proj.weight": (kv, h),
+                "self_attn.o_proj.weight": (h, q),
+                "mlp.gate_proj.weight": (f, h),
+                "mlp.up_proj.weight": (f, h),
+                "mlp.down_proj.weight": (h, f),
+            }
+            if config.architecture == "qwen2":
+                shapes.update(
+                    {
+                        "self_attn.q_proj.bias": (q,),
+                        "self_attn.k_proj.bias": (kv,),
+                        "self_attn.v_proj.bias": (kv,),
+                    }
+                )
+            required.update({prefix + k: v for k, v in shapes.items()})
+        for name, shape in required.items():
+            if (
+                name not in self.weights
+                or self.weights[name].shape != shape
+                or not np.isfinite(self.weights[name]).all()
+            ):
+                raise ValueError(f"Missing, malformed or nonfinite variant weight: {name}")
+
+    def forward(self, tokens):
+        from .math import attention, rope
+
+        c = self.config
+        ids = np.asarray(tokens)
+        if (
+            ids.ndim != 1
+            or not ids.size
+            or ids.dtype.kind not in "iu"
+            or ids.min() < 0
+            or ids.max() >= c.vocab_size
+            or len(ids) > c.max_position_embeddings
+        ):
+            raise ValueError("Invalid variant token sequence")
+        x = variant_embedding(self.weights["model.embed_tokens.weight"], ids, c)
+        positions = np.arange(len(ids))
+        for i in range(c.num_hidden_layers):
+            prefix = f"model.layers.{i}."
+
+            def w(name):
+                return self.weights[prefix + name]
+
+            norm = variant_norm(x, w("input_layernorm.weight"), c)
+
+            def project(name, heads):
+                value = norm @ w(f"self_attn.{name}_proj.weight").T
+                if c.architecture == "qwen2":
+                    value += w(f"self_attn.{name}_proj.bias")
+                return value.reshape(len(ids), heads, c.head_dim)
+
+            q = rope(project("q", c.num_attention_heads), positions, c.rope_theta)
+            k = rope(project("k", c.num_key_value_heads), positions, c.rope_theta)
+            v = project("v", c.num_key_value_heads)
+            mixed = attention(q, k, v).reshape(len(ids), c.num_attention_heads * c.head_dim)
+            x = x + mixed @ w("self_attn.o_proj.weight").T
+            norm = variant_norm(x, w("post_attention_layernorm.weight"), c)
+            gated = variant_gate(
+                norm @ w("mlp.gate_proj.weight").T, norm @ w("mlp.up_proj.weight").T, c
+            )
+            x = (x + gated @ w("mlp.down_proj.weight").T).astype(np.float32)
+        x = variant_norm(x, self.weights["model.norm.weight"], c)
+        head = (
+            self.weights["model.embed_tokens.weight"]
+            if c.tie_word_embeddings
+            else self.weights["lm_head.weight"]
+        )
+        return (x @ head.T).astype(np.float32)
+
+
 # VARIANT_CODE
