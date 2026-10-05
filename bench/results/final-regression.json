@@ -1,0 +1,50 @@
+{
+  "measured_at_utc": "2026-10-14T01:34:39.889188+00:00",
+  "logits": [
+    {
+      "tokens": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "comparison": {
+        "max_absolute_error": 5.960464477539063e-08,
+        "top1_agreement": 1.0,
+        "within_tolerance": true
+      },
+      "native_perplexity": 31981.48491066363,
+      "oracle_perplexity": 31981.485052355227
+    },
+    {
+      "tokens": [
+        0,
+        17,
+        400,
+        2
+      ],
+      "comparison": {
+        "max_absolute_error": 8.940696716308594e-08,
+        "top1_agreement": 1.0,
+        "within_tolerance": true
+      },
+      "native_perplexity": 31005.67412898642,
+      "oracle_perplexity": 31005.67430386064
+    },
+    {
+      "tokens": [
+        1,
+        42
+      ],
+      "comparison": {
+        "max_absolute_error": 5.960464477539063e-08,
+        "top1_agreement": 1.0,
+        "within_tolerance": true
+      },
+      "native_perplexity": 29992.793793698762,
+      "oracle_perplexity": 29992.79399878401
+    }
+  ],
+  "greedy_matches": true,
+  "scope": "Pinned random tiny HF Llama oracle fixtures; perplexity is a numerical regression metric, not trained-model language quality"
+}

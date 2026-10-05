@@ -87,7 +87,8 @@ TVARA_AVX2 inline std::vector<float> rms_norm_avx2(std::span<const float> x,std:
     float inverse=static_cast<float>(1/std::sqrt(sum/static_cast<double>(x.size())+epsilon));
     std::vector<float> out(x.size());i=0;auto factor=_mm256_set1_ps(inverse);
     for(;i+8<=x.size();i+=8)_mm256_storeu_ps(out.data()+i,_mm256_mul_ps(_mm256_mul_ps(_mm256_loadu_ps(x.data()+i),factor),_mm256_loadu_ps(w.data()+i)));
-    for(;i<x.size();++i)out[i]=x[i]*inverse*w[i];return out;
+    for(;i<x.size();++i){out[i]=x[i]*inverse*w[i];}
+    return out;
 }
 TVARA_AVX2 inline void swiglu_avx2(std::span<float> gate,std::span<const float> up) {
     if(gate.size()!=up.size())throw std::invalid_argument("AVX2 SwiGLU dimensions");

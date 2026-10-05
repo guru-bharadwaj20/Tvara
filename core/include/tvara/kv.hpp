@@ -17,7 +17,8 @@ struct CacheGeometry {
     }
     std::size_t elements_per_block()const{
         std::size_t count=kv_width();for(auto dim:{layers,tokens_per_block,std::size_t(2)}){
-            if(!dim || count>std::numeric_limits<std::size_t>::max()/dim)throw std::invalid_argument("KV block overflow");count*=dim;}
+            if(!dim || count>std::numeric_limits<std::size_t>::max()/dim){throw std::invalid_argument("KV block overflow");}
+            count*=dim;}
         return count;
     }
     void validate()const{

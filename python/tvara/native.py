@@ -109,9 +109,69 @@ class NativeModel:
             return json.loads(raw.decode("utf-8"))
 
     def attach_tokenizer(self, tokenizer):
-        if len(tokenizer.vocabulary) != self.vocab_size:
+        words = tuple(tokenizer.vocabulary)
+        if len(words) != self.vocab_size:
             raise ValueError("Tokenizer vocabulary does not match model")
-        self._tokenizer = tokenizer
+        with self._lock:
+            metadata = self.metadata
+            expected = metadata.get("tokenizer.ggml.tokens")
+            if expected is not None and words != tuple(expected):
+                raise ValueError("Tokenizer token IDs do not match the ordered model vocabulary")
+            special_ids = set(getattr(tokenizer, "special_ids", ()))
+            for name in ("bos", "eos", "unknown", "padding"):
+                token = metadata.get(f"tokenizer.ggml.{name}_token_id")
+                if token is not None and token not in special_ids:
+                    raise ValueError("Model special token is not marked special by the tokenizer")
+            if "tokenizer.ggml.merges" in metadata:
+                ranks = getattr(tokenizer, "ranks", None)
+                expected_merges = tuple(
+                    tuple(x.split(" ")) if isinstance(x, str) else tuple(x)
+                    for x in metadata["tokenizer.ggml.merges"]
+                )
+                actual_merges = (
+                    tuple(pair for pair, _ in sorted(ranks.items(), key=lambda item: item[1]))
+                    if ranks is not None
+                    else None
+                )
+                if actual_merges != expected_merges:
+                    raise ValueError("Tokenizer merge ranks do not match the model")
+            self._tokenizer = tokenizer
+
+    def token_inventory(self):
+        """Decode ordered token bytes, with control tokens excluded from generated text."""
+        with self._lock:
+            self._check_open()
+            if self._tokenizer is not None:
+                tokenizer = self._tokenizer
+                return tuple(
+                    b"" if i in tokenizer.special_ids else tokenizer.token_bytes(i)
+                    for i in range(self.vocab_size)
+                )
+            metadata = self.metadata
+            words = metadata.get("tokenizer.ggml.tokens")
+            if not isinstance(words, list) or len(words) != self.vocab_size:
+                raise ValueError("Model token inventory is unavailable")
+            kinds = metadata.get("tokenizer.ggml.token_type")
+            if kinds is not None and (not isinstance(kinds, list) or len(kinds) != self.vocab_size):
+                raise ValueError("Invalid model token types")
+            special_ids = {i for i, kind in enumerate(kinds or ()) if kind in (2, 3, 4)}
+            for key, value in metadata.items():
+                if key.startswith("tokenizer.ggml.") and key.endswith("_token_id"):
+                    if not isinstance(value, int) or not 0 <= value < self.vocab_size:
+                        raise ValueError("Invalid model special token ID")
+                    special_ids.add(value)
+            if metadata.get("tokenizer.ggml.model") != "gpt2":
+                raise ValueError("Attach a tokenizer to validate native token bytes")
+            from .tokenizer import byte_mapping
+
+            _, reverse = byte_mapping()
+            try:
+                return tuple(
+                    b"" if i in special_ids else bytes(reverse[c] for c in word)
+                    for i, word in enumerate(words)
+                )
+            except KeyError as error:
+                raise ValueError("Model tokens require an explicit tokenizer") from error
 
     def encode(self, text, allow_special=False):
         if self._tokenizer is None:
@@ -137,7 +197,11 @@ class NativeModel:
                 self._raise_error()
 
     def logits(self, sequence, token):
-        if not isinstance(token, (int, np.integer)) or not 0 <= token < self.vocab_size:
+        if (
+            isinstance(token, (bool, np.bool_))
+            or not isinstance(token, (int, np.integer))
+            or not 0 <= token < self.vocab_size
+        ):
             raise ValueError("Invalid token ID")
         output = np.empty(self.vocab_size, dtype=np.float32)
         with self._lock:
@@ -170,15 +234,34 @@ class NativeModel:
     ):
         prompt = list(prompt)
         if not prompt or any(
-            not isinstance(t, (int, np.integer)) or not 0 <= t < self.vocab_size for t in prompt
+            isinstance(t, (bool, np.bool_))
+            or not isinstance(t, (int, np.integer))
+            or not 0 <= t < self.vocab_size
+            for t in prompt
         ):
             raise ValueError("Invalid prompt token IDs")
         if (
-            not isinstance(max_new_tokens, int)
+            isinstance(max_new_tokens, (bool, np.bool_))
+            or not isinstance(max_new_tokens, int)
             or max_new_tokens < 0
             or len(prompt) + max_new_tokens > self.context_size
         ):
             raise ValueError("Generation exceeds context limits")
+
+        def real_scalar(value):
+            if isinstance(value, (bool, np.bool_)) or not isinstance(
+                value, (int, float, np.integer, np.floating)
+            ):
+                raise ValueError("Sampling parameters must be real scalars")
+            try:
+                return float(value)
+            except (OverflowError, ValueError, TypeError) as error:
+                raise ValueError("Sampling parameters must be finite real scalars") from error
+
+        temperature, top_p, min_p, repetition, frequency, presence = (
+            real_scalar(value)
+            for value in (temperature, top_p, min_p, repetition, frequency, presence)
+        )
         if (
             not np.isfinite(temperature)
             or temperature < 0
@@ -189,7 +272,8 @@ class NativeModel:
         ):
             raise ValueError("Invalid sampling parameters")
         if (
-            not isinstance(top_k, int)
+            isinstance(top_k, (bool, np.bool_))
+            or not isinstance(top_k, int)
             or top_k < 0
             or not np.isfinite(repetition)
             or repetition <= 0
@@ -197,22 +281,36 @@ class NativeModel:
             or not np.isfinite(presence)
         ):
             raise ValueError("Invalid sampling filters or penalties")
-        if eos_id is not None and not 0 <= eos_id < self.vocab_size:
+        if eos_id is not None and (
+            not isinstance(eos_id, (int, np.integer))
+            or isinstance(eos_id, bool)
+            or not 0 <= eos_id < self.vocab_size
+        ):
             raise ValueError("Invalid EOS ID")
-        rng = np.random.default_rng(seed)
+        if isinstance(seed, (bool, np.bool_)):
+            raise ValueError("Invalid random seed")
+        try:
+            rng = np.random.default_rng(seed)
+        except (ValueError, TypeError, OverflowError) as error:
+            raise ValueError("Invalid random seed") from error
         sequence = self._new_sequence()
         history = prompt.copy()
         try:
             for token in prompt:
                 logits = self.logits(sequence, token)
             for index in range(max_new_tokens):
-                logits = logits.copy()
+                logits = logits.astype(np.float64, copy=True)
+                if not np.isfinite(logits).all():
+                    raise ValueError("Nonfinite model logits")
                 counts = np.bincount(history, minlength=self.vocab_size)
                 seen = counts > 0
-                logits[seen] = np.where(
-                    logits[seen] >= 0, logits[seen] / repetition, logits[seen] * repetition
-                )
-                logits -= counts * frequency + seen * presence
+                with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+                    logits[seen] = np.where(
+                        logits[seen] >= 0, logits[seen] / repetition, logits[seen] * repetition
+                    )
+                    logits -= counts * frequency + seen * presence
+                if not np.isfinite(logits).all():
+                    raise ValueError("Nonfinite adjusted sampling logits")
                 if token_constraint is not None:
                     logits = token_constraint.mask_logits(logits)
                 if temperature == 0:

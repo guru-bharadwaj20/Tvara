@@ -32,8 +32,9 @@ inline std::size_t sample(std::span<const float> logits,double temperature,std::
 inline void filter_probabilities(std::vector<double>& p,std::size_t top_k=0,double top_p=1,double min_p=0) {
     if(p.empty() || !std::isfinite(top_p) || top_p<=0 || top_p>1 || !std::isfinite(min_p) || min_p<0 || min_p>1)
         throw std::invalid_argument("invalid sampler filters");
-    double total=0;for(auto v:p){if(!std::isfinite(v)||v<0)throw std::invalid_argument("invalid probability");total+=v;}
-    if(total<=0)throw std::invalid_argument("empty distribution");
+    double maximum=0;for(auto v:p){if(!std::isfinite(v)||v<0)throw std::invalid_argument("invalid probability");maximum=std::max(maximum,v);}
+    if(maximum<=0)throw std::invalid_argument("empty distribution");
+    double total=0;for(auto& v:p){v/=maximum;total+=v;}
     for(auto& v:p)v/=total;
     std::vector<std::size_t> order(p.size());std::iota(order.begin(),order.end(),0);
     std::stable_sort(order.begin(),order.end(),[&](auto a,auto b){return p[a]>p[b];});

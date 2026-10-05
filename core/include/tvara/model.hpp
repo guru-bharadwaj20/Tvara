@@ -174,12 +174,16 @@ inline std::vector<float> execute_token(const ModelWeights& w,SequenceState& sta
     const auto& c=w.config;c.validate();
     if(token>=c.vocab || state.length>=c.context || w.layers.size()!=c.layers || state.layers.size()!=c.layers)
         throw std::invalid_argument("invalid sequence token context or layer state");
+    if(state.length>std::numeric_limits<std::size_t>::max()/c.kv_width())
+        throw std::invalid_argument("layer KV length overflow");
+    const auto cache_length=state.length*c.kv_width();
+    for(const auto& cache:state.layers)
+        if(cache.keys.size()!=cache_length || cache.values.size()!=cache_length)
+            throw std::invalid_argument("inconsistent layer KV length");
     auto x=embedding_lookup(w.embedding,token);
     try {
         for(std::size_t i=0;i<c.layers;++i) {
             auto& cache=state.layers[i];const auto& layer=w.layers[i];
-            if(cache.keys.size()!=state.length*c.kv_width() || cache.values.size()!=cache.keys.size())
-                throw std::invalid_argument("inconsistent layer KV length");
             auto normalized=rms_norm(x,layer.attention_norm,c.rms_epsilon);
             auto projected=project_attention(layer,normalized,c);
             rotary(projected.query,c.heads,c.head_dim(),state.length,c.rope_theta,c.interleaved_rope);
@@ -196,7 +200,7 @@ inline std::vector<float> execute_token(const ModelWeights& w,SequenceState& sta
         auto logits=(w.output.rows?w.output:w.embedding).multiply(normalized);
         ++state.length;return logits;
     } catch(...) {
-        for(auto& cache:state.layers) {cache.keys.resize(state.length*c.kv_width());cache.values.resize(state.length*c.kv_width());}
+        for(auto& cache:state.layers) {cache.keys.resize(cache_length);cache.values.resize(cache_length);}
         throw;
     }
 }

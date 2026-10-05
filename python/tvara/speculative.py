@@ -28,6 +28,43 @@ class TokenizerIdentity:
             raise ValueError("Invalid EOS identity")
 
 
+def tokenizer_identity(tokenizer, eos_id=None):
+    """Derive all supported encoding settings rather than trusting a caller label."""
+    from dataclasses import asdict
+    from .tokenizer import ByteBPE, SentencePiece
+
+    configuration = {
+        "implementation": type(tokenizer).__module__ + "." + type(tokenizer).__qualname__,
+        "vocabulary": tokenizer.vocabulary,
+        "special_ids": sorted(tokenizer.special_ids),
+    }
+    if isinstance(tokenizer, ByteBPE):
+        configuration.update(
+            normalizer=tokenizer.normalizer,
+            pattern=tokenizer.pattern.pattern,
+            pattern_flags=int(tokenizer.pattern.flags),
+            add_prefix_space=tokenizer.add_prefix_space,
+            merges=[pair for pair, _ in sorted(tokenizer.ranks.items(), key=lambda item: item[1])],
+        )
+    elif isinstance(tokenizer, SentencePiece):
+        configuration.update(
+            normalizer=tokenizer.normalizer,
+            remove_extra_whitespace=tokenizer.remove_extra_whitespace,
+            metadata=asdict(tokenizer.metadata),
+        )
+    else:
+        raise ValueError("Cannot derive complete settings for this tokenizer implementation")
+    if eos_id is not None and eos_id not in tokenizer.special_ids:
+        raise ValueError("EOS must be a special token in the tokenizer")
+    pieces = tuple(
+        b"" if i in tokenizer.special_ids else tokenizer.token_bytes(i)
+        for i in range(len(tokenizer.vocabulary))
+    )
+    return TokenizerIdentity(
+        pieces, json.dumps(configuration, sort_keys=True, separators=(",", ":")), eos_id
+    )
+
+
 class SpeculativeModel(Protocol):
     identity: TokenizerIdentity
     history: list[int]
@@ -164,6 +201,19 @@ class NativeSpeculativeModel:
         self._ctypes = ctypes
         if len(identity.pieces) != model.vocab_size:
             raise ValueError("Tokenizer vocabulary does not match native model")
+        if identity.pieces != model.token_inventory():
+            raise ValueError("Tokenizer token bytes do not match the native model")
+        metadata_eos = model.metadata.get("tokenizer.ggml.eos_token_id")
+        if (
+            identity.eos_id is not None
+            and metadata_eos is not None
+            and identity.eos_id != metadata_eos
+        ):
+            raise ValueError("Tokenizer EOS does not match the native model")
+        if getattr(model, "_tokenizer", None) is not None:
+            actual = tokenizer_identity(model._tokenizer, identity.eos_id)
+            if tokenizer_fingerprint(identity) != tokenizer_fingerprint(actual):
+                raise ValueError("Use tokenizer_identity for the attached tokenizer settings")
         self.history = list(prompt)
         if not self.history or any(
             not isinstance(t, int) or not 0 <= t < model.vocab_size for t in self.history

@@ -5,13 +5,21 @@ from jinja2.sandbox import ImmutableSandboxedEnvironment
 
 
 def render_chat_template(
-    metadata, messages, tokenizer, add_generation_prompt=True, max_chars=65536
+    metadata, messages, tokenizer, add_generation_prompt=True, max_chars=65536, tools=None
 ):
     template = metadata.get("tokenizer.chat_template")
     if not isinstance(template, str) or not template or len(template) > 20000:
         raise ValueError("Missing or oversized GGUF chat template")
     if not isinstance(messages, list) or not messages or len(messages) > 256:
         raise ValueError("Invalid chat messages")
+    if tools is None:
+        tools = []
+    if (
+        not isinstance(tools, list)
+        or len(tools) > 16
+        or any(not isinstance(tool, dict) for tool in tools)
+    ):
+        raise ValueError("Invalid chat template tools")
     clean = []
     for message in messages:
         if (
@@ -45,6 +53,7 @@ def render_chat_template(
             add_generation_prompt=add_generation_prompt,
             bos_token=special("bos"),
             eos_token=special("eos"),
+            tools=tools,
         )
     except TemplateError as error:
         raise ValueError("Unsupported or unsafe GGUF chat template") from error

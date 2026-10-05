@@ -12,7 +12,7 @@ defaults:
     shell: bash
 jobs:
   arm-native:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:') || startsWith(github.event.head_commit.message, 'T261:')
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
     steps:
@@ -26,6 +26,9 @@ jobs:
         run: |
           mkdir -p bench/results/portability
           uname -a | tee bench/results/portability/arm-host.txt
+          lscpu | tee -a bench/results/portability/arm-host.txt
+          free -h | tee -a bench/results/portability/arm-host.txt
+          python tools/record_portability_host.py --output bench/results/portability/arm-execution.json --cpu-details arm-host.txt
           python -c "import platform; assert platform.machine().lower() in ('aarch64', 'arm64'), platform.machine()"
       - name: Build native ARM core
         run: |
@@ -47,7 +50,7 @@ jobs:
           path: bench/results/portability/
           if-no-files-found: error
   x64-avx512:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:') || startsWith(github.event.head_commit.message, 'T261:')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -60,6 +63,9 @@ jobs:
         run: |
           mkdir -p bench/results/portability
           uname -a | tee bench/results/portability/x64-host.txt
+          lscpu | tee -a bench/results/portability/x64-host.txt
+          free -h | tee -a bench/results/portability/x64-host.txt
+          python tools/record_portability_host.py --output bench/results/portability/x64-execution.json --cpu-details x64-host.txt
           python tools/check_prefill.py tests/core/variant_t247.cpp bench/results/portability/avx512-probe.json | tee bench/results/portability/avx512-probe.txt
           python - <<'PY'
           import json, os
@@ -80,7 +86,7 @@ jobs:
           path: bench/results/portability/
           if-no-files-found: error
   windows-avx512:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:') || startsWith(github.event.head_commit.message, 'T261:')
     runs-on: windows-2025
     timeout-minutes: 20
     defaults:
@@ -104,6 +110,8 @@ jobs:
           set -euo pipefail
           mkdir -p bench/results/portability
           uname -a | tee bench/results/portability/windows-host.txt
+          powershell.exe -NoProfile -Command '(Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed | ConvertTo-Json -Compress)' | tee -a bench/results/portability/windows-host.txt
+          python tools/record_portability_host.py --output bench/results/portability/windows-execution.json --cpu-details windows-host.txt
           python --version
           g++ --version
           python tools/check_prefill.py tests/core/variant_t247.cpp bench/results/portability/windows-avx512-probe.json | tee bench/results/portability/windows-avx512-probe.txt

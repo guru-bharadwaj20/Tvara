@@ -65,8 +65,8 @@ class NativeBackend:
     def encode(self, text):
         return self.model.encode(text, allow_special=True)
 
-    def render_chat(self, messages):
-        return render_chat_template(self.model.metadata, messages, self.tokenizer)
+    def render_chat(self, messages, *, tools=None):
+        return render_chat_template(self.model.metadata, messages, self.tokenizer, tools=tools)
 
     def stream(self, prompt, options):
         from .tokenizer import TokenTextStream
@@ -91,7 +91,7 @@ class NativeBackend:
 
 
 class CompletionRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     model: str
     prompt: str | list[int]
     max_tokens: int = Field(default=16, ge=0)
@@ -103,13 +103,13 @@ class CompletionRequest(BaseModel):
 
 
 class ChatMessage(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     role: Literal["system", "user", "assistant", "tool"]
     content: str
 
 
 class ChatRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     model: str
     messages: list[ChatMessage] = Field(min_length=1)
     tools: list[dict] | None = None
@@ -234,9 +234,23 @@ def create_app(backend, config=None):
             raise ValueError("Unknown model")
         if body.max_tokens > config.max_new_tokens:
             raise ValueError("Generation limit exceeds server configuration")
-        prompt = (
-            backend.render_chat([m.model_dump() for m in body.messages]) if chat else body.prompt
-        )
+        if chat and body.tools is not None:
+            if body.response_format is not None:
+                raise ValueError("Tools and response_format cannot be combined")
+            if body.stream:
+                raise ValueError("Streaming tool calls are not supported")
+            body.response_format = tool_response_format(body.tools, body.tool_choice)
+        elif chat and body.tool_choice is not None:
+            raise ValueError("tool_choice requires declared tools")
+        if chat:
+            messages = [m.model_dump() for m in body.messages]
+            prompt = (
+                backend.render_chat(messages, tools=body.tools)
+                if body.tools
+                else backend.render_chat(messages)
+            )
+        else:
+            prompt = body.prompt
         if isinstance(prompt, str) and len(prompt) > config.max_prompt_chars:
             raise ValueError("Prompt exceeds configured character limit")
         ids = list(prompt) if isinstance(prompt, list) else backend.encode(prompt)
@@ -252,12 +266,6 @@ def create_app(backend, config=None):
             "seed": body.seed,
             "top_p": body.top_p,
         }
-        if chat and body.tools:
-            if body.response_format is not None:
-                raise ValueError("Tools and response_format cannot be combined")
-            if body.stream:
-                raise ValueError("Streaming tool calls are not supported")
-            body.response_format = tool_response_format(body.tools, body.tool_choice)
         if body.response_format is not None:
             if not hasattr(backend, "tokenizer"):
                 raise ValueError("Backend lacks tokenizer for structured output")
