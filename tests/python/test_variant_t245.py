@@ -1,8 +1,11 @@
+import pytest
 import numpy as np
-import torch
-from transformers.models.gemma.modeling_gemma import GemmaRMSNorm
-from transformers.activations import ACT2FN
-from tvara.reference.variants import gemma_config, variant_norm, variant_gate, variant_embedding
+
+torch = pytest.importorskip("torch")
+pytest.importorskip("transformers")
+from transformers.models.gemma.modeling_gemma import GemmaRMSNorm  # noqa: E402
+from transformers.activations import ACT2FN  # noqa: E402
+from tvara.reference.variants import gemma_config, variant_norm, variant_gate, variant_embedding  # noqa: E402
 
 
 def config():

@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
-import torch
-from transformers import GemmaConfig, GemmaForCausalLM, Qwen2Config, Qwen2ForCausalLM
-from tvara.reference.variants import gemma_config, qwen_config, VariantReferenceModel
+
+torch = pytest.importorskip("torch")
+pytest.importorskip("transformers")
+from transformers import GemmaConfig, GemmaForCausalLM, Qwen2Config, Qwen2ForCausalLM  # noqa: E402
+from tvara.reference.variants import gemma_config, qwen_config, VariantReferenceModel  # noqa: E402
 
 
 @pytest.mark.parametrize(

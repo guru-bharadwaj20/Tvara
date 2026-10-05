@@ -10,7 +10,7 @@ logit buffers, and a thread-local copied error message. Python owns the handle,
 serializes calls, closes it through a context manager or finalizer, and validates
 token IDs and buffer sizes. Closing a generator releases its sequence's KV pages.
 
-Attach an independently validated tokenizer with the same vocabulary size before
+Attach a validated tokenizer with exactly matching ordered GGUF vocabulary, declared control-token IDs and known BPE merge ranks before
 encoding text. Generation uses native paged decode and Python sampling. An explicit
 seed reproduces results within the Python sampler; it does not promise identical
 draws to the separate C++ standard-library sampler.
@@ -19,3 +19,5 @@ Local validation executes three real-library checks: model loading/closing,
 metadata/tokenizer attachment, and generation matching the six-token Hugging Face
 greedy fixture, including seeded sampling and generator cleanup. These tests skip
 only when their optional checkpoint or built library is unavailable.
+
+Derive speculative identity with `tokenizer_identity(tokenizer, eos_id)` after attachment; it includes tokenizer normalization, merge and special-token policy. Unattached manually declared identities require caller-provided configuration information where GGUF lacks encoder details. The Python wheel contains Python modules only: build a matching native library from the source checkout/archive and set `TVARA_LIBRARY` or an explicit library path.

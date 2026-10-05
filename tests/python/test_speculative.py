@@ -110,16 +110,12 @@ def test_native_batch_and_rollback_match_uncached_conditionals():
     from tvara.speculative import NativeSpeculativeModel, Proposal, TokenizerIdentity
 
     root = Path.cwd()
-    libraries = [
-        root / "build/debug" / name
-        for name in (
-            "libtvara_capi.dll",
-            "tvara_capi.dll",
-            "libtvara_capi.so",
-            "libtvara_capi.dylib",
-        )
-    ]
-    library = next((p for p in libraries if p.exists()), None)
+    from tvara.native import find_library
+
+    try:
+        library = find_library()
+    except FileNotFoundError:
+        library = None
     model_path = root / "models/api-fixture/model.gguf"
     if library is None or not model_path.exists():
         pytest.skip("Native fixture absent; runner must build and create fixture")

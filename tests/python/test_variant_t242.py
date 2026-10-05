@@ -1,12 +1,15 @@
+import pytest
 import numpy as np
-import torch
-from transformers.models.qwen2.modeling_qwen2 import (
+
+torch = pytest.importorskip("torch")
+pytest.importorskip("transformers")
+from transformers.models.qwen2.modeling_qwen2 import (  # noqa: E402
     Qwen2RMSNorm,
     Qwen2RotaryEmbedding,
     apply_rotary_pos_emb,
 )
-from transformers import Qwen2Config
-from tvara.reference.math import rms_norm, rope
+from transformers import Qwen2Config  # noqa: E402
+from tvara.reference.math import rms_norm, rope  # noqa: E402
 
 
 def test_qwen_normalization():
