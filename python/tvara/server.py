@@ -1,5 +1,7 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+from .response_constraints import tool_response_format
+
 from .chat_templates import render_chat_template
 
 from .response_constraints import response_constraint
@@ -110,6 +112,8 @@ class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     model: str
     messages: list[ChatMessage] = Field(min_length=1)
+    tools: list[dict] | None = None
+    tool_choice: str | dict | None = None
     max_tokens: int = Field(default=16, ge=0)
     temperature: float = Field(default=0, ge=0, allow_inf_nan=False)
     top_p: float = Field(default=1, gt=0, le=1, allow_inf_nan=False)
@@ -248,6 +252,12 @@ def create_app(backend, config=None):
             "seed": body.seed,
             "top_p": body.top_p,
         }
+        if chat and body.tools:
+            if body.response_format is not None:
+                raise ValueError("Tools and response_format cannot be combined")
+            if body.stream:
+                raise ValueError("Streaming tool calls are not supported")
+            body.response_format = tool_response_format(body.tools, body.tool_choice)
         if body.response_format is not None:
             if not hasattr(backend, "tokenizer"):
                 raise ValueError("Backend lacks tokenizer for structured output")
@@ -291,6 +301,23 @@ def create_app(backend, config=None):
             return result
         choice = result["choices"][0]
         choice["message"] = {"role": "assistant", "content": choice.pop("text")}
+        if body.tools and choice["finish_reason"] == "stop":
+            call = json.loads(choice["message"]["content"])
+            choice["message"] = {
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [
+                    {
+                        "id": "call_" + uuid.uuid4().hex,
+                        "type": "function",
+                        "function": {
+                            "name": call["name"],
+                            "arguments": json.dumps(call["arguments"], ensure_ascii=False),
+                        },
+                    }
+                ],
+            }
+            choice["finish_reason"] = "tool_calls"
         return result
 
     @app.exception_handler(ValueError)
