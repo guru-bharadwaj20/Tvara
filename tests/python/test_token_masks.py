@@ -88,3 +88,22 @@ def test_recursive_stack_masks_match_independent_vocabulary_scan():
         state = m.advance_byte(g, state, byte)
     assert state.grammar_state.accepting(g)
     assert e.mask(state).ids() == ()
+
+
+def test_split_utf8_and_malformed_sequences():
+    g = grammar('"€"')
+    e = m.MaskEngine([b"\xe2", b"\x82", b"\xac", b"\xe2\x82\xac", b"\xff", b""], g, eos_id=5)
+    state = m.ByteState(GrammarState.start(g))
+    assert e.mask(state).ids() == (0, 3)
+    state = m.advance_byte(g, state, 0xE2)
+    assert state.pending == b"\xe2"
+    assert e.mask(state).ids() == (1,)
+    state = m.advance_byte(g, state, 0x82)
+    assert e.mask(state).ids() == (2,)
+    state = m.advance_byte(g, state, 0xAC)
+    assert e.mask(state).ids() == (5,)
+    assert m.advance_byte(g, m.ByteState(GrammarState.start(g)), 0xC0) is None
+    ascii_g = grammar('"a"')
+    assert m.advance_byte(ascii_g, m.ByteState(GrammarState.start(ascii_g)), 0xE2) is None
+    done_g = grammar('""')
+    assert m.advance_byte(done_g, m.ByteState(GrammarState.start(done_g)), 0xE2) is None
