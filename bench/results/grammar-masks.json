@@ -1,0 +1,20 @@
+{
+  "measured_at_utc": "2026-10-13T18:49:33.540895+00:00",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "vocabulary_size": 256,
+  "schema_outputs": [
+    "{\"city\":\"Paris\",\"ok\":true}",
+    "{\"city\":\"Paris\",\"ok\":false}",
+    "{\"city\":\"\\u6771\\u4eac\",\"ok\":true}",
+    "{\"city\":\"\\u6771\\u4eac\",\"ok\":false}"
+  ],
+  "valid_outputs": 4,
+  "latency_ns": {
+    "median": 11758500.0,
+    "p95": 32507864.999999996,
+    "samples": 120
+  },
+  "cache_hits": 124,
+  "cache_misses": 124,
+  "scope": "Fixture-driven constrained greedy sampling; not trained-model quality or production vocabulary throughput"
+}
