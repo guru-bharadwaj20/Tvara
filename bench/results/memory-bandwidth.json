@@ -1,0 +1,45 @@
+{
+  "measured_at_utc": "2026-10-13T19:14:54.072845+00:00",
+  "source": "https://www.cs.virginia.edu/stream/FTP/Code/stream.c",
+  "source_sha256": "4802cae6d1c4d86897928424bfdd47605dcdc73aa7efec71899b62d3cb41015c",
+  "compile_command": [
+    "gcc",
+    "-O3",
+    "-DSTREAM_ARRAY_SIZE=8388608",
+    "-DNTIMES=10",
+    "bench\\third_party\\stream.c",
+    "-o",
+    "build\\bench-stream.exe"
+  ],
+  "array_elements": 8388608,
+  "working_set_bytes": 201326592,
+  "threads": 1,
+  "results": {
+    "copy": {
+      "best_mb_per_second": 10978.2,
+      "average_seconds": 0.013553,
+      "minimum_seconds": 0.012226,
+      "maximum_seconds": 0.018363
+    },
+    "scale": {
+      "best_mb_per_second": 7446.2,
+      "average_seconds": 0.019682,
+      "minimum_seconds": 0.018025,
+      "maximum_seconds": 0.024039
+    },
+    "add": {
+      "best_mb_per_second": 7838.6,
+      "average_seconds": 0.028881,
+      "minimum_seconds": 0.025684,
+      "maximum_seconds": 0.040105
+    },
+    "triad": {
+      "best_mb_per_second": 8009.5,
+      "average_seconds": 0.028469,
+      "minimum_seconds": 0.025136,
+      "maximum_seconds": 0.034686
+    }
+  },
+  "raw_output": "-------------------------------------------------------------\nSTREAM version $Revision: 5.10 $\n-------------------------------------------------------------\nThis system uses 8 bytes per array element.\n-------------------------------------------------------------\nArray size = 8388608 (elements), Offset = 0 (elements)\nMemory per array = 64.0 MiB (= 0.1 GiB).\nTotal memory required = 192.0 MiB (= 0.2 GiB).\nEach kernel will be executed 10 times.\n The *best* time for each kernel (excluding the first iteration)\n will be used to compute the reported bandwidth.\n-------------------------------------------------------------\nYour clock granularity/precision appears to be 2 microseconds.\nEach test below will take on the order of 11663 microseconds.\n   (= 5831 clock ticks)\nIncrease the size of the arrays if this shows that\nyou are not getting at least 20 clock ticks per test.\n-------------------------------------------------------------\nWARNING -- The above is only a rough guideline.\nFor best results, please be sure you know the\nprecision of your system timer.\n-------------------------------------------------------------\nFunction    Best Rate MB/s  Avg time     Min time     Max time\nCopy:           10978.2     0.013553     0.012226     0.018363\nScale:           7446.2     0.019682     0.018025     0.024039\nAdd:             7838.6     0.028881     0.025684     0.040105\nTriad:           8009.5     0.028469     0.025136     0.034686\n-------------------------------------------------------------\nSolution Validates: avg error less than 1.000000e-13 on all three arrays\n-------------------------------------------------------------\n",
+  "scope": "Unmodified STREAM 5.10 source, local single-thread run; uncontrolled frequency and temperature; no certified-conformance or model-throughput claim"
+}
