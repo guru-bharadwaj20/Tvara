@@ -112,4 +112,36 @@ def gemma_config(data):
     )
 
 
+def variant_norm(x, weight, config):
+    from .math import rms_norm
+
+    if config.architecture == "gemma":
+        weight = np.asarray(weight, dtype=np.float32) + np.float32(1)
+    return rms_norm(x, weight, config.rms_norm_eps)
+
+
+def variant_embedding(table, tokens, config):
+    result = np.asarray(table, dtype=np.float32)[tokens].copy()
+    if config.architecture == "gemma":
+        result *= np.float32(np.sqrt(config.hidden_size))
+    return result
+
+
+def variant_gate(gate, up, config):
+    from .math import swiglu
+
+    if config.activation == "silu":
+        return swiglu(gate, up)
+    gate = np.asarray(gate, dtype=np.float32)
+    if config.activation == "gelu":
+        import math
+
+        erf = np.vectorize(math.erf, otypes=[np.float32])(gate / np.float32(np.sqrt(2)))
+        activation = np.float32(0.5) * gate * (np.float32(1) + erf)
+    else:
+        inner = np.float32(np.sqrt(2 / np.pi)) * (gate + np.float32(0.044715) * gate**3)
+        activation = np.float32(0.5) * gate * (np.float32(1) + np.tanh(inner))
+    return (activation * np.asarray(up, dtype=np.float32)).astype(np.float32)
+
+
 # VARIANT_CODE
