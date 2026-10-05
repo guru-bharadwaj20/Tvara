@@ -226,3 +226,22 @@ def request_latency(request):
         "tokens": len(request.output),
         "state": request.state.value,
     }
+
+
+def latency_report(requests):
+    import numpy as np
+
+    requests = list(requests)
+    ttft = [r.token_times[0] - r.submitted for r in requests if r.token_times]
+    intervals = [b - a for r in requests for a, b in zip(r.token_times, r.token_times[1:])]
+
+    def summarize(values):
+        return {
+            "count": len(values),
+            **{
+                f"p{q}_seconds": float(np.percentile(values, q)) if values else None
+                for q in (50, 95, 99)
+            },
+        }
+
+    return {"ttft": summarize(ttft), "inter_token": summarize(intervals)}
