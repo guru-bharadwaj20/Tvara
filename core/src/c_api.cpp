@@ -59,5 +59,17 @@ int tvara_sequence_drop(tvara_model* model,uint64_t sequence){
     error_message.clear();try{if(!model)throw std::invalid_argument("closed model");std::lock_guard lock(model->mutex);model->executor.cache().drop(sequence);return 0;}
     catch(const std::exception& e){failure(e);return -1;}catch(...){error_message="unknown native error";return -1;}
 }
+
+int tvara_sequence_decode_batch(tvara_model* model,uint64_t sequence,const uint32_t* tokens,size_t token_count,float* output,size_t count){
+    error_message.clear();try{if(!model || (!tokens && token_count) || (!output && count))throw std::invalid_argument("invalid batch buffers");
+        const auto vocab=model->executor.config().vocab;if(token_count>std::numeric_limits<size_t>::max()/vocab || count!=token_count*vocab)throw std::invalid_argument("invalid batch dimensions");
+        std::lock_guard lock(model->mutex);const auto length=model->executor.cache().sequence(sequence).length;
+        if(token_count>model->executor.config().context-length)throw std::invalid_argument("batch exceeds context");
+        for(size_t i=0;i<token_count;++i)if(tokens[i]>=vocab)throw std::invalid_argument("invalid batch token");
+        try{for(size_t i=0;i<token_count;++i){auto row=model->executor.decode(sequence,tokens[i]);std::copy(row.begin(),row.end(),output+i*vocab);}}
+        catch(...){model->executor.cache().truncate(sequence,length);throw;}return 0;
+    }catch(const std::exception& e){failure(e);return -1;}catch(...){error_message="unknown batch error";return -1;}
+}
+
 // ABI_IMPLEMENTATIONS
 }

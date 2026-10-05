@@ -58,3 +58,13 @@ def test_draft_proposals_preserve_each_sampling_distribution():
         np.testing.assert_array_equal(p.distribution, [0, 1, 0])
     with pytest.raises(ValueError):
         propose(draft, 65, np.random.default_rng(0))
+
+
+def test_target_verification_returns_alignment_and_bonus_distribution():
+    from tvara.speculative import propose, verify
+
+    draft, target = ToyModel([0, 1, 0]), ToyModel([0.2, 0.3, 0.5])
+    proposed = propose(draft, 2, np.random.default_rng(0))
+    rows = verify(target, proposed)
+    assert len(rows) == 3 and target.history == [0, 1, 1]
+    np.testing.assert_allclose(rows, [[0.2, 0.3, 0.5]] * 3)

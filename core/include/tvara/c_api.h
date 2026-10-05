@@ -19,6 +19,8 @@ TVARA_API const char* tvara_model_metadata(tvara_model* model);
 TVARA_API uint64_t tvara_sequence_create(tvara_model* model);
 TVARA_API int tvara_sequence_decode(tvara_model* model,uint64_t sequence,uint32_t token,float* logits,size_t count);
 TVARA_API int tvara_sequence_drop(tvara_model* model,uint64_t sequence);
+TVARA_API int tvara_sequence_decode_batch(tvara_model* model,uint64_t sequence,const uint32_t* tokens,size_t token_count,float* logits,size_t count);
+
 // ABI_FUNCTIONS
 #ifdef __cplusplus
 }
