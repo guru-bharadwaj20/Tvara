@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 225 tasks are completed and 45 are not completed.
+Current status: 226 tasks are completed and 44 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -341,7 +341,7 @@ Target: Weeks 10-14.
 
 Target: Weeks 12-16.
 
-- ❌ T226 — Define draft and target model interfaces.
+- ✅ T226 — Define draft and target model interfaces. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py).
 - ❌ T227 — Validate draft-target tokenizer compatibility.
 - ❌ T228 — Implement draft-token proposal generation.
 - ❌ T229 — Implement batched target verification.
