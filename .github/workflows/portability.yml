@@ -1,0 +1,128 @@
+name: portability hardware validation
+"on":
+  push:
+    paths:
+      - '.github/workflows/portability.yml'
+      - 'tests/core/variant_t250.cpp'
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  arm-native:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:')
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install portable build and reference dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Record actual ARM architecture
+        run: |
+          mkdir -p bench/results/portability
+          uname -a | tee bench/results/portability/arm-host.txt
+          python -c "import platform; assert platform.machine().lower() in ('aarch64', 'arm64'), platform.machine()"
+      - name: Build native ARM core
+        run: |
+          cmake -S . -B build/portability-arm -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON '-DCMAKE_CXX_FLAGS_RELEASE=-O3 -UNDEBUG'
+          cmake --build build/portability-arm --parallel 2
+      - name: Run native ARM core tests
+        run: ctest --test-dir build/portability-arm --output-on-failure | tee bench/results/portability/arm-ctest.txt
+      - name: Run ARM NEON reference validation
+        run: |
+          python tools/check_prefill.py tests/core/variant_t250.cpp bench/results/portability/arm-neon.json | tee bench/results/portability/arm-neon.txt
+          python -c "import json; d=json.load(open('bench/results/portability/arm-neon.json')); assert d['status']=='validated' and d['neon_vectors']==500 and d['q8_blocks']==8, d"
+      - name: Validate native ARM model logits against NumPy
+        run: python tools/check_portability_logits.py --binary build/portability-arm/tvara_model_check --output bench/results/portability/arm-logits.json | tee bench/results/portability/arm-logits.txt
+      - name: Preserve ARM execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arm-native-validation-${{ github.sha }}
+          path: bench/results/portability/
+          if-no-files-found: error
+  x64-avx512:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe AVX512F and AVX512BW support
+        id: avx512_probe
+        run: |
+          mkdir -p bench/results/portability
+          uname -a | tee bench/results/portability/x64-host.txt
+          python tools/check_prefill.py tests/core/variant_t247.cpp bench/results/portability/avx512-probe.json | tee bench/results/portability/avx512-probe.txt
+          python - <<'PY'
+          import json, os
+          data=json.load(open('bench/results/portability/avx512-probe.json'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('supported='+str(data['avx512_hardware']).lower()+'\n')
+          PY
+      - name: Benchmark AVX512 on supported hardware
+        if: steps.avx512_probe.outputs.supported == 'true'
+        run: |
+          python tools/check_prefill.py tests/core/variant_t248.cpp bench/results/portability/avx512-benchmark.json | tee bench/results/portability/avx512-benchmark.txt
+          python -c "import json; d=json.load(open('bench/results/portability/avx512-benchmark.json')); assert d['status']=='validated' and d['avx2_us_100']>0 and d['avx512_us_100']>0, d"
+      - name: Preserve x64 capability and execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: x64-avx512-validation-${{ github.sha }}
+          path: bench/results/portability/
+          if-no-files-found: error
+  windows-avx512:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'T250:')
+    runs-on: windows-2025
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Provision documented UCRT64 GCC environment
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          path-type: inherit
+          install: mingw-w64-ucrt-x86_64-gcc
+      - name: Probe AVX512F and AVX512BW support on Windows
+        id: avx512_probe
+        run: |
+          set -euo pipefail
+          mkdir -p bench/results/portability
+          uname -a | tee bench/results/portability/windows-host.txt
+          python --version
+          g++ --version
+          python tools/check_prefill.py tests/core/variant_t247.cpp bench/results/portability/windows-avx512-probe.json | tee bench/results/portability/windows-avx512-probe.txt
+          python - <<'PY'
+          import json, os
+          data=json.load(open('bench/results/portability/windows-avx512-probe.json'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('supported='+str(data['avx512_hardware']).lower()+'\n')
+          PY
+      - name: Benchmark AVX512 on supported hardware
+        if: steps.avx512_probe.outputs.supported == 'true'
+        run: |
+          set -euo pipefail
+          python tools/check_prefill.py tests/core/variant_t248.cpp bench/results/portability/windows-avx512-benchmark.json | tee bench/results/portability/windows-avx512-benchmark.txt
+          python -c "import json; d=json.load(open('bench/results/portability/windows-avx512-benchmark.json')); assert d['status']=='validated' and d['avx2_us_100']>0 and d['avx512_us_100']>0, d"
+      - name: Preserve Windows capability and execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-avx512-validation-${{ github.sha }}
+          path: bench/results/portability/
+          if-no-files-found: error
