@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 213 tasks are completed and 57 are not completed.
+Current status: 214 tasks are completed and 56 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -324,7 +324,7 @@ Target: Weeks 10-14.
 - ✅ T211 — Build a trie over vocabulary token bytes. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T212 — Traverse the trie with grammar states. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T213 — Prune invalid vocabulary subtrees. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
-- ❌ T214 — Represent allowed tokens as bitmasks.
+- ✅ T214 — Represent allowed tokens as bitmasks. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ❌ T215 — Classify context-independent mask cases.
 - ❌ T216 — Precompute reusable grammar masks.
 - ❌ T217 — Cache masks by relevant automaton state.
