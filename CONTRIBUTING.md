@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 256 tasks are completed and 14 are not completed.
+Current status: 257 tasks are completed and 13 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -384,7 +384,7 @@ Target: Weeks 17-18.
 - ✅ T256 — Pin benchmark models and quantized file checksums. Evidence: [tools/make_api_fixture.py](tools/make_api_fixture.py), [tools/pin_benchmark_models.py](tools/pin_benchmark_models.py).
 - ✅ T257 — Record CPU memory OS and compiler configuration. Evidence: [tools/record_machine.py](tools/record_machine.py).
 - ✅ T258 — Measure STREAM memory bandwidth on the test machine. Evidence: [bench/third_party/stream.c](bench/third_party/stream.c), [docs/third-party.md](docs/third-party.md), [tools/run_memory_bandwidth.py](tools/run_memory_bandwidth.py).
-- ❌ T259 — Run matched llama.cpp prefill and decode baselines.
+- ✅ T259 — Run matched llama.cpp prefill and decode baselines. Evidence: [bench/llama_matched.cpp](bench/llama_matched.cpp), [tools/run_matched_baseline.py](tools/run_matched_baseline.py), [docs/matched-baseline.md](docs/matched-baseline.md).
 - ❌ T260 — Report repeated measurements and thermal conditions.
 - ❌ T261 — Run the final perplexity and greedy regression suite.
 - ❌ T262 — Measure prefix-cache effects on conversation traces.
