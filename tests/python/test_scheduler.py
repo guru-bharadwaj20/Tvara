@@ -156,3 +156,15 @@ def test_ttft_matches_monotonic_timestamps():
     r.output = [2, 3]
     assert request_latency(r)["ttft_seconds"] == 0.5
     assert request_latency(Request("b", (1,), 0))["ttft_seconds"] is None
+
+
+def test_intertoken_percentiles():
+    from tvara.scheduler import latency_report
+
+    r = Request("a", (1,), 3)
+    r.submitted = 1
+    r.token_times = [2, 2.2, 2.6]
+    out = latency_report([r])
+    assert out["inter_token"]["count"] == 2
+    assert out["inter_token"]["p50_seconds"] == pytest.approx(0.3)
+    assert latency_report([])["ttft"]["p99_seconds"] is None
