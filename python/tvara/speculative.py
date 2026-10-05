@@ -123,3 +123,12 @@ def verify(target, proposals, constraint=None):
         extra = constrained_probabilities(extra, constraint)
     distributions.append(extra)
     return distributions
+
+
+def acceptance_probability(p, q, token):
+    p, q = probabilities(p), probabilities(q)
+    if p.shape != q.shape or not 0 <= token < len(p):
+        raise ValueError("Incompatible acceptance distributions")
+    if q[token] <= 0:
+        raise ValueError("A proposed token must have positive draft probability")
+    return min(1.0, float(p[token] / q[token]))
