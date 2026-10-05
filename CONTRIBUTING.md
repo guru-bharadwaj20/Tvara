@@ -368,7 +368,7 @@ Target: Weeks 15-16; stretch work after core validation.
 - ✅ T245 — Implement Gemma-specific normalization behavior. Evidence: [python/tvara/reference/variants.py](python/tvara/reference/variants.py), [tests/python/test_variant_t245.py](tests/python/test_variant_t245.py).
 - ✅ T246 — Validate Gemma logits against a reference. Evidence: [python/tvara/reference/variants.py](python/tvara/reference/variants.py), [docs/variants.md](docs/variants.md), [tests/python/test_variant_t246.py](tests/python/test_variant_t246.py).
 - ✅ T247 — Implement optional AVX-512 kernel dispatch. Evidence: Executable numerical checks and capability evidence: [bench/results/variants/T247.json](bench/results/variants/T247.json)..
-- ❌ T248 — Benchmark AVX-512 against AVX2 on supported hardware.
+- ❌ T248 — Benchmark AVX-512 against AVX2 on supported hardware. Evidence: Pending: current host lacks AVX512F/BW. Guarded executable benchmark and capability result in [T248](bench/results/variants/T248.json); no supported-hardware measurement claimed..
 - ❌ T249 — Implement ARM NEON quantized dot products.
 - ❌ T250 — Validate an ARM build and reference output.
 - ❌ T251 — Prototype quantized KV storage.
