@@ -165,3 +165,40 @@ def test_target_rollback_preserves_accepted_prefix():
         target.advance(token)
     rollback_target(target, checkpoint, 1)
     assert target.history == [0, 1]
+
+
+def test_history_dependent_rejection_preserves_accepted_prefix():
+    from tvara.speculative import speculative_step
+
+    class Conditional(ToyModel):
+        def __init__(self, draft):
+            super().__init__([0, 1, 0])
+            self.is_draft = draft
+
+        def distribution(self):
+            if self.history[-1] == 1:
+                return np.array([1, 0, 0]) if self.is_draft else np.array([0, 0, 1])
+            return np.array([0, 1, 0])
+
+    draft, target = Conditional(True), Conditional(False)
+    result = speculative_step(draft, target, 3, np.random.default_rng(9))
+    assert result.tokens == (1, 2) and result.accepted == 1
+    assert draft.history == target.history == [0, 1, 2]
+
+
+def test_rejection_rolls_back_both_models_and_emits_residual():
+    from tvara.speculative import speculative_step
+
+    draft, target = ToyModel([1, 0, 0]), ToyModel([0, 0, 1])
+    result = speculative_step(draft, target, 3, np.random.default_rng(0))
+    assert result.tokens == (2,) and result.accepted == 0
+    assert draft.history == target.history == [0, 2]
+
+
+def test_full_acceptance_appends_bonus_and_synchronizes():
+    from tvara.speculative import speculative_step
+
+    draft, target = ToyModel([0, 1, 0]), ToyModel([0, 1, 0])
+    result = speculative_step(draft, target, 3, np.random.default_rng(0))
+    assert result.tokens == (1, 1, 1, 1) and result.accepted == 3
+    assert draft.history == target.history == [0, 1, 1, 1, 1]

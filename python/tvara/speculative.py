@@ -254,3 +254,64 @@ def rollback_target(target, checkpoint, accepted):
     if not isinstance(accepted, int) or accepted < 0:
         raise ValueError("Invalid accepted prefix")
     target.rollback(checkpoint + accepted)
+
+
+@dataclass(frozen=True)
+class StepResult:
+    tokens: tuple[int, ...]
+    proposed: int
+    accepted: int
+
+
+def speculative_step(draft, target, length, rng, constraint=None):
+    require_compatible(draft, target)
+    if draft.history != target.history:
+        raise ValueError("Draft and target histories differ")
+    d_checkpoint, t_checkpoint = draft.checkpoint(), target.checkpoint()
+    original_constraint = clone_constraint(constraint) if constraint is not None else None
+    draft_constraint = clone_constraint(constraint) if constraint is not None else None
+    target_constraint = clone_constraint(constraint) if constraint is not None else None
+    try:
+        proposals = propose(draft, length, rng, draft_constraint)
+        rows = verify(target, proposals, target_constraint)
+        accepted = 0
+        for index, proposal in enumerate(proposals):
+            if rng.random() >= acceptance_probability(
+                rows[index], proposal.distribution, proposal.token
+            ):
+                break
+            accepted += 1
+        output = [p.token for p in proposals[:accepted]]
+        ended = output and (
+            output[-1] == target.identity.eos_id
+            or (
+                target_constraint is not None
+                and target_constraint.ended
+                and accepted == len(proposals)
+            )
+        )
+        if not ended:
+            token = (
+                accepted_bonus(rows, rng)
+                if accepted == len(proposals)
+                else choose(
+                    residual_distribution(rows[accepted], proposals[accepted].distribution), rng
+                )
+            )
+            output.append(token)
+        rollback_target(target, t_checkpoint, accepted)
+        draft.rollback(d_checkpoint + accepted)
+        for token in output[accepted:]:
+            target.advance(token)
+            draft.advance(token)
+        if constraint is not None:
+            for token in output:
+                constraint.accept(token)
+        return StepResult(tuple(output), len(proposals), accepted)
+    except BaseException:
+        target.rollback(t_checkpoint)
+        draft.rollback(d_checkpoint)
+        if constraint is not None:
+            constraint.state = original_constraint.state
+            constraint.ended = original_constraint.ended
+        raise
