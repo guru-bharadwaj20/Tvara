@@ -1,0 +1,128 @@
+{
+  "measured_at_utc": "2026-10-13T19:15:20.591909+00:00",
+  "llama_cpp_revision": "45451c366d4256f94fbc8845645e31a6b9155054",
+  "threads": 1,
+  "kv_precision": "F32 keys and values in both engines",
+  "output_policy": "Full vocabulary logits at every prefill and decode position in both engines",
+  "prompt_tokens": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "decode_tokens": [
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24
+  ],
+  "warmup_runs": 1,
+  "measured_runs": 5,
+  "rows": [
+    {
+      "model": "models/benchmark-f32/model.gguf",
+      "sha256": "7330c4b5e417c0233966a836746e60492a4bd2b5250590a6c1c149d2bcc80f09",
+      "quantization": "f32",
+      "llama_cpp": {
+        "prefill_seconds": [
+          0.0006595,
+          0.00065,
+          0.0006549,
+          0.0008965,
+          0.0006583
+        ],
+        "decode_seconds": [
+          0.0007134,
+          0.0007056,
+          0.000912,
+          0.0007502,
+          0.0007096
+        ]
+      },
+      "tvara_native": {
+        "prefill_seconds": [
+          0.0010665000008884817,
+          0.0010640999971656129,
+          0.0010583999974187464,
+          0.0010614999919198453,
+          0.0010608999873511493
+        ],
+        "decode_seconds": [
+          0.0005958000110695139,
+          0.0005872000037925318,
+          0.0005879999953322113,
+          0.000589100003708154,
+          0.0005951000057393685
+        ],
+        "native_library": {
+          "name": "libtvara_capi.dll",
+          "sha256": "f097b126b10162a67e406658b3fe3e74a987efc850cfe2ad6048111cdcf1b8e5",
+          "build": "Release"
+        }
+      },
+      "maximum_logit_error": 3.0207031265216955e-08,
+      "f32_oracle_pass": true
+    },
+    {
+      "model": "models/benchmark-q8/model.gguf",
+      "sha256": "d30d38de82278b6b93673e49d7ebcbe413864fbe04f803f92f74da4402dd3ebb",
+      "quantization": "q8",
+      "llama_cpp": {
+        "prefill_seconds": [
+          0.0006329,
+          0.0006253,
+          0.0010173,
+          0.000658,
+          0.0006524
+        ],
+        "decode_seconds": [
+          0.0007237,
+          0.0007204,
+          0.0007865,
+          0.0007688,
+          0.0007583
+        ]
+      },
+      "tvara_native": {
+        "prefill_seconds": [
+          0.00105489999987185,
+          0.0013087999977869913,
+          0.0010492000001249835,
+          0.0010495000024093315,
+          0.001028700004098937
+        ],
+        "decode_seconds": [
+          0.0005846999993082136,
+          0.0006320000102277845,
+          0.0005958000110695139,
+          0.0005731999990530312,
+          0.0005659000016748905
+        ],
+        "native_library": {
+          "name": "libtvara_capi.dll",
+          "sha256": "f097b126b10162a67e406658b3fe3e74a987efc850cfe2ad6048111cdcf1b8e5",
+          "build": "Release"
+        }
+      },
+      "maximum_logit_error": 0.0019691291849365244,
+      "f32_oracle_pass": false
+    }
+  ],
+  "scope": "Same random-weight interleaved-RoPE model files and exact token IDs; tiny-model ctypes/allocation overhead matters; Q8 native weights dequantize to F32 and llama.cpp uses quantized kernels; no pretrained quality or large-model speed claim"
+}
