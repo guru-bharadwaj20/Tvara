@@ -40,8 +40,9 @@ class SpeculativeModel(Protocol):
 
 def probabilities(values):
     p = np.asarray(values, dtype=np.float64)
-    if p.ndim != 1 or not p.size or not np.isfinite(p).all() or (p < 0).any() or p.sum() <= 0:
+    if p.ndim != 1 or not p.size or not np.isfinite(p).all() or (p < 0).any() or p.max() <= 0:
         raise ValueError("Invalid probability distribution")
+    p = p / p.max()
     return p / p.sum()
 
 
