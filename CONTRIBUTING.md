@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 244 tasks are completed and 26 are not completed.
+Current status: 245 tasks are completed and 25 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -365,7 +365,7 @@ Target: Weeks 15-16; stretch work after core validation.
 - ✅ T242 — Validate Qwen normalization and rotary behavior. Evidence: [tests/python/test_variant_t242.py](tests/python/test_variant_t242.py).
 - ✅ T243 — Validate Qwen tokenization and special tokens. Evidence: [python/tvara/qwen.py](python/tvara/qwen.py), [tests/python/test_variant_t243.py](tests/python/test_variant_t243.py).
 - ✅ T244 — Implement Gemma-specific configuration mapping. Evidence: [python/tvara/reference/variants.py](python/tvara/reference/variants.py), [tests/python/test_variant_t244.py](tests/python/test_variant_t244.py).
-- ❌ T245 — Implement Gemma-specific normalization behavior.
+- ✅ T245 — Implement Gemma-specific normalization behavior. Evidence: [python/tvara/reference/variants.py](python/tvara/reference/variants.py), [tests/python/test_variant_t245.py](tests/python/test_variant_t245.py).
 - ❌ T246 — Validate Gemma logits against a reference.
 - ❌ T247 — Implement optional AVX-512 kernel dispatch.
 - ❌ T248 — Benchmark AVX-512 against AVX2 on supported hardware.
