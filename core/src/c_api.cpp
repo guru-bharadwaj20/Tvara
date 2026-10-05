@@ -71,5 +71,11 @@ int tvara_sequence_decode_batch(tvara_model* model,uint64_t sequence,const uint3
     }catch(const std::exception& e){failure(e);return -1;}catch(...){error_message="unknown batch error";return -1;}
 }
 
+
+int tvara_sequence_truncate(tvara_model* model,uint64_t sequence,size_t length){
+    error_message.clear();try{if(!model)throw std::invalid_argument("closed model");std::lock_guard lock(model->mutex);model->executor.cache().truncate(sequence,length);return 0;}
+    catch(const std::exception& e){failure(e);return -1;}catch(...){error_message="unknown truncate error";return -1;}
+}
+
 // ABI_IMPLEMENTATIONS
 }
