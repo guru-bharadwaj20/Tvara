@@ -1,0 +1,39 @@
+{
+  "measured_at_utc": "2026-10-13T18:56:34.471370+00:00",
+  "scope": "real native random-weight 257-vocabulary fixture; diagnostic prompt shapes only, not trained text/code/JSON quality or production speed. Both timings exclude setup prefill and decode exactly eight tokens; both consume each emitted token to leave synchronized KV. Debug native build, single run; timings are diagnostic.",
+  "cases": [
+    {
+      "prompt_shape": "text-shaped",
+      "prompt_tokens": 7,
+      "emitted_tokens": 8,
+      "proposed": 5,
+      "accepted": 5,
+      "acceptance_rate": 1.0,
+      "speculative_seconds": 0.01069199999619741,
+      "baseline_seconds": 0.0047697999980300665,
+      "speedup": 0.44610924052809925
+    },
+    {
+      "prompt_shape": "code-shaped",
+      "prompt_tokens": 8,
+      "emitted_tokens": 8,
+      "proposed": 5,
+      "accepted": 5,
+      "acceptance_rate": 1.0,
+      "speculative_seconds": 0.014213000002200715,
+      "baseline_seconds": 0.00560119999863673,
+      "speedup": 0.394089917524059
+    },
+    {
+      "prompt_shape": "JSON-shaped",
+      "prompt_tokens": 5,
+      "emitted_tokens": 8,
+      "proposed": 5,
+      "accepted": 5,
+      "acceptance_rate": 1.0,
+      "speculative_seconds": 0.0111787999921944,
+      "baseline_seconds": 0.004487500002142042,
+      "speedup": 0.4014294920094679
+    }
+  ]
+}

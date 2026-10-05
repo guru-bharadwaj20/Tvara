@@ -1,0 +1,36 @@
+{
+  "measured_at_utc": "2026-10-13T18:56:34.337902+00:00",
+  "scope": "synthetic constant-probability model; Python orchestration overhead only, no natural-language/code/JSON inference performance claim",
+  "cases": [
+    {
+      "workload": "high-overlap",
+      "proposals": 8000,
+      "accepted": 8000,
+      "acceptance_rate": 1.0,
+      "emitted": 10000,
+      "speculative_seconds": 1.742877500000759,
+      "baseline_seconds": 0.2719474000041373,
+      "speedup": 0.15603357092166195
+    },
+    {
+      "workload": "moderate-overlap",
+      "proposals": 8000,
+      "accepted": 3667,
+      "acceptance_rate": 0.458375,
+      "emitted": 5667,
+      "speculative_seconds": 1.545371599990176,
+      "baseline_seconds": 0.15054809999128338,
+      "speedup": 0.09741870498476898
+    },
+    {
+      "workload": "disjoint",
+      "proposals": 8000,
+      "accepted": 0,
+      "acceptance_rate": 0.0,
+      "emitted": 2000,
+      "speculative_seconds": 1.3944726000045193,
+      "baseline_seconds": 0.05208550000679679,
+      "speedup": 0.0373513972283342
+    }
+  ]
+}
