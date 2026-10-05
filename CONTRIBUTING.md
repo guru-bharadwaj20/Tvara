@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 247 tasks are completed and 23 are not completed.
+Current status: 248 tasks are completed and 22 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -369,7 +369,7 @@ Target: Weeks 15-16; stretch work after core validation.
 - ✅ T246 — Validate Gemma logits against a reference. Evidence: [python/tvara/reference/variants.py](python/tvara/reference/variants.py), [docs/variants.md](docs/variants.md), [tests/python/test_variant_t246.py](tests/python/test_variant_t246.py).
 - ✅ T247 — Implement optional AVX-512 kernel dispatch. Evidence: Executable numerical checks and capability evidence: [bench/results/variants/T247.json](bench/results/variants/T247.json)..
 - ❌ T248 — Benchmark AVX-512 against AVX2 on supported hardware. Evidence: Pending: current host lacks AVX512F/BW. Guarded executable benchmark and capability result in [T248](bench/results/variants/T248.json); no supported-hardware measurement claimed..
-- ❌ T249 — Implement ARM NEON quantized dot products.
+- ✅ T249 — Implement ARM NEON quantized dot products. Evidence: Executable numerical checks and capability evidence: [bench/results/variants/T249.json](bench/results/variants/T249.json)..
 - ❌ T250 — Validate an ARM build and reference output.
 - ❌ T251 — Prototype quantized KV storage.
 - ❌ T252 — Measure quantized KV quality and memory tradeoffs.
