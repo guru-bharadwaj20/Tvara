@@ -265,6 +265,8 @@ class StepResult:
 
 def speculative_step(draft, target, length, rng, constraint=None):
     require_compatible(draft, target)
+    if constraint is not None:
+        require_grammar_identity(target.identity, constraint)
     if draft.history != target.history:
         raise ValueError("Draft and target histories differ")
     d_checkpoint, t_checkpoint = draft.checkpoint(), target.checkpoint()
@@ -315,3 +317,16 @@ def speculative_step(draft, target, length, rng, constraint=None):
             constraint.state = original_constraint.state
             constraint.ended = original_constraint.ended
         raise
+
+
+def grammar_checkpoint(constraint):
+    return (constraint.state, constraint.ended)
+
+
+def require_grammar_identity(identity, constraint):
+    inventory = getattr(constraint.engine, "trie", None)
+    if inventory is not None and (
+        tuple(inventory.vocabulary) != identity.pieces
+        or constraint.engine.eos_id != identity.eos_id
+    ):
+        raise ValueError("Grammar token inventory does not match model token IDs")
