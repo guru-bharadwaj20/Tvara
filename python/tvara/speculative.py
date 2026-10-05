@@ -263,7 +263,7 @@ class StepResult:
     accepted: int
 
 
-def speculative_step(draft, target, length, rng, constraint=None):
+def speculative_step(draft, target, length, rng, constraint=None, proposer=None):
     require_compatible(draft, target)
     if constraint is not None:
         require_grammar_identity(target.identity, constraint)
@@ -274,7 +274,7 @@ def speculative_step(draft, target, length, rng, constraint=None):
     draft_constraint = clone_constraint(constraint) if constraint is not None else None
     target_constraint = clone_constraint(constraint) if constraint is not None else None
     try:
-        proposals = propose(draft, length, rng, draft_constraint)
+        proposals = (proposer or propose)(draft, length, rng, draft_constraint)
         rows = verify(target, proposals, target_constraint)
         accepted = 0
         for index, proposal in enumerate(proposals):
@@ -330,3 +330,43 @@ def require_grammar_identity(identity, constraint):
         or constraint.engine.eos_id != identity.eos_id
     ):
         raise ValueError("Grammar token inventory does not match model token IDs")
+
+
+def prompt_lookup(history, max_tokens=4, max_ngram=8):
+    if (
+        not isinstance(max_tokens, int)
+        or not 0 <= max_tokens <= 64
+        or not isinstance(max_ngram, int)
+        or not 1 <= max_ngram <= 64
+    ):
+        raise ValueError("Invalid prompt lookup bounds")
+    history = list(history)
+    for width in range(min(max_ngram, len(history) - 1), 0, -1):
+        suffix = history[-width:]
+        for start in range(len(history) - width - 1, -1, -1):
+            if history[start : start + width] == suffix:
+                continuation = history[
+                    start + width : min(start + width + max_tokens, len(history) - width)
+                ]
+                if continuation:
+                    return continuation
+    return []
+
+
+def propose_lookup(draft, length, rng, constraint=None):
+    del rng
+    proposals = []
+    for token in prompt_lookup(draft.history, length):
+        q = np.zeros(len(draft.identity.pieces), dtype=np.float64)
+        if not 0 <= token < len(q):
+            raise ValueError("Prompt lookup token exceeds vocabulary")
+        q[token] = 1
+        if constraint is not None:
+            if token not in constraint.engine.mask(constraint.state).ids():
+                break
+            constraint.accept(token)
+        proposals.append(Proposal(token, q))
+        draft.advance(token)
+        if token == draft.identity.eos_id or (constraint is not None and constraint.ended):
+            break
+    return proposals
