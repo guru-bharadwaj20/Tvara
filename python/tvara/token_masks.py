@@ -1,5 +1,7 @@
 """Vocabulary masks over immutable grammar states; one constraint per generation."""
 
+import codecs
+
 from collections import OrderedDict
 
 from dataclasses import dataclass, field
@@ -38,10 +40,21 @@ class ByteState:
 
 
 def advance_byte(grammar, state, byte):
-    if byte >= 128:
+    decoder = codecs.getincrementaldecoder("utf-8")("strict")
+    decoder.setstate((state.pending, 0))
+    try:
+        text = decoder.decode(bytes([byte]), final=False)
+    except UnicodeDecodeError:
         return None
-    next_state = state.grammar_state.advance(grammar, chr(byte))
-    return ByteState(next_state) if next_state is not None else None
+    next_state = state.grammar_state
+    for char in text:
+        next_state = next_state.advance(grammar, char)
+        if next_state is None:
+            return None
+    pending = decoder.getstate()[0]
+    if pending and not pending_can_match(grammar, next_state, pending):
+        return None
+    return ByteState(next_state, pending)
 
 
 def trie_allowed(trie, grammar, state, stats=None):
@@ -156,3 +169,46 @@ def naive_allowed(vocabulary, grammar, state):
         if candidate is not None:
             result.append(token)
     return tuple(result)
+
+
+def pending_can_match(grammar, state, pending):
+    from .grammar import closure
+
+    first = pending[0]
+    length = 2 if first < 0xE0 else 3 if first < 0xF0 else 4
+    low = bytearray(pending)
+    high = bytearray(pending)
+    for position in range(len(pending), length):
+        minimum = 0x80
+        maximum = 0xBF
+        if position == 1:
+            if first == 0xE0:
+                minimum = 0xA0
+            elif first == 0xED:
+                maximum = 0x9F
+            elif first == 0xF0:
+                minimum = 0x90
+            elif first == 0xF4:
+                maximum = 0x8F
+        low.append(minimum)
+        high.append(maximum)
+    left = ord(low.decode("utf8"))
+    right = ord(high.decode("utf8"))
+    for stack in closure(grammar, state.stacks):
+        if not stack:
+            continue
+        charset = stack[0]
+        if not charset.negate:
+            if any(a <= right and b >= left for a, b in charset.ranges):
+                return True
+        else:
+            uncovered = left
+            for a, b in sorted(charset.ranges):
+                if b < uncovered:
+                    continue
+                if a > uncovered:
+                    break
+                uncovered = max(uncovered, b + 1)
+            if uncovered <= right:
+                return True
+    return False

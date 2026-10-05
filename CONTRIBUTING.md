@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 218 tasks are completed and 52 are not completed.
+Current status: 219 tasks are completed and 51 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -329,7 +329,7 @@ Target: Weeks 10-14.
 - ✅ T216 — Precompute reusable grammar masks. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T217 — Cache masks by relevant automaton state. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T218 — Handle stack-dependent validity checks. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
-- ❌ T219 — Preserve state across split UTF-8 tokens.
+- ✅ T219 — Preserve state across split UTF-8 tokens. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ❌ T220 — Integrate masks with sampling filters.
 - ❌ T221 — Implement JSON Schema response-format requests.
 - ❌ T222 — Apply GGUF chat templates.
