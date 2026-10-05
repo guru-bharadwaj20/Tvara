@@ -143,3 +143,9 @@ def residual_distribution(p, q):
     if not np.any(residual > 0):
         raise ValueError("Residual sampling is undefined without rejection mass")
     return probabilities(residual)
+
+
+def accepted_bonus(target_rows, rng):
+    if not target_rows:
+        raise ValueError("Verification requires a bonus distribution")
+    return choose(target_rows[-1], rng)

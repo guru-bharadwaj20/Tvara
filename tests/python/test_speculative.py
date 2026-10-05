@@ -96,3 +96,9 @@ def test_zero_and_extreme_probability_edges():
     with pytest.raises(ValueError):
         acceptance_probability([1, 0], [0, 1], 0)
     np.testing.assert_array_equal(residual_distribution([1, 0], [0, 1]), [1, 0])
+
+
+def test_fully_accepted_bonus_uses_target_distribution():
+    from tvara.speculative import accepted_bonus
+
+    assert accepted_bonus([np.array([1, 0, 0]), np.array([0, 0, 1])], np.random.default_rng(5)) == 2
