@@ -57,3 +57,29 @@ def trie_allowed(trie, grammar, state, stats=None):
             elif stats is not None:
                 stats["pruned"] = stats.get("pruned", 0) + 1
     return tuple(sorted(result))
+
+
+@dataclass(frozen=True)
+class TokenMask:
+    size: int
+    bits: int
+
+    @classmethod
+    def from_ids(cls, size, ids):
+        if not isinstance(size, int) or size < 1:
+            raise ValueError("Invalid mask size")
+        bits = 0
+        for token in ids:
+            if not isinstance(token, int) or not 0 <= token < size:
+                raise ValueError("Invalid mask token")
+            bits |= 1 << token
+        return cls(size, bits)
+
+    def allows(self, token):
+        return 0 <= token < self.size and bool(self.bits & (1 << token))
+
+    def ids(self):
+        return tuple(i for i in range(self.size) if self.allows(i))
+
+    def packed(self):
+        return self.bits.to_bytes((self.size + 7) // 8, "little")

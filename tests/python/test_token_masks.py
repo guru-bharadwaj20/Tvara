@@ -36,3 +36,11 @@ def test_invalid_subtree_is_never_visited():
     assert m.trie_allowed(trie, g, state, stats) == (0,)
     assert stats["visited"] == 4 and stats["pruned"] == 2
     assert stats["visited"] < trie.node_count
+
+
+def test_bitmask_boundary_and_invalid_ids():
+    mask = m.TokenMask.from_ids(66, [0, 7, 8, 65])
+    assert mask.ids() == (0, 7, 8, 65) and len(mask.packed()) == 9
+    assert mask.packed()[0] == 129 and mask.packed()[-1] == 2
+    with pytest.raises(ValueError):
+        m.TokenMask.from_ids(3, [3])
