@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 251 tasks are completed and 19 are not completed.
+Current status: 252 tasks are completed and 18 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -374,7 +374,7 @@ Target: Weeks 15-16; stretch work after core validation.
 - ✅ T251 — Prototype quantized KV storage. Evidence: [python/tvara/quantized_kv.py](python/tvara/quantized_kv.py), [tests/python/test_variant_t251.py](tests/python/test_variant_t251.py).
 - ✅ T252 — Measure quantized KV quality and memory tradeoffs. Evidence: [tools/bench_quantized_kv.py](tools/bench_quantized_kv.py), [docs/quantized-kv.md](docs/quantized-kv.md).
 - ✅ T253 — Prototype mixture-of-experts routing. Evidence: [python/tvara/moe.py](python/tvara/moe.py), [tests/python/test_variant_t253.py](tests/python/test_variant_t253.py).
-- ❌ T254 — Prototype tree-based speculative verification.
+- ✅ T254 — Prototype tree-based speculative verification. Evidence: [python/tvara/speculative_tree.py](python/tvara/speculative_tree.py), [tests/python/test_variant_t254.py](tests/python/test_variant_t254.py).
 - ❌ T255 — Assess WebAssembly SIMD build feasibility.
 
 ### Phase 18: Final evaluation documentation and release
