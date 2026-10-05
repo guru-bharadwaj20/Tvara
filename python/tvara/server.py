@@ -1,5 +1,7 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+from .response_constraints import response_constraint
+
 from fastapi.exceptions import RequestValidationError
 
 import anyio
@@ -93,6 +95,7 @@ class CompletionRequest(BaseModel):
     top_p: float = Field(default=1, gt=0, le=1, allow_inf_nan=False)
     seed: int = Field(default=0, ge=0, le=18446744073709551615)
     stream: bool = False
+    response_format: dict | None = None
 
 
 class ChatMessage(BaseModel):
@@ -110,6 +113,7 @@ class ChatRequest(BaseModel):
     top_p: float = Field(default=1, gt=0, le=1, allow_inf_nan=False)
     seed: int = Field(default=0, ge=0, le=18446744073709551615)
     stream: bool = False
+    response_format: dict | None = None
 
 
 # REQUEST_TYPES
@@ -242,6 +246,12 @@ def create_app(backend, config=None):
             "seed": body.seed,
             "top_p": body.top_p,
         }
+        if body.response_format is not None:
+            if not hasattr(backend, "tokenizer"):
+                raise ValueError("Backend lacks tokenizer for structured output")
+            options["token_constraint"] = response_constraint(
+                body.response_format, backend.tokenizer, getattr(backend, "eos_id", None)
+            )
         if body.stream:
             return StreamingResponse(
                 stream_events(

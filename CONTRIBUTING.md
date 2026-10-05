@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 220 tasks are completed and 50 are not completed.
+Current status: 221 tasks are completed and 49 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -331,7 +331,7 @@ Target: Weeks 10-14.
 - ✅ T218 — Handle stack-dependent validity checks. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T219 — Preserve state across split UTF-8 tokens. Evidence: [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T220 — Integrate masks with sampling filters. Evidence: [python/tvara/native.py](python/tvara/native.py), [tests/python/test_native_bindings.py](tests/python/test_native_bindings.py), [python/tvara/token_masks.py](python/tvara/token_masks.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
-- ❌ T221 — Implement JSON Schema response-format requests.
+- ✅ T221 — Implement JSON Schema response-format requests. Evidence: [tests/python/test_server.py](tests/python/test_server.py), [python/tvara/response_constraints.py](python/tvara/response_constraints.py), [python/tvara/server.py](python/tvara/server.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ❌ T222 — Apply GGUF chat templates.
 - ❌ T223 — Translate tool signatures into output constraints.
 - ❌ T224 — Run schema-compliance and mask-latency benchmarks.
