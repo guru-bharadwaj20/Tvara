@@ -83,3 +83,16 @@ def test_residual_samples_only_missing_target_mass():
     np.testing.assert_allclose(residual_distribution([0.2, 0.3, 0.5], [0.4, 0.1, 0.5]), [0, 1, 0])
     with pytest.raises(ValueError):
         residual_distribution([0.2, 0.3, 0.5], [0.2, 0.3, 0.5])
+
+
+def test_zero_and_extreme_probability_edges():
+    from tvara.speculative import acceptance_probability, residual_distribution
+
+    np.testing.assert_allclose(probabilities([1e308, 1e308, 0]), [0.5, 0.5, 0])
+    np.testing.assert_array_equal(probabilities([0, 1e-320, 0]), [0, 1, 0])
+    for bad in ([0, 0], [np.nan, 1], [np.inf, 1], [-1, 2]):
+        with pytest.raises(ValueError):
+            probabilities(bad)
+    with pytest.raises(ValueError):
+        acceptance_probability([1, 0], [0, 1], 0)
+    np.testing.assert_array_equal(residual_distribution([1, 0], [0, 1]), [1, 0])

@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 231 tasks are completed and 39 are not completed.
+Current status: 232 tasks are completed and 38 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -347,7 +347,7 @@ Target: Weeks 12-16.
 - ✅ T229 — Implement batched target verification. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py), [core/include/tvara/c_api.h](core/include/tvara/c_api.h), [core/src/c_api.cpp](core/src/c_api.cpp).
 - ✅ T230 — Implement probabilistic draft acceptance. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py).
 - ✅ T231 — Implement normalized residual sampling. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py).
-- ❌ T232 — Handle zero-probability numerical edge cases.
+- ✅ T232 — Handle zero-probability numerical edge cases. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py).
 - ❌ T233 — Sample the extra target token after full acceptance.
 - ❌ T234 — Rollback target KV state after rejection.
 - ❌ T235 — Rollback draft KV state after rejection.
