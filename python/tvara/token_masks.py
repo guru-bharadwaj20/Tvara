@@ -83,3 +83,14 @@ class TokenMask:
 
     def packed(self):
         return self.bits.to_bytes((self.size + 7) // 8, "little")
+
+
+def state_kind(grammar, state):
+    from .grammar import closure, CharSet
+
+    stacks = closure(grammar, state.grammar_state.stacks)
+    if state.pending:
+        return "utf8-dependent"
+    if all(all(isinstance(symbol, CharSet) for symbol in stack) for stack in stacks):
+        return "terminal-only"
+    return "stack-dependent"

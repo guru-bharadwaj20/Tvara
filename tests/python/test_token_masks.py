@@ -44,3 +44,12 @@ def test_bitmask_boundary_and_invalid_ids():
     assert mask.packed()[0] == 129 and mask.packed()[-1] == 2
     with pytest.raises(ValueError):
         m.TokenMask.from_ids(3, [3])
+
+
+def test_state_classification_is_conservative():
+    g = grammar('"ab"')
+    s = m.ByteState(GrammarState.start(g))
+    assert m.state_kind(g, s) == "terminal-only"
+    assert m.state_kind(g, m.ByteState(s.grammar_state, b"\xe2")) == "utf8-dependent"
+    recursive = Grammar.from_text('root ::= "(" root ")" | "x"')
+    assert m.state_kind(recursive, m.ByteState(GrammarState.start(recursive))) == "stack-dependent"
