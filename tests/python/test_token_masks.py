@@ -16,3 +16,13 @@ def test_trie_shared_prefix_and_duplicates():
         m.VocabularyTrie([])
     assert trie.root.children[97].tokens == [0, 2]
     assert trie.root.children[97].children[98].tokens == [1]
+
+
+def test_trie_grammar_traversal():
+    g = grammar('"ab" | "ac"')
+    state = m.ByteState(GrammarState.start(g))
+    assert m.trie_allowed(m.VocabularyTrie([b"a", b"ab", b"ac", b"ad", b"b"]), g, state) == (
+        0,
+        1,
+        2,
+    )
