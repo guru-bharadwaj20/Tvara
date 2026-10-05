@@ -1,0 +1,12 @@
+{
+  "host": "Windows-11-10.0.22000-SP0",
+  "emscripten_available": false,
+  "status": "toolchain_unavailable",
+  "blockers": [
+    "native file mapping requires a wasm/virtual-file-system path",
+    "thread pool requires pthread build plus browser cross-origin isolation",
+    "runtime x86 intrinsics must remain excluded from wasm",
+    "browser memory budgets and model download paths need explicit limits"
+  ],
+  "recommended_scope": "standalone scalar and wasm-SIMD Q8 kernels before complete runtime"
+}
