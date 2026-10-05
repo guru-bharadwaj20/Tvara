@@ -1,5 +1,7 @@
 """CPU inference HTTP adapter with explicit backend ownership."""
 
+from .chat_templates import render_chat_template
+
 from .response_constraints import response_constraint
 
 from fastapi.exceptions import RequestValidationError
@@ -62,7 +64,7 @@ class NativeBackend:
         return self.model.encode(text, allow_special=True)
 
     def render_chat(self, messages):
-        raise ValueError("A validated chat template is required for native chat")
+        return render_chat_template(self.model.metadata, messages, self.tokenizer)
 
     def stream(self, prompt, options):
         from .tokenizer import TokenTextStream

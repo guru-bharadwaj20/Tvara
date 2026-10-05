@@ -147,3 +147,22 @@ def test_schema_request_constraints_validate_real_json():
     validate(json.loads(text), schema)
     with pytest.raises(ValueError):
         response_constraint({"type": "json_object"}, tok)
+
+
+def test_gguf_chat_template_roles_and_sandbox():
+    from tvara.chat_templates import render_chat_template
+
+    class Tok:
+        vocabulary = ("BOS", "EOS")
+
+    meta = {
+        "tokenizer.chat_template": "{{bos_token}}{% for m in messages %}{{m.role}}:{{m.content}};{% endfor %}{% if add_generation_prompt %}assistant:{% endif %}",
+        "tokenizer.ggml.bos_token_id": 0,
+    }
+    assert (
+        render_chat_template(meta, [{"role": "user", "content": "Hi"}], Tok())
+        == "BOSuser:Hi;assistant:"
+    )
+    meta["tokenizer.chat_template"] = "{{ messages.__class__.__mro__ }}"
+    with pytest.raises(ValueError):
+        render_chat_template(meta, [{"role": "user", "content": "Hi"}], Tok())
