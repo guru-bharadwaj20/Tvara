@@ -1,0 +1,8 @@
+{
+  "status": "blocked",
+  "reason": "AVX512F and AVX512BW hardware unavailable",
+  "avx2": true,
+  "platform": "Windows-11-10.0.22000-SP0",
+  "compiler": "g++.EXE (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "flags": "-std=c++20 -O2"
+}
