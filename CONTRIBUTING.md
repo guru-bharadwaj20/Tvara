@@ -370,7 +370,7 @@ Target: Weeks 15-16; stretch work after core validation.
 - ✅ T247 — Implement optional AVX-512 kernel dispatch. Evidence: Executable numerical checks and capability evidence: [bench/results/variants/T247.json](bench/results/variants/T247.json)..
 - ❌ T248 — Benchmark AVX-512 against AVX2 on supported hardware. Evidence: Pending: current host lacks AVX512F/BW. Guarded executable benchmark and capability result in [T248](bench/results/variants/T248.json); no supported-hardware measurement claimed..
 - ✅ T249 — Implement ARM NEON quantized dot products. Evidence: Executable numerical checks and capability evidence: [bench/results/variants/T249.json](bench/results/variants/T249.json)..
-- ❌ T250 — Validate an ARM build and reference output.
+- ❌ T250 — Validate an ARM build and reference output. Evidence: Pending: ARM compiler/emulator/hardware unavailable. [Validation harness](tests/core/variant_t250.cpp) and [local capability evidence](bench/results/variants/T250.json) document the blocker..
 - ❌ T251 — Prototype quantized KV storage.
 - ❌ T252 — Measure quantized KV quality and memory tradeoffs.
 - ❌ T253 — Prototype mixture-of-experts routing.
