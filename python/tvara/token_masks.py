@@ -42,14 +42,18 @@ def advance_byte(grammar, state, byte):
     return ByteState(next_state) if next_state is not None else None
 
 
-def trie_allowed(trie, grammar, state):
+def trie_allowed(trie, grammar, state, stats=None):
     result = []
     pending = [(trie.root, state)]
     while pending:
         node, current = pending.pop()
+        if stats is not None:
+            stats["visited"] = stats.get("visited", 0) + 1
         result.extend(node.tokens)
         for byte, child in node.children.items():
             candidate = advance_byte(grammar, current, byte)
             if candidate is not None:
                 pending.append((child, candidate))
+            elif stats is not None:
+                stats["pruned"] = stats.get("pruned", 0) + 1
     return tuple(sorted(result))

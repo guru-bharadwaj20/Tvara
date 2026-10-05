@@ -26,3 +26,13 @@ def test_trie_grammar_traversal():
         1,
         2,
     )
+
+
+def test_invalid_subtree_is_never_visited():
+    g = grammar('"abc"')
+    state = m.ByteState(GrammarState.start(g))
+    stats = {}
+    trie = m.VocabularyTrie([b"abc", b"axxxxxxxxx", b"yyyyyyyy"])
+    assert m.trie_allowed(trie, g, state, stats) == (0,)
+    assert stats["visited"] == 4 and stats["pruned"] == 2
+    assert stats["visited"] < trie.node_count
