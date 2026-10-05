@@ -122,3 +122,28 @@ def test_constraint_dominates_logits_and_preserves_transactional_state():
     assert c.ended
     with pytest.raises(ValueError):
         c.accept(2)
+
+
+def test_schema_request_constraints_validate_real_json():
+    from tvara.response_constraints import response_constraint
+    from tvara.tokenizer import ByteBPE, byte_mapping
+    from jsonschema import validate
+    import json
+
+    forward, _ = byte_mapping()
+    tok = ByteBPE(list(forward.values()), [])
+    schema = {
+        "type": "object",
+        "properties": {"ok": {"const": True}},
+        "required": ["ok"],
+        "additionalProperties": False,
+    }
+    c = response_constraint({"type": "json_schema", "json_schema": {"schema": schema}}, tok)
+    text = '{"ok":true}'
+    for token in tok.encode(text):
+        assert c.engine.mask(c.state).allows(token)
+        c.accept(token)
+    assert c.complete
+    validate(json.loads(text), schema)
+    with pytest.raises(ValueError):
+        response_constraint({"type": "json_object"}, tok)

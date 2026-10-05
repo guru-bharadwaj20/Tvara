@@ -164,3 +164,41 @@ def test_validation_errors_follow_the_error_object_contract(client):
     )
     assert response.status_code == 400 and response.json()["error"]["code"] == "validation_error"
     assert response.json()["error"]["type"] == "invalid_request_error"
+
+
+def test_real_native_api_schema_response(tmp_path):
+    from pathlib import Path
+    from tvara.native import NativeModel, find_library
+    from tvara.tokenizer import ByteBPE
+    from tvara.server import NativeBackend
+    import importlib.util
+
+    try:
+        library = find_library()
+    except FileNotFoundError:
+        pytest.skip("Optional native CPU library absent")
+    root = Path(__file__).resolve().parents[2]
+    spec = importlib.util.spec_from_file_location("api_fixture", root / "tools/make_api_fixture.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    directory = module.make_fixture(tmp_path / "fixture")
+    backend = NativeBackend(
+        NativeModel(directory / "model.gguf", library=library),
+        ByteBPE.from_json(directory / "tokenizer.json"),
+    )
+    with TestClient(create_app(backend)) as client:
+        response = client.post(
+            "/v1/completions",
+            json={
+                "model": "tvara-local",
+                "prompt": "A",
+                "max_tokens": 8,
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {"schema": {"const": True}},
+                },
+            },
+        )
+        assert response.status_code == 200
+        assert response.json()["choices"][0]["text"].strip() == "true"
+        assert response.json()["choices"][0]["finish_reason"] in {"stop", "length"}
