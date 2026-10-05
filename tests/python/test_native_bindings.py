@@ -56,3 +56,26 @@ def test_native_generation_matches_greedy_oracle_and_releases_sequences(native):
     next(stream)
     stream.close()
     assert native.generate([1, 2], max_new_tokens=1)
+
+
+@pytest.mark.parametrize("temperature", [0, 1])
+def test_native_grammar_mask_precedes_all_sampling_filters(native, temperature):
+    from tvara.grammar import Grammar
+    from tvara.token_masks import TokenConstraint, MaskEngine
+
+    vocabulary = [b""] * native.vocab_size
+    vocabulary[17] = b"a"
+    constraint = TokenConstraint(
+        MaskEngine(vocabulary, Grammar.from_text('root ::= "a"'), eos_id=2)
+    )
+    assert native.generate(
+        [1, 2],
+        max_new_tokens=2,
+        temperature=temperature,
+        top_k=1,
+        min_p=0.9,
+        top_p=0.1,
+        eos_id=2,
+        token_constraint=constraint,
+    ) == [17, 2]
+    assert constraint.complete and constraint.ended

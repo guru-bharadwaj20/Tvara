@@ -107,3 +107,18 @@ def test_split_utf8_and_malformed_sequences():
     assert m.advance_byte(ascii_g, m.ByteState(GrammarState.start(ascii_g)), 0xE2) is None
     done_g = grammar('""')
     assert m.advance_byte(done_g, m.ByteState(GrammarState.start(done_g)), 0xE2) is None
+
+
+def test_constraint_dominates_logits_and_preserves_transactional_state():
+    c = m.TokenConstraint(m.MaskEngine([b"a", b"b", b""], grammar('"a"'), eos_id=2))
+    assert int(c.mask_logits(np.array([1.0, 999.0, 5.0])).argmax()) == 0
+    before = c.state
+    with pytest.raises(ValueError):
+        c.accept(1)
+    assert c.state == before
+    c.accept(0)
+    assert c.complete
+    c.accept(2)
+    assert c.ended
+    with pytest.raises(ValueError):
+        c.accept(2)

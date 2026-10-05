@@ -212,3 +212,47 @@ def pending_can_match(grammar, state, pending):
             if uncovered <= right:
                 return True
     return False
+
+
+class TokenConstraint:
+    def __init__(self, engine):
+        self.engine = engine
+        self.state = ByteState(GrammarState.start(engine.grammar))
+        self.ended = False
+
+    def mask_logits(self, logits):
+        import numpy as np
+
+        values = np.asarray(logits, dtype=float)
+        if values.ndim != 1 or len(values) != len(self.engine.trie.vocabulary):
+            raise ValueError("Logit vocabulary mismatch")
+        if not np.isfinite(values).all():
+            raise ValueError("Nonfinite model logits")
+        ids = self.engine.mask(self.state).ids()
+        if not ids:
+            raise ValueError("No grammar-valid tokens remain")
+        result = np.full(values.shape, -np.inf)
+        result[list(ids)] = values[list(ids)]
+        return result
+
+    def accept(self, token):
+        if self.ended or not self.engine.mask(self.state).allows(token):
+            raise ValueError("Invalid constrained token")
+        if token == self.engine.eos_id:
+            self.ended = True
+            return
+        state = self.state
+        for byte in self.engine.trie.vocabulary[token]:
+            state = advance_byte(self.engine.grammar, state, byte)
+        self.state = state
+
+    @property
+    def complete(self):
+        return not self.state.pending and self.state.grammar_state.accepting(self.engine.grammar)
+
+
+def tokenizer_bytes(tokenizer):
+    return tuple(
+        b"" if token in tokenizer.special_ids else tokenizer.token_bytes(token)
+        for token in range(len(tokenizer.vocabulary))
+    )

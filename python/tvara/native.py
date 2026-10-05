@@ -166,6 +166,7 @@ class NativeModel:
         repetition=1,
         frequency=0,
         presence=0,
+        token_constraint=None,
     ):
         prompt = list(prompt)
         if not prompt or any(
@@ -212,6 +213,8 @@ class NativeModel:
                     logits[seen] >= 0, logits[seen] / repetition, logits[seen] * repetition
                 )
                 logits -= counts * frequency + seen * presence
+                if token_constraint is not None:
+                    logits = token_constraint.mask_logits(logits)
                 if temperature == 0:
                     token = int(logits.argmax())
                 else:
@@ -227,6 +230,8 @@ class NativeModel:
                     p[order[np.r_[False, cumulative[:-1] >= top_p]]] = 0
                     p /= p.sum()
                     token = int(rng.choice(self.vocab_size, p=p))
+                if token_constraint is not None:
+                    token_constraint.accept(token)
                 history.append(token)
                 yield token
                 if token == eos_id:
