@@ -166,3 +166,30 @@ def test_gguf_chat_template_roles_and_sandbox():
     meta["tokenizer.chat_template"] = "{{ messages.__class__.__mro__ }}"
     with pytest.raises(ValueError):
         render_chat_template(meta, [{"role": "user", "content": "Hi"}], Tok())
+
+
+def test_tool_signatures_become_name_and_argument_constraints():
+    from tvara.response_constraints import tool_response_format
+    from tvara.schema import compile_schema
+    from tvara.grammar import accepts
+
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "weather",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"city": {"enum": ["Paris"]}},
+                    "required": ["city"],
+                    "additionalProperties": False,
+                },
+            },
+        }
+    ]
+    spec = tool_response_format(tools, "required")
+    g = compile_schema(spec["json_schema"]["schema"])
+    assert accepts(g, '{"name":"weather","arguments":{"city":"Paris"}}')
+    assert not accepts(g, '{"name":"other","arguments":{"city":"Paris"}}')
+    with pytest.raises(ValueError):
+        tool_response_format(tools, "auto")
