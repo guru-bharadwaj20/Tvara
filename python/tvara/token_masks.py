@@ -141,3 +141,18 @@ class MaskEngine:
         if len(self.cache) > self.max_entries:
             self.cache.popitem(last=False)
         return result
+
+
+def naive_allowed(vocabulary, grammar, state):
+    result = []
+    for token, raw in enumerate(vocabulary):
+        if not raw:
+            continue
+        candidate = state
+        for byte in raw:
+            candidate = advance_byte(grammar, candidate, byte)
+            if candidate is None:
+                break
+        if candidate is not None:
+            result.append(token)
+    return tuple(result)
