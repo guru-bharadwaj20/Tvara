@@ -104,3 +104,22 @@ def propose(draft, length, rng, constraint=None):
         if token == draft.identity.eos_id:
             break
     return proposals
+
+
+def verify(target, proposals, constraint=None):
+    if constraint is None and hasattr(target, "verify_batch"):
+        return target.verify_batch(proposals)
+    distributions = []
+    for proposal in proposals:
+        p = probabilities(target.distribution())
+        if constraint is not None:
+            p = constrained_probabilities(p, constraint)
+        distributions.append(p)
+        target.advance(proposal.token)
+        if constraint is not None:
+            constraint.accept(proposal.token)
+    extra = probabilities(target.distribution())
+    if constraint is not None and not constraint.ended:
+        extra = constrained_probabilities(extra, constraint)
+    distributions.append(extra)
+    return distributions
