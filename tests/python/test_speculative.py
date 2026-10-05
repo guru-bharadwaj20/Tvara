@@ -68,3 +68,10 @@ def test_target_verification_returns_alignment_and_bonus_distribution():
     rows = verify(target, proposed)
     assert len(rows) == 3 and target.history == [0, 1, 1]
     np.testing.assert_allclose(rows, [[0.2, 0.3, 0.5]] * 3)
+
+
+def test_probability_ratio_acceptance():
+    from tvara.speculative import acceptance_probability
+
+    assert acceptance_probability([0.2, 0.3, 0.5], [0.4, 0.1, 0.5], 0) == 0.5
+    assert acceptance_probability([0.2, 0.3, 0.5], [0.4, 0.1, 0.5], 1) == 1
