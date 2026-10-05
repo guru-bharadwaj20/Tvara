@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 254 tasks are completed and 16 are not completed.
+Current status: 255 tasks are completed and 15 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -382,7 +382,7 @@ Target: Weeks 15-16; stretch work after core validation.
 Target: Weeks 17-18.
 
 - ✅ T256 — Pin benchmark models and quantized file checksums. Evidence: [tools/make_api_fixture.py](tools/make_api_fixture.py), [tools/pin_benchmark_models.py](tools/pin_benchmark_models.py).
-- ❌ T257 — Record CPU memory OS and compiler configuration.
+- ✅ T257 — Record CPU memory OS and compiler configuration. Evidence: [tools/record_machine.py](tools/record_machine.py).
 - ❌ T258 — Measure STREAM memory bandwidth on the test machine.
 - ❌ T259 — Run matched llama.cpp prefill and decode baselines.
 - ❌ T260 — Report repeated measurements and thermal conditions.

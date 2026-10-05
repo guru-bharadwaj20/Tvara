@@ -1,0 +1,11 @@
+{
+  "measured_at_utc": "2026-10-13T19:14:45.998663+00:00",
+  "os": "Windows-11-10.0.22000-SP0",
+  "cpu": "Intel64 Family 6 Model 61 Stepping 4, GenuineIntel",
+  "logical_processors": 4,
+  "physical_memory_bytes": 8497737728,
+  "compiler": "g++ (x86_64-posix-seh-rev1, Built by MinGW-Builds project) 15.2.0",
+  "python": "3.13.1",
+  "native_build": "Release C++20",
+  "limitations": "CPU frequency, temperature and background load are not controlled; native benchmarks identify worker count individually"
+}
