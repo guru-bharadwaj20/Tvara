@@ -1,5 +1,6 @@
 """Compile and run a native optimization check, preserving measured JSON evidence."""
 
+from datetime import datetime, timezone
 import argparse
 import json
 import os
@@ -36,6 +37,8 @@ def main():
         run = subprocess.run([binary], check=True, capture_output=True, text=True)
     measured = json.loads(run.stdout)
     measured.update(
+        executed_at_utc=datetime.now(timezone.utc).isoformat(),
+        conditions="Frequency, temperature and concurrent background work were not controlled",
         platform=platform.platform(),
         compiler=subprocess.run(
             [compiler, "--version"], check=True, capture_output=True, text=True

@@ -20,3 +20,7 @@ Record CPU, RAM, OS, compiler flags, library versions, power settings, warm-up c
 repetitions, and raw timings. Report median and spread, not the fastest run alone.
 Measure STREAM on the same hardware before reporting achieved bandwidth fractions.
 Keep synthetic load seeds and conversation-length distributions reproducible.
+
+## Final measurement conditions
+
+Every final benchmark records the actual UTC execution time. Commit author and committer dates are historical metadata and do not describe test execution time. Earlier prefill artifacts without timestamps retain that limitation; dates are not reconstructed. Repeated native timings report raw samples, range and median. CPU temperature and frequency are unavailable to this process, cooldown is not imposed and concurrent work is uncontrolled, so these measurements do not establish thermal stability or an idle-machine performance baseline.
