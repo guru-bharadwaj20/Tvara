@@ -45,3 +45,16 @@ def test_tokenizer_mismatch_is_rejected():
     target.identity = TokenizerIdentity((b"b", b"a", b"c"), "fixture-v1")
     with pytest.raises(ValueError):
         require_compatible(draft, target)
+
+
+def test_draft_proposals_preserve_each_sampling_distribution():
+    from tvara.speculative import propose
+
+    draft = ToyModel([0, 1, 0])
+    proposals = propose(draft, 3, np.random.default_rng(8))
+    assert [p.token for p in proposals] == [1, 1, 1]
+    assert draft.history == [0, 1, 1, 1]
+    for p in proposals:
+        np.testing.assert_array_equal(p.distribution, [0, 1, 0])
+    with pytest.raises(ValueError):
+        propose(draft, 65, np.random.default_rng(0))

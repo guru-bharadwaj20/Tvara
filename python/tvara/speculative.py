@@ -62,3 +62,45 @@ def tokenizer_fingerprint(identity):
 def require_compatible(draft, target):
     if tokenizer_fingerprint(draft.identity) != tokenizer_fingerprint(target.identity):
         raise ValueError("Draft and target tokenizers must have identical token IDs and rules")
+
+
+def clone_constraint(constraint):
+    candidate = type(constraint)(constraint.engine)
+    candidate.state = constraint.state
+    candidate.ended = constraint.ended
+    return candidate
+
+
+def constrained_probabilities(p, constraint):
+    if constraint.ended:
+        raise ValueError("Cannot propose after grammar EOS")
+    allowed = constraint.engine.mask(constraint.state).ids()
+    masked = np.zeros_like(p)
+    masked[list(allowed)] = p[list(allowed)]
+    return probabilities(masked)
+
+
+@dataclass(frozen=True)
+class Proposal:
+    token: int
+    distribution: np.ndarray
+
+
+def propose(draft, length, rng, constraint=None):
+    if not isinstance(length, int) or not 0 <= length <= 64:
+        raise ValueError("Draft length must be between zero and 64")
+    proposals = []
+    for _ in range(length):
+        q = probabilities(draft.distribution())
+        if constraint is not None:
+            q = constrained_probabilities(q, constraint)
+        token = choose(q, rng)
+        proposals.append(Proposal(token, q.copy()))
+        draft.advance(token)
+        if constraint is not None:
+            constraint.accept(token)
+            if constraint.ended:
+                break
+        if token == draft.identity.eos_id:
+            break
+    return proposals
