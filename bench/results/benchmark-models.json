@@ -1,0 +1,24 @@
+{
+  "generated_at_utc": "2026-10-13T19:14:36.985554+00:00",
+  "scope": "Random-weight tiny Llama fixtures, not pretrained language quality or representative large-model speed",
+  "models": [
+    {
+      "path": "models/benchmark-f32/model.gguf",
+      "sha256": "7330c4b5e417c0233966a836746e60492a4bd2b5250590a6c1c149d2bcc80f09",
+      "bytes": 106848,
+      "quantization": "F32",
+      "context": 64,
+      "vocabulary": 257,
+      "seed": 2026
+    },
+    {
+      "path": "models/benchmark-q8/model.gguf",
+      "sha256": "d30d38de82278b6b93673e49d7ebcbe413864fbe04f803f92f74da4402dd3ebb",
+      "bytes": 31520,
+      "quantization": "Q8_0 matrices/F32 norms",
+      "context": 64,
+      "vocabulary": 257,
+      "seed": 2026
+    }
+  ]
+}

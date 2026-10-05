@@ -12,7 +12,7 @@ def string(value):
     return struct.pack("<Q", len(data)) + data
 
 
-def make_fixture(directory="models/api-fixture"):
+def make_fixture(directory="models/api-fixture", benchmark=False, q8=False):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     forward, _ = byte_mapping()
@@ -73,7 +73,10 @@ def make_fixture(directory="models/api-fixture"):
     }
     metadata = [
         ("general.architecture", 8, string("llama")),
-        ("tvara.rope.layout", 8, string("split")),
+        ("tvara.rope.layout", 8, string("interleaved" if benchmark else "split")),
+        ("llama.attention.layer_norm_rms_epsilon", 6, struct.pack("<f", 1e-6)),
+        ("tokenizer.ggml.pre", 8, string("gpt-2")),
+        ("tokenizer.ggml.merges", 9, struct.pack("<IQ", 8, 0)),
         ("tokenizer.ggml.model", 8, string("gpt2")),
         ("tokenizer.ggml.eos_token_id", 4, struct.pack("<I", 256)),
         (
@@ -97,15 +100,29 @@ def make_fixture(directory="models/api-fixture"):
     )
     payload = bytearray()
     for name, array in tensors.items():
+        kind = 8 if q8 and array.ndim == 2 else 0
+        raw = array.tobytes()
+        if kind == 8:
+            blocks = array.reshape(-1, 32)
+            payload_blocks = []
+            for block in blocks:
+                scale = float(np.max(np.abs(block))) / 127
+                quant = (
+                    np.zeros(32, dtype=np.int8)
+                    if scale == 0
+                    else np.clip(np.round(block / scale), -127, 127).astype(np.int8)
+                )
+                payload_blocks.append(np.asarray(scale, dtype="<f2").tobytes() + quant.tobytes())
+            raw = b"".join(payload_blocks)
         payload.extend(b"\x00" * ((-len(payload)) % 32))
         offset = len(payload)
         header += (
             string(name)
             + struct.pack("<I", array.ndim)
             + b"".join(struct.pack("<Q", d) for d in array.shape[::-1])
-            + struct.pack("<IQ", 0, offset)
+            + struct.pack("<IQ", kind, offset)
         )
-        payload.extend(array.tobytes())
+        payload.extend(raw)
     header += b"\x00" * ((-len(header)) % 32)
     (directory / "model.gguf").write_bytes(header + payload)
     return directory
