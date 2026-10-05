@@ -1,0 +1,89 @@
+{
+  "measured_at_utc": "2026-10-13T19:15:25.722828+00:00",
+  "runs": [
+    {
+      "prefill_seconds": [
+        0.0012059000000590459,
+        0.00105489999987185,
+        0.0010521999938646331,
+        0.001044400007231161,
+        0.0010470999986864626
+      ],
+      "decode_seconds": [
+        0.0005942999996477738,
+        0.0005910000036237761,
+        0.0005945000011706725,
+        0.0005908999883104116,
+        0.0005877000075997785
+      ],
+      "native_library": {
+        "name": "libtvara_capi.dll",
+        "sha256": "f097b126b10162a67e406658b3fe3e74a987efc850cfe2ad6048111cdcf1b8e5",
+        "build": "Release"
+      }
+    },
+    {
+      "prefill_seconds": [
+        0.0016679999971529469,
+        0.0016602000105194747,
+        0.0016109999996842816,
+        0.0016740999999456108,
+        0.001505500011262484
+      ],
+      "decode_seconds": [
+        0.0008927999879233539,
+        0.0009052999957930297,
+        0.0008870000019669533,
+        0.0005955000087851658,
+        0.0008569999918108806
+      ],
+      "native_library": {
+        "name": "libtvara_capi.dll",
+        "sha256": "f097b126b10162a67e406658b3fe3e74a987efc850cfe2ad6048111cdcf1b8e5",
+        "build": "Release"
+      }
+    },
+    {
+      "prefill_seconds": [
+        0.0010258999973302707,
+        0.0010292999941157177,
+        0.0010298999986844137,
+        0.0010264000011375174,
+        0.0010220999974990264
+      ],
+      "decode_seconds": [
+        0.0005680000031134114,
+        0.0005686999938916415,
+        0.0005660000024363399,
+        0.0005722999921999872,
+        0.0009149999968940392
+      ],
+      "native_library": {
+        "name": "libtvara_capi.dll",
+        "sha256": "f097b126b10162a67e406658b3fe3e74a987efc850cfe2ad6048111cdcf1b8e5",
+        "build": "Release"
+      }
+    }
+  ],
+  "summary": {
+    "prefill_seconds": {
+      "median": 0.0010521999938646331,
+      "minimum": 0.0010220999974990264,
+      "maximum": 0.0016740999999456108,
+      "samples": 15
+    },
+    "decode_seconds": {
+      "median": 0.0005942999996477738,
+      "minimum": 0.0005660000024363399,
+      "maximum": 0.0009149999968940392,
+      "samples": 15
+    }
+  },
+  "conditions": {
+    "temperature_celsius": null,
+    "frequency_hz": null,
+    "cooldown": "not imposed",
+    "concurrent_load": "not controlled; build processes and other applications may be active"
+  },
+  "scope": "Three native runs with one warmup and five measured samples each; tiny random-weight model, ctypes calls included. Temperature telemetry unavailable, so thermal stability is not established."
+}
