@@ -53,3 +53,15 @@ def test_state_classification_is_conservative():
     assert m.state_kind(g, m.ByteState(s.grammar_state, b"\xe2")) == "utf8-dependent"
     recursive = Grammar.from_text('root ::= "(" root ")" | "x"')
     assert m.state_kind(recursive, m.ByteState(GrammarState.start(recursive))) == "stack-dependent"
+
+
+def test_precomputation_bound_and_eos():
+    g = grammar('"a"')
+    s = m.ByteState(GrammarState.start(g))
+    e = m.MaskEngine([b"a", b""], g, eos_id=1, max_entries=1)
+    e.precompute([s])
+    assert e.mask(s).ids() == (0,)
+    done = m.advance_byte(g, s, 97)
+    assert e.compute(done).ids() == (1,)
+    with pytest.raises(ValueError):
+        e.precompute([done])

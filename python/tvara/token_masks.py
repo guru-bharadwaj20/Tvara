@@ -94,3 +94,33 @@ def state_kind(grammar, state):
     if all(all(isinstance(symbol, CharSet) for symbol in stack) for stack in stacks):
         return "terminal-only"
     return "stack-dependent"
+
+
+class MaskEngine:
+    def __init__(self, vocabulary, grammar, eos_id=None, max_entries=1024):
+        self.trie = VocabularyTrie(vocabulary)
+        self.grammar = grammar
+        self.eos_id = eos_id
+        if eos_id is not None and not 0 <= eos_id < len(vocabulary):
+            raise ValueError("Invalid EOS ID")
+        if not isinstance(max_entries, int) or max_entries < 1:
+            raise ValueError("Invalid mask cache bound")
+        self.max_entries = max_entries
+        self.precomputed = {}
+
+    def compute(self, state):
+        ids = list(trie_allowed(self.trie, self.grammar, state))
+        if self.eos_id is not None:
+            ids = [token for token in ids if token != self.eos_id]
+            if not state.pending and state.grammar_state.accepting(self.grammar):
+                ids.append(self.eos_id)
+        return TokenMask.from_ids(len(self.trie.vocabulary), ids)
+
+    def precompute(self, states):
+        for state in states:
+            if len(self.precomputed) >= self.max_entries and state not in self.precomputed:
+                raise ValueError("Precompute limit reached")
+            self.precomputed[state] = self.compute(state)
+
+    def mask(self, state):
+        return self.precomputed.get(state) or self.compute(state)
