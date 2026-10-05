@@ -1,0 +1,45 @@
+{
+  "measured_at": "2026-10-13T18:44:14.556284+00:00",
+  "fixture": "random 1-layer native GGUF, not pretrained",
+  "backend": "serial decode_batch, no SIMD batch inference",
+  "seed": 19,
+  "requests": 8,
+  "repetitions": 1,
+  "rows": [
+    {
+      "mode": "static",
+      "seconds": 0.08393159999104682,
+      "tokens_per_second": 357.4339105080824,
+      "ttft": {
+        "count": 8,
+        "p50_seconds": 0.053999799994926434,
+        "p95_seconds": 0.07247377499588765,
+        "p99_seconds": 0.07451147499610669
+      },
+      "inter_token": {
+        "count": 22,
+        "p50_seconds": 0.002203449999797158,
+        "p95_seconds": 0.007278774995938875,
+        "p99_seconds": 0.014324257003318045
+      }
+    },
+    {
+      "mode": "continuous",
+      "seconds": 0.10179539999808185,
+      "tokens_per_second": 294.7087982420158,
+      "ttft": {
+        "count": 8,
+        "p50_seconds": 0.054117300009238534,
+        "p95_seconds": 0.08767945000727195,
+        "p99_seconds": 0.08767973000940402
+      },
+      "inter_token": {
+        "count": 22,
+        "p50_seconds": 0.005218850004894193,
+        "p95_seconds": 0.01933364499564049,
+        "p99_seconds": 0.019701569001772442
+      }
+    }
+  ],
+  "outputs_identical": true
+}
