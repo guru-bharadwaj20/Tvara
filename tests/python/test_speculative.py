@@ -202,3 +202,66 @@ def test_full_acceptance_appends_bonus_and_synchronizes():
     result = speculative_step(draft, target, 3, np.random.default_rng(0))
     assert result.tokens == (1, 1, 1, 1) and result.accepted == 3
     assert draft.history == target.history == [0, 1, 1, 1, 1]
+
+
+def test_real_grammar_mask_speculative_utf8_and_eos():
+    from tvara.grammar import Grammar
+    from tvara.token_masks import MaskEngine, TokenConstraint
+    from tvara.speculative import speculative_step
+
+    cases = [("ab", (b"a", b"b", b""), 2), ("€", (b"\xe2", b"\x82", b"\xac", b""), 3)]
+    for literal, pieces, eos in cases:
+        constraint = TokenConstraint(
+            MaskEngine(pieces, Grammar.from_text('root ::= "' + literal + '"'), eos_id=eos)
+        )
+        identity = TokenizerIdentity(pieces, "grammar-fixture-v1", eos)
+        draft, target = ToyModel(np.ones(len(pieces))), ToyModel(np.ones(len(pieces)))
+        draft.identity = target.identity = identity
+        result = speculative_step(draft, target, 6, np.random.default_rng(12), constraint)
+        assert result.tokens == tuple(range(len(pieces)))
+        assert constraint.ended and constraint.complete
+        assert draft.history == target.history
+
+
+def test_grammar_zero_probability_failure_preserves_branches():
+    from tvara.grammar import Grammar
+    from tvara.token_masks import MaskEngine, TokenConstraint
+    from tvara.speculative import speculative_step
+
+    constraint = TokenConstraint(
+        MaskEngine([b"a", b"b", b""], Grammar.from_text('root ::= "a"'), eos_id=2)
+    )
+    original = constraint.state
+    draft, target = ToyModel([0, 1, 0]), ToyModel([1, 0, 0])
+    draft.identity = target.identity = TokenizerIdentity((b"a", b"b", b""), "grammar-fixture-v1", 2)
+    with pytest.raises(ValueError):
+        speculative_step(draft, target, 3, np.random.default_rng(0), constraint)
+    assert constraint.state == original and not constraint.ended
+    assert draft.history == target.history == [0]
+
+
+def test_constraint_filters_draft_and_target_and_commits_only_output():
+    from tvara.speculative import speculative_step
+
+    class Mask:
+        def ids(self):
+            return (1,)
+
+    class Engine:
+        def mask(self, state):
+            return Mask()
+
+    class Constraint:
+        def __init__(self, engine):
+            self.engine, self.state, self.ended = engine, (), False
+
+        def accept(self, token):
+            if token != 1:
+                raise ValueError("Constraint rejected token")
+            self.state += (token,)
+
+    constraint = Constraint(Engine())
+    draft, target = ToyModel([0.7, 0.2, 0.1]), ToyModel([0.1, 0.3, 0.6])
+    result = speculative_step(draft, target, 2, np.random.default_rng(4), constraint)
+    assert result.tokens == (1, 1, 1)
+    assert constraint.state == (1, 1, 1)
