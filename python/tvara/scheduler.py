@@ -95,7 +95,7 @@ class Scheduler:
             request.state = State.PREFILL
             self.active.append(request)
 
-    def step(self):
+    def _step(self):
         self.iteration += 1
         self.reap()
         self.admit()
@@ -126,6 +126,16 @@ class Scheduler:
             if r.state in {State.FINISHED, State.CANCELLED, State.FAILED}:
                 self.backend.drop(r.identifier)
                 self.active.remove(r)
+
+    def step(self):
+        try:
+            return self._step()
+        except Exception:
+            for request in self.active:
+                request.state = State.FAILED
+                request.error = "Backend iteration failed"
+            self.reap()
+            raise
 
     def run(self, max_iterations=100000):
         for _ in range(max_iterations):

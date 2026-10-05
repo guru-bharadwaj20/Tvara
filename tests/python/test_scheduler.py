@@ -168,3 +168,69 @@ def test_intertoken_percentiles():
     assert out["inter_token"]["count"] == 2
     assert out["inter_token"]["p50_seconds"] == pytest.approx(0.3)
     assert latency_report([])["ttft"]["p99_seconds"] is None
+
+
+def test_cancellation_and_starvation_under_load():
+    from tvara.scheduler import conversation_load
+
+    b = Backend()
+    s = Scheduler(b, 2, prefill_chunk=1, kv_tokens=64)
+    requests = conversation_load(40, seed=29)
+    for r in requests:
+        s.submit(r)
+    s.step()
+    cancelled = [requests[0], requests[20]]
+    for r in cancelled:
+        s.cancel(r.identifier)
+    s.run(max_iterations=2000)
+    assert not b.live and not s.queue and not s.active
+    assert all(r.state is State.CANCELLED for r in cancelled)
+    assert all(r.state is State.FINISHED for r in requests if r not in cancelled)
+
+
+def test_backend_failure_releases_active_sequences():
+    class Broken(Backend):
+        def decode_batch(self, keys):
+            raise RuntimeError("broken backend")
+
+    b = Broken()
+    s = Scheduler(b)
+    r = Request("a", (1,), 2)
+    s.submit(r)
+    with pytest.raises(RuntimeError):
+        s.step()
+    assert r.state is State.FAILED and not b.live and not s.active
+
+
+def test_admission_failure_keeps_explicit_terminal_state():
+    class BrokenCreate(Backend):
+        def create(self, key):
+            raise RuntimeError("failed atomic create")
+
+    s = Scheduler(BrokenCreate())
+    r = Request("admission", (1,), 1)
+    s.submit(r)
+    with pytest.raises(RuntimeError):
+        s.step()
+    assert r.state is State.FAILED and not s.active and not s.queue
+
+
+def test_native_resume_matches_uninterrupted_generation():
+    from pathlib import Path
+    from tvara.native import NativeModel
+    from tvara.scheduler import NativeSchedulerBackend
+
+    path = Path("models/api-fixture/model.gguf")
+    if not path.exists():
+        pytest.skip("Local native random fixture unavailable")
+    with NativeModel(path) as model:
+        expected = model.generate([1, 2, 3], max_new_tokens=5)
+        s = Scheduler(NativeSchedulerBackend(model), prefill_chunk=2)
+        r = Request("resume", (1, 2, 3), 5)
+        s.submit(r)
+        while not r.output:
+            s.step()
+        s.preempt(r.identifier)
+        s.resume(r.identifier)
+        s.run()
+        assert r.output == expected
