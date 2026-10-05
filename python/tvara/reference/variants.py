@@ -87,4 +87,29 @@ def qwen_config(data):
     )
 
 
+def gemma_config(data):
+    if data.get("model_type") != "gemma":
+        raise ValueError("Only Gemma 1 is supported by this mapping")
+    if data.get("rope_scaling") is not None or data.get("attention_bias", False):
+        raise ValueError("Scaled RoPE and biased Gemma attention are unsupported")
+    activation = data.get("hidden_act", "gelu_pytorch_tanh")
+    if activation not in ("gelu_pytorch_tanh", "gelu_new", "gelu"):
+        raise ValueError("Unsupported Gemma activation")
+    return VariantConfig(
+        "gemma",
+        data["vocab_size"],
+        data["hidden_size"],
+        data["intermediate_size"],
+        data["num_hidden_layers"],
+        data["num_attention_heads"],
+        data.get("num_key_value_heads", data["num_attention_heads"]),
+        data.get("head_dim", 256),
+        data.get("max_position_embeddings", 8192),
+        data.get("rms_norm_eps", 1e-6),
+        data.get("rope_theta", 10000.0),
+        data.get("tie_word_embeddings", True),
+        activation,
+    )
+
+
 # VARIANT_CODE
