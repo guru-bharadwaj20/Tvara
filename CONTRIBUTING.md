@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 238 tasks are completed and 32 are not completed.
+Current status: 239 tasks are completed and 31 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -354,7 +354,7 @@ Target: Weeks 12-16.
 - ✅ T236 — Integrate grammar validity with draft proposals. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py).
 - ✅ T237 — Implement n-gram prompt-lookup proposals. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py).
 - ✅ T238 — Implement adaptive draft length. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py).
-- ❌ T239 — Run statistical distribution-equivalence checks.
+- ✅ T239 — Run statistical distribution-equivalence checks. Evidence: [python/tvara/speculative.py](python/tvara/speculative.py), [tests/python/test_speculative.py](tests/python/test_speculative.py), [tools/check_speculative_distribution.py](tools/check_speculative_distribution.py).
 - ❌ T240 — Measure acceptance rate and speed across task types.
 
 ### Phase 17: Model variants and portability stretch work
