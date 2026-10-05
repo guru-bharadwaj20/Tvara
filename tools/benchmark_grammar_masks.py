@@ -68,16 +68,63 @@ def measure():
     }
 
 
+def compare():
+    from tvara.grammar import Grammar, GrammarState
+    from tvara.token_masks import VocabularyTrie, ByteState, trie_allowed, naive_allowed, MaskEngine
+
+    g = Grammar.from_text('root ::= "abc" [a-z]*')
+    vocabulary = [
+        ("abc" + "".join(chr(97 + (i // (26**power)) % 26) for power in (2, 1, 0))).encode()
+        for i in range(2048)
+    ] + [
+        ("zzz" + "".join(chr(97 + (i // (26**power)) % 26) for power in (2, 1, 0))).encode()
+        for i in range(2048)
+    ]
+    trie = VocabularyTrie(vocabulary)
+    state = ByteState(GrammarState.start(g))
+    engine = MaskEngine(vocabulary, g)
+    samples = {"trie": [], "naive_scan": [], "cached": []}
+    expected = naive_allowed(vocabulary, g, state)
+    assert trie_allowed(trie, g, state) == expected
+    for _ in range(15):
+        for name, fn in (
+            ("trie", lambda: trie_allowed(trie, g, state)),
+            ("naive_scan", lambda: naive_allowed(vocabulary, g, state)),
+            ("cached", lambda: engine.mask(state).ids()),
+        ):
+            begin = time.perf_counter_ns()
+            result = fn()
+            samples[name].append(time.perf_counter_ns() - begin)
+            assert result == expected
+    return {
+        "measured_at_utc": datetime.now(timezone.utc).isoformat(),
+        "platform": platform.platform(),
+        "vocabulary_size": len(vocabulary),
+        "allowed_tokens": len(expected),
+        "median_ns": {name: statistics.median(values) for name, values in samples.items()},
+        "repetitions": 15,
+        "cache_hits": engine.hits,
+        "scope": "Synthetic shared-prefix vocabulary and one automaton state; no full-model throughput claim",
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="bench/results/grammar-masks.json")
+    parser.add_argument("--compare", action="store_true")
     args = parser.parse_args()
-    result = measure()
+    result = compare() if args.compare else measure()
     path = Path(args.output)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf8")
     print(
-        json.dumps({"valid_outputs": result["valid_outputs"], "latency_ns": result["latency_ns"]})
+        json.dumps(
+            {
+                key: value
+                for key, value in result.items()
+                if key in {"valid_outputs", "latency_ns", "median_ns"}
+            }
+        )
     )
 
 

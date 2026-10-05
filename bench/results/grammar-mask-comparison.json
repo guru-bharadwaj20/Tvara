@@ -1,0 +1,14 @@
+{
+  "measured_at_utc": "2026-10-13T18:49:48.778795+00:00",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "vocabulary_size": 4096,
+  "allowed_tokens": 2048,
+  "median_ns": {
+    "trie": 30995000,
+    "naive_scan": 218484000,
+    "cached": 4321400
+  },
+  "repetitions": 15,
+  "cache_hits": 14,
+  "scope": "Synthetic shared-prefix vocabulary and one automaton state; no full-model throughput claim"
+}

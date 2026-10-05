@@ -31,7 +31,7 @@ that may extend beyond week 18. Ownership and dates have not been assigned yet.
 - ✅ Completed: the deliverable exists and its relevant validation has passed.
 - ❌ Not completed: planned, unverified, or not yet implemented.
 
-Current status: 224 tasks are completed and 46 are not completed.
+Current status: 225 tasks are completed and 45 are not completed.
 A proposal describing a feature does not count as implementing it. When updating
 this list, link the implementation or validation evidence and revise the totals.
 The tracked design notes under docs/ replace the unavailable local proposal.
@@ -335,7 +335,7 @@ Target: Weeks 10-14.
 - ✅ T222 — Apply GGUF chat templates. Evidence: [python/tvara/chat_templates.py](python/tvara/chat_templates.py), [python/tvara/server.py](python/tvara/server.py), [pyproject.toml](pyproject.toml), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T223 — Translate tool signatures into output constraints. Evidence: [python/tvara/response_constraints.py](python/tvara/response_constraints.py), [python/tvara/server.py](python/tvara/server.py), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 - ✅ T224 — Run schema-compliance and mask-latency benchmarks. Evidence: [tools/benchmark_grammar_masks.py](tools/benchmark_grammar_masks.py), [docs/structured-output.md](docs/structured-output.md).
-- ❌ T225 — Compare mask caching with a naive vocabulary scan.
+- ✅ T225 — Compare mask caching with a naive vocabulary scan. Evidence: [tools/benchmark_grammar_masks.py](tools/benchmark_grammar_masks.py), [docs/structured-output.md](docs/structured-output.md), [tests/python/test_token_masks.py](tests/python/test_token_masks.py).
 
 ### Phase 16: Speculative decoding
 
