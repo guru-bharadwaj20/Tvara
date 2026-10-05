@@ -285,3 +285,17 @@ def test_prompt_lookup_returns_only_observed_continuations():
     assert prompt_lookup([1, 2, 3, 4, 1, 2], 3, 2) == [3, 4]
     assert prompt_lookup([1, 2, 3], 4, 2) == []
     assert prompt_lookup([1, 1, 1, 1], 2, 3) == [1]
+
+
+def test_adaptive_length_and_exact_output_cap():
+    from tvara.speculative import DraftController, StepResult, speculative_generate
+
+    controller = DraftController(length=4, maximum=6)
+    for _ in range(20):
+        controller.observe(StepResult((), 4, 4))
+    assert controller.length == 6
+    for _ in range(30):
+        controller.observe(StepResult((), 4, 0))
+    assert controller.length == 1
+    draft, target = ToyModel([0, 1, 0]), ToyModel([0, 1, 0])
+    assert speculative_generate(draft, target, 9, np.random.default_rng(8)) == [1] * 9
