@@ -102,3 +102,66 @@ def test_fully_accepted_bonus_uses_target_distribution():
     from tvara.speculative import accepted_bonus
 
     assert accepted_bonus([np.array([1, 0, 0]), np.array([0, 0, 1])], np.random.default_rng(5)) == 2
+
+
+def test_native_batch_and_rollback_match_uncached_conditionals():
+    from pathlib import Path
+    from tvara.native import NativeModel
+    from tvara.speculative import NativeSpeculativeModel, Proposal, TokenizerIdentity
+
+    root = Path.cwd()
+    libraries = [
+        root / "build/debug" / name
+        for name in (
+            "libtvara_capi.dll",
+            "tvara_capi.dll",
+            "libtvara_capi.so",
+            "libtvara_capi.dylib",
+        )
+    ]
+    library = next((p for p in libraries if p.exists()), None)
+    model_path = root / "models/api-fixture/model.gguf"
+    if library is None or not model_path.exists():
+        pytest.skip("Native fixture absent; runner must build and create fixture")
+    identity = TokenizerIdentity(
+        tuple(bytes([i]) for i in range(256)) + (b"",), "byte-fixture-v1", 256
+    )
+    with (
+        NativeModel(model_path, library=library) as first,
+        NativeModel(model_path, library=library) as second,
+    ):
+        one, two = (
+            NativeSpeculativeModel(first, [1, 2, 3], identity),
+            NativeSpeculativeModel(second, [1, 2, 3], identity),
+        )
+        try:
+            original = one.distribution()
+            checkpoint = one.checkpoint()
+            proposals = [Proposal(4, original), Proposal(5, original)]
+            batch = one.verify_batch(proposals)
+            expected = [two.distribution()]
+            for token in [4, 5]:
+                two.advance(token)
+                expected.append(two.distribution())
+            np.testing.assert_allclose(batch, expected, atol=1e-12)
+            one.rollback(checkpoint)
+            np.testing.assert_array_equal(one.distribution(), original)
+            assert one.history == [1, 2, 3]
+            with pytest.raises(ValueError):
+                one.verify_batch([Proposal(-1, original)])
+            assert one.history == [1, 2, 3]
+            np.testing.assert_array_equal(one.verify_batch([])[0], original)
+        finally:
+            one.close()
+            two.close()
+
+
+def test_target_rollback_preserves_accepted_prefix():
+    from tvara.speculative import rollback_target
+
+    target = ToyModel([1, 1, 1])
+    checkpoint = target.checkpoint()
+    for token in [1, 2, 0]:
+        target.advance(token)
+    rollback_target(target, checkpoint, 1)
+    assert target.history == [0, 1]

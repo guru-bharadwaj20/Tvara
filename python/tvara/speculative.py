@@ -149,3 +149,108 @@ def accepted_bonus(target_rows, rng):
     if not target_rows:
         raise ValueError("Verification requires a bonus distribution")
     return choose(target_rows[-1], rng)
+
+
+class NativeSpeculativeModel:
+    """Owned sequence adapter; caller owns the NativeModel lifetime."""
+
+    def __init__(self, model, prompt, identity, temperature=1.0):
+        import ctypes
+
+        self.model, self.identity = model, identity
+        if not np.isfinite(temperature) or temperature <= 0:
+            raise ValueError("Native speculative temperature must be positive")
+        self.temperature = float(temperature)
+        self._ctypes = ctypes
+        if len(identity.pieces) != model.vocab_size:
+            raise ValueError("Tokenizer vocabulary does not match native model")
+        self.history = list(prompt)
+        if not self.history or any(
+            not isinstance(t, int) or not 0 <= t < model.vocab_size for t in self.history
+        ):
+            raise ValueError("Invalid speculative prompt")
+        lib = model._library
+        lib.tvara_sequence_decode_batch.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_uint64,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.c_size_t,
+            ctypes.POINTER(ctypes.c_float),
+            ctypes.c_size_t,
+        ]
+        lib.tvara_sequence_decode_batch.restype = ctypes.c_int
+        lib.tvara_sequence_truncate.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_size_t]
+        lib.tvara_sequence_truncate.restype = ctypes.c_int
+        self.sequence = model._new_sequence()
+        try:
+            for token in self.history:
+                self._logits = model.logits(self.sequence, token)
+        except BaseException:
+            self.close()
+            raise
+
+    def distribution(self):
+        values = self._logits.astype(np.float64) / self.temperature
+        if not np.isfinite(values).all():
+            raise ValueError("Native logits are nonfinite")
+        return probabilities(np.exp(values - values.max()))
+
+    def advance(self, token):
+        self._logits = self.model.logits(self.sequence, token)
+        self.history.append(token)
+
+    def checkpoint(self):
+        return len(self.history)
+
+    def rollback(self, checkpoint):
+        if not isinstance(checkpoint, int) or not 1 <= checkpoint <= len(self.history):
+            raise ValueError("Invalid native checkpoint")
+        if checkpoint == len(self.history):
+            return
+        with self.model._lock:
+            status = self.model._library.tvara_sequence_truncate(
+                self.model._handle, self.sequence, checkpoint - 1
+            )
+            if status:
+                self.model._raise_error()
+            del self.history[checkpoint:]
+            self._logits = self.model.logits(self.sequence, self.history[-1])
+
+    def verify_batch(self, proposals):
+        old = self.distribution()
+        proposed_tokens = [p.token for p in proposals]
+        if any(
+            not isinstance(t, int) or not 0 <= t < self.model.vocab_size for t in proposed_tokens
+        ):
+            raise ValueError("Invalid native proposal token")
+        tokens = np.asarray(proposed_tokens, dtype=np.uint32)
+        output = np.empty((len(tokens), self.model.vocab_size), dtype=np.float32)
+        ctypes = self._ctypes
+        with self.model._lock:
+            status = self.model._library.tvara_sequence_decode_batch(
+                self.model._handle,
+                self.sequence,
+                tokens.ctypes.data_as(ctypes.POINTER(ctypes.c_uint32)),
+                len(tokens),
+                output.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
+                output.size,
+            )
+            if status:
+                self.model._raise_error()
+        rows = [old]
+        for token, logits in zip(tokens, output):
+            self.history.append(int(token))
+            self._logits = logits.copy()
+            rows.append(self.distribution())
+        return rows
+
+    def close(self):
+        if getattr(self, "sequence", None) is not None:
+            self.model._drop_sequence(self.sequence)
+            self.sequence = None
+
+
+def rollback_target(target, checkpoint, accepted):
+    if not isinstance(accepted, int) or accepted < 0:
+        raise ValueError("Invalid accepted prefix")
+    target.rollback(checkpoint + accepted)
