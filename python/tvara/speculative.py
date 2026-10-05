@@ -132,3 +132,13 @@ def acceptance_probability(p, q, token):
     if q[token] <= 0:
         raise ValueError("A proposed token must have positive draft probability")
     return min(1.0, float(p[token] / q[token]))
+
+
+def residual_distribution(p, q):
+    p, q = probabilities(p), probabilities(q)
+    if p.shape != q.shape:
+        raise ValueError("Residual distributions have different vocabularies")
+    residual = np.maximum(p - q, 0)
+    if not np.any(residual > 0):
+        raise ValueError("Residual sampling is undefined without rejection mass")
+    return probabilities(residual)

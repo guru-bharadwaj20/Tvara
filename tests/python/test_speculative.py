@@ -75,3 +75,11 @@ def test_probability_ratio_acceptance():
 
     assert acceptance_probability([0.2, 0.3, 0.5], [0.4, 0.1, 0.5], 0) == 0.5
     assert acceptance_probability([0.2, 0.3, 0.5], [0.4, 0.1, 0.5], 1) == 1
+
+
+def test_residual_samples_only_missing_target_mass():
+    from tvara.speculative import residual_distribution
+
+    np.testing.assert_allclose(residual_distribution([0.2, 0.3, 0.5], [0.4, 0.1, 0.5]), [0, 1, 0])
+    with pytest.raises(ValueError):
+        residual_distribution([0.2, 0.3, 0.5], [0.2, 0.3, 0.5])
