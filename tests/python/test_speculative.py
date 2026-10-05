@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 from tvara.speculative import TokenizerIdentity, probabilities
 
@@ -33,3 +34,14 @@ def test_protocol_distribution_and_owned_state():
     model.advance(1)
     model.rollback(position)
     assert model.history == [0]
+
+
+def test_tokenizer_mismatch_is_rejected():
+    from tvara.speculative import require_compatible, tokenizer_fingerprint
+
+    draft, target = ToyModel([1, 1, 1]), ToyModel([1, 1, 1])
+    require_compatible(draft, target)
+    assert tokenizer_fingerprint(draft.identity) == tokenizer_fingerprint(target.identity)
+    target.identity = TokenizerIdentity((b"b", b"a", b"c"), "fixture-v1")
+    with pytest.raises(ValueError):
+        require_compatible(draft, target)

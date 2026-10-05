@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 from typing import Protocol
+import hashlib
+import json
 import numpy as np
 
 
@@ -46,3 +48,17 @@ def probabilities(values):
 def choose(p, rng):
     p = probabilities(p)
     return int(rng.choice(len(p), p=p))
+
+
+def tokenizer_fingerprint(identity):
+    payload = {
+        "pieces": [p.hex() for p in identity.pieces],
+        "configuration": identity.configuration,
+        "eos_id": identity.eos_id,
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+
+def require_compatible(draft, target):
+    if tokenizer_fingerprint(draft.identity) != tokenizer_fingerprint(target.identity):
+        raise ValueError("Draft and target tokenizers must have identical token IDs and rules")
