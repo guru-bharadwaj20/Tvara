@@ -12,3 +12,5 @@ def test_performance_page_matches_recorded_results():
     spec.loader.exec_module(module)
     page = (ROOT / "docs/performance.md").read_text(encoding="utf-8")
     assert page == module.render(), "Run python tools/render_performance_tables.py"
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert readme == module.readme_text(), "Run python tools/render_performance_tables.py"
