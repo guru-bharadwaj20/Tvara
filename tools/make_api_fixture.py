@@ -12,7 +12,21 @@ def string(value):
     return struct.pack("<Q", len(data)) + data
 
 
-def make_fixture(directory="models/api-fixture", benchmark=False, q8=False):
+def make_fixture(
+    directory="models/api-fixture",
+    benchmark=False,
+    q8=False,
+    layers=1,
+    hidden=32,
+    ffn=64,
+    heads=4,
+    kv_heads=2,
+    context=64,
+    output_std=0.02,
+):
+    """Defaults reproduce the pinned fixture bytes. Tensors are drawn in a fixed order
+    (embeddings, output, then each block), so a model with fewer layers and the same
+    seed shares its embeddings, output projection and leading blocks with a deeper one."""
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     forward, _ = byte_mapping()
@@ -51,24 +65,29 @@ def make_fixture(directory="models/api-fixture", benchmark=False, q8=False):
         json.dumps(tokenizer, ensure_ascii=True) + "\n", encoding="utf-8"
     )
     rng = np.random.default_rng(2026)
+    kv = hidden // heads * kv_heads
     shapes = {
-        "token_embd.weight": (257, 32),
-        "output.weight": (257, 32),
-        "output_norm.weight": (32,),
-        "blk.0.attn_norm.weight": (32,),
-        "blk.0.ffn_norm.weight": (32,),
-        "blk.0.attn_q.weight": (32, 32),
-        "blk.0.attn_k.weight": (16, 32),
-        "blk.0.attn_v.weight": (16, 32),
-        "blk.0.attn_output.weight": (32, 32),
-        "blk.0.ffn_gate.weight": (64, 32),
-        "blk.0.ffn_up.weight": (64, 32),
-        "blk.0.ffn_down.weight": (32, 64),
+        "token_embd.weight": (257, hidden),
+        "output.weight": (257, hidden),
+        "output_norm.weight": (hidden,),
     }
+    for layer in range(layers):
+        block = f"blk.{layer}."
+        shapes |= {
+            block + "attn_norm.weight": (hidden,),
+            block + "ffn_norm.weight": (hidden,),
+            block + "attn_q.weight": (hidden, hidden),
+            block + "attn_k.weight": (kv, hidden),
+            block + "attn_v.weight": (kv, hidden),
+            block + "attn_output.weight": (hidden, hidden),
+            block + "ffn_gate.weight": (ffn, hidden),
+            block + "ffn_up.weight": (ffn, hidden),
+            block + "ffn_down.weight": (hidden, ffn),
+        }
     tensors = {
         name: np.ones(shape, dtype="<f4")
         if "norm.weight" in name
-        else rng.normal(0, 0.02, shape).astype("<f4")
+        else rng.normal(0, output_std if name == "output.weight" else 0.02, shape).astype("<f4")
         for name, shape in shapes.items()
     }
     metadata = [
@@ -86,12 +105,12 @@ def make_fixture(directory="models/api-fixture", benchmark=False, q8=False):
         ),
     ]
     for name, value in {
-        "embedding_length": 32,
-        "feed_forward_length": 64,
-        "block_count": 1,
-        "attention.head_count": 4,
-        "attention.head_count_kv": 2,
-        "context_length": 64,
+        "embedding_length": hidden,
+        "feed_forward_length": ffn,
+        "block_count": layers,
+        "attention.head_count": heads,
+        "attention.head_count_kv": kv_heads,
+        "context_length": context,
     }.items():
         metadata.append(("llama." + name, 4, struct.pack("<I", value)))
     header = struct.pack("<4sIQQ", b"GGUF", 3, len(tensors), len(metadata))
