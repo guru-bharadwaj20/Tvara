@@ -23,6 +23,7 @@ def make_fixture(
     kv_heads=2,
     context=64,
     output_std=0.02,
+    chat_template=None,
 ):
     """Defaults reproduce the pinned fixture bytes. Tensors are drawn in a fixed order
     (embeddings, output, then each block), so a model with fewer layers and the same
@@ -104,6 +105,8 @@ def make_fixture(
             struct.pack("<IQ", 8, len(words)) + b"".join(string(word) for word in words),
         ),
     ]
+    if chat_template is not None:
+        metadata.append(("tokenizer.chat_template", 8, string(chat_template)))
     for name, value in {
         "embedding_length": hidden,
         "feed_forward_length": ffn,

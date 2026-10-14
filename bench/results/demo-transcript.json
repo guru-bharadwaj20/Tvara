@@ -1,0 +1,359 @@
+{
+ "task": "T268",
+ "started_at_utc": "2026-10-14T08:14:04.786853+00:00",
+ "finished_at_utc": "2026-10-14T08:14:06.599734+00:00",
+ "host": {
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "python": "3.13.15"
+ },
+ "command": "python tools/run_demo.py",
+ "fixture": {
+  "path": "models/demo-fixture/model.gguf",
+  "sha256": "00c26880fca4cdc21645bcc19918f57455cb9a1e5f6f182afbef9a35c8ed5aa6",
+  "tokenizer_sha256": "314d4ca982f7f93c74e8dac5c4b20d05f84be2ef2637f97267721d8d36d9b1a5",
+  "context": 512,
+  "vocabulary": 257,
+  "weights": "random, seed 2026; not a trained model",
+  "chat_template": "{% if tools %}<|tools|>{% for t in tools %}{{ t.function.name }} {% endfor %}\n{% endif %}{% for m in messages %}<|{{ m.role }}|>{{ m.content }}\n{% endfor %}{% if add_generation_prompt %}<|assistant|>{% endif %}"
+ },
+ "runs": 2,
+ "checks": {
+  "all expected statuses": true,
+  "stream matches non-stream text": true,
+  "structured output is schema-valid": true,
+  "tool call parsed": true,
+  "2 server processes identical": true
+ },
+ "status": "pass",
+ "normalized": "id and created fields and tool-call IDs replaced with <varies>",
+ "transcript": [
+  {
+   "step": "health",
+   "method": "GET",
+   "path": "/health",
+   "request": null,
+   "status": 200,
+   "response": {
+    "status": "ok",
+    "ready": true
+   }
+  },
+  {
+   "step": "models",
+   "method": "GET",
+   "path": "/v1/models",
+   "request": null,
+   "status": 200,
+   "response": {
+    "object": "list",
+    "data": [
+     {
+      "id": "tvara-demo",
+      "object": "model",
+      "created": 0,
+      "owned_by": "local"
+     }
+    ]
+   }
+  },
+  {
+   "step": "greedy completion",
+   "method": "POST",
+   "path": "/v1/completions",
+   "request": {
+    "model": "tvara-demo",
+    "prompt": "Once upon a time",
+    "max_tokens": 12
+   },
+   "status": 200,
+   "response": {
+    "id": "<varies>",
+    "object": "text_completion",
+    "created": "<varies>",
+    "model": "tvara-demo",
+    "choices": [
+     {
+      "index": 0,
+      "text": "��\u000fdH����LYz",
+      "finish_reason": "length",
+      "logprobs": null
+     }
+    ],
+    "usage": {
+     "prompt_tokens": 16,
+     "completion_tokens": 12,
+     "total_tokens": 28
+    }
+   }
+  },
+  {
+   "step": "seeded sampling",
+   "method": "POST",
+   "path": "/v1/completions",
+   "request": {
+    "model": "tvara-demo",
+    "prompt": "Once upon a time",
+    "max_tokens": 12,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "seed": 7
+   },
+   "status": 200,
+   "response": {
+    "id": "<varies>",
+    "object": "text_completion",
+    "created": "<varies>",
+    "model": "tvara-demo",
+    "choices": [
+     {
+      "index": 0,
+      "text": "���7P�\u0001��xLH",
+      "finish_reason": "length",
+      "logprobs": null
+     }
+    ],
+    "usage": {
+     "prompt_tokens": 16,
+     "completion_tokens": 12,
+     "total_tokens": 28
+    }
+   }
+  },
+  {
+   "step": "streamed seeded sampling",
+   "method": "STREAM",
+   "path": "/v1/completions",
+   "request": {
+    "model": "tvara-demo",
+    "prompt": "Once upon a time",
+    "max_tokens": 12,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "seed": 7,
+    "stream": true
+   },
+   "status": 200,
+   "events": 14,
+   "done": true,
+   "text": "���7P�\u0001��xLH",
+   "finish_reason": "length"
+  },
+  {
+   "step": "JSON schema output",
+   "method": "POST",
+   "path": "/v1/completions",
+   "request": {
+    "model": "tvara-demo",
+    "prompt": "Plan a trip as JSON:",
+    "max_tokens": 160,
+    "temperature": 1.0,
+    "seed": 3,
+    "response_format": {
+     "type": "json_schema",
+     "json_schema": {
+      "name": "trip",
+      "strict": true,
+      "schema": {
+       "type": "object",
+       "properties": {
+        "city": {
+         "enum": [
+          "Paris",
+          "Tokyo",
+          "Lima"
+         ]
+        },
+        "days": {
+         "type": "integer"
+        },
+        "indoor": {
+         "type": "boolean"
+        }
+       },
+       "required": [
+        "city",
+        "days",
+        "indoor"
+       ],
+       "additionalProperties": false
+      }
+     }
+    }
+   },
+   "status": 200,
+   "response": {
+    "id": "<varies>",
+    "object": "text_completion",
+    "created": "<varies>",
+    "model": "tvara-demo",
+    "choices": [
+     {
+      "index": 0,
+      "text": "\t\n{ \t\r\r\t \t\r\r\r\r \"city\":\n\n\"Paris\"\t ,\t \n  \n\"indoor\":\r\r\tfalse\r\r\t\t  \r,\t\"days\":6\t\n\t\t\t}\t\n\r",
+      "finish_reason": "stop",
+      "logprobs": null
+     }
+    ],
+    "usage": {
+     "prompt_tokens": 20,
+     "completion_tokens": 84,
+     "total_tokens": 104
+    }
+   }
+  },
+  {
+   "step": "chat",
+   "method": "POST",
+   "path": "/v1/chat/completions",
+   "request": {
+    "model": "tvara-demo",
+    "messages": [
+     {
+      "role": "system",
+      "content": "You are terse."
+     },
+     {
+      "role": "user",
+      "content": "Say hello."
+     }
+    ],
+    "max_tokens": 12,
+    "seed": 1,
+    "temperature": 0.7
+   },
+   "status": 200,
+   "response": {
+    "id": "<varies>",
+    "object": "chat.completion",
+    "created": "<varies>",
+    "model": "tvara-demo",
+    "choices": [
+     {
+      "index": 0,
+      "finish_reason": "length",
+      "logprobs": null,
+      "message": {
+       "role": "assistant",
+       "content": "��$�Qk�j�\u0006��"
+      }
+     }
+    ],
+    "usage": {
+     "prompt_tokens": 57,
+     "completion_tokens": 12,
+     "total_tokens": 69
+    }
+   }
+  },
+  {
+   "step": "tool call",
+   "method": "POST",
+   "path": "/v1/chat/completions",
+   "request": {
+    "model": "tvara-demo",
+    "messages": [
+     {
+      "role": "user",
+      "content": "Weather in Paris?"
+     }
+    ],
+    "tools": [
+     {
+      "type": "function",
+      "function": {
+       "name": "get_weather",
+       "description": "Look up the weather for a city.",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "city": {
+          "enum": [
+           "Paris",
+           "Tokyo"
+          ]
+         },
+         "unit": {
+          "enum": [
+           "c",
+           "f"
+          ]
+         }
+        },
+        "required": [
+         "city",
+         "unit"
+        ],
+        "additionalProperties": false
+       }
+      }
+     }
+    ],
+    "tool_choice": "required",
+    "max_tokens": 160,
+    "temperature": 1.0,
+    "seed": 2
+   },
+   "status": 200,
+   "response": {
+    "id": "<varies>",
+    "object": "chat.completion",
+    "created": "<varies>",
+    "model": "tvara-demo",
+    "choices": [
+     {
+      "index": 0,
+      "finish_reason": "tool_calls",
+      "logprobs": null,
+      "message": {
+       "role": "assistant",
+       "content": null,
+       "tool_calls": [
+        {
+         "id": "<varies>",
+         "type": "function",
+         "function": {
+          "name": "get_weather",
+          "arguments": "{\"unit\": \"f\", \"city\": \"Tokyo\"}"
+         }
+        }
+       ]
+      }
+     }
+    ],
+    "usage": {
+     "prompt_tokens": 61,
+     "completion_tokens": 117,
+     "total_tokens": 178
+    }
+   }
+  },
+  {
+   "step": "unsupported schema is rejected",
+   "method": "POST",
+   "path": "/v1/completions",
+   "request": {
+    "model": "tvara-demo",
+    "prompt": "x",
+    "max_tokens": 4,
+    "response_format": {
+     "type": "json_schema",
+     "json_schema": {
+      "schema": {
+       "type": "string",
+       "pattern": "^a+$"
+      }
+     }
+    }
+   },
+   "status": 400,
+   "response": {
+    "error": {
+     "message": "Unsupported schema keywords: pattern",
+     "type": "invalid_request_error",
+     "code": "invalid_request"
+    }
+   }
+  }
+ ]
+}
