@@ -17,3 +17,8 @@
 Invalid files and incompatible configurations fail before execution. Array shapes
 are checked at public boundaries. Numerical kernels do not parse model metadata.
 The API must propagate cancellation and avoid exposing filesystem details in errors.
+
+The GGUF reader, kernels, executor, KV allocator and prefix cache are C++; the
+tokenizer, grammar, sampler, scheduler, speculation and API adapter are Python.
+The served path does not include the scheduler, prefix cache or speculation; see
+[architecture.md](architecture.md).

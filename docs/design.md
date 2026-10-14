@@ -1,7 +1,9 @@
 # Architecture proposal
 
 This is the repository's tracked design baseline. Components below are planned
-unless the task list links to implementation and validation evidence.
+unless the task list links to implementation and validation evidence. The
+implemented state is described in [architecture.md](architecture.md),
+[kernels.md](kernels.md) and [sampling.md](sampling.md).
 
 Requests enter a serving adapter, which tokenizes input and submits a sequence to
 the scheduler. The executor reads tensor views from a read-only GGUF mapping and
@@ -24,6 +26,11 @@ flowchart LR
   Executor --> Grammar --> Sampler --> API
   Draft --> Verification --> Executor
 ```
+
+Current divergence from this proposal: the HTTP adapter calls the native executor
+directly through the C ABI, without the scheduler, prefix cache or speculation;
+those exist as separately tested components. The executor copies weights into
+float32 at load instead of reading mapped tensor views during execution.
 
 Dependencies: reference numerical checks precede core optimization; validated
 single-sequence decode precedes cache sharing, batching, and speculation. Serving
