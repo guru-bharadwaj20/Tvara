@@ -2,67 +2,66 @@
 
 A CPU-only inference engine for small language models, built from scratch.
 
-Tvara aims to load GGUF weights, execute quantized transformer models, and serve
+Tvara loads GGUF weights, executes Llama-family transformer models in C++20, and serves
 text generation through an OpenAI-compatible API. The project focuses on
 understanding each layer of inference and measuring correctness and performance
 against Hugging Face Transformers and llama.cpp on the same hardware.
 
 ## Purpose and scope
 
-Build and understand a complete local inference pipeline on CPUs. Start with a
-single Llama-family sequence and a float32 reference; add quantization, concurrency,
-and constrained decoding only after correctness is established. The first target
-is x86-64 with a scalar fallback and optional AVX2. GPU execution and model training
-are outside the scope. This project reports measured results rather than assumed
-speedups or promised parity with mature engines.
+Build and understand a complete local inference pipeline on CPUs. The work started
+with a single Llama-family sequence and a float32 reference, and added quantization,
+concurrency, and constrained decoding only after correctness was established. The
+primary target is x86-64 with a scalar fallback and runtime-dispatched AVX2. GPU
+execution and model training are outside the scope. This project reports measured
+results rather than assumed speedups or promised parity with mature engines.
 
-## Project status
+## Status
 
-Tvara is in early implementation. The portable C++20 build and native GGUF loader
-are available, and the independent NumPy Llama reference passes pinned tiny-model
-logit and greedy-token checks. The scalar native model executor now passes tiny-checkpoint logit checks. A local completions API and SSE streaming are available; native chat templates,
-optimized execution, and final benchmarks remain under development.
+Version 0.1.0 is the first release; see the [release notes](docs/release-notes.md) for
+setup, validation, and known limitations. It is a validated research baseline, not
+an optimized engine: the executor runs float32 scalar matvec on one thread, and all
+recorded results use seeded random-weight fixtures, not pretrained models.
 
-See [local development](docs/development.md) for exercised build/test commands and
-[reference validation](docs/reference-validation.md) for numerical coverage.
+- GGUF loading with F32, F16, Q4_0, Q8_0, and Q4_K tensors (dequantized to float32).
+- A native Llama-family executor with paged KV storage and fused paged attention,
+  checked against an independent NumPy reference and Transformers logits.
+- Byte-level BPE and SentencePiece tokenizers, GGUF chat templates, and sampling
+  with temperature, top-k, top-p, min-p, and repetition penalties.
+- Grammar-constrained generation for GBNF and a strict JSON Schema subset, including
+  tool calls.
+- An OpenAI-compatible server with SSE streaming.
+- Separately tested components not yet on the served path: radix-tree prefix reuse,
+  an iteration-level scheduler, and exact speculative decoding.
+- Prototypes: Qwen2 and Gemma 1 reference models, quantized KV, MoE routing, tree
+  speculation, AVX-512 and NEON Q8_0 kernels.
 
-## Planned capabilities
+## Quick start
 
-- GGUF loading with F16, Q4_0, Q4_K, and Q8_0 weight formats.
-- Reference kernels followed by AVX2 optimization and CPU threading.
-- Tokenization and a Llama-family forward pass, followed by Qwen and Gemma variants.
-- Paged KV storage, radix-tree prefix reuse, and continuous batching.
-- Draft-model and prompt-lookup speculative decoding.
-- Grammar-constrained generation for JSON Schema and EBNF/GBNF.
-- Streaming completions, chat templates, and tool calling.
+```text
+python -m venv .venv
+.venv/Scripts/python.exe -m pip install -e ".[dev,server]"
+.venv/Scripts/cmake.exe --preset release -G "MinGW Makefiles"
+.venv/Scripts/cmake.exe --build --preset release
+.venv/Scripts/python.exe tools/run_demo.py
+```
 
-These are planned features, not claims of current support. The core language
-(C++20 or Rust) and serving stack will be decided during project setup. AVX-512,
-ARM NEON, and other portability work are later goals.
+On Linux or macOS, use `.venv/bin/` and omit the generator option. The demo starts the
+server against a generated fixture and exercises every endpoint
+([demo.md](docs/demo.md)). See [local development](docs/development.md) for the full
+test commands and [API setup](docs/api.md) for serving your own GGUF model.
 
-## Development approach
+## Documentation
 
-Start with a scalar or NumPy reference and establish correctness before optimizing.
-Compare logits, greedy tokens, and perplexity with reference implementations.
-Measure prefill and decode throughput, memory bandwidth, time to first token,
-inter-token latency, and structured-output overhead under reproducible conditions.
-No performance results are available yet.
-
-The proposal estimates 18 weeks for a team of four. This is a planning target,
-not a delivery commitment; overlapping work depends on staffing and completed
-prerequisites.
-
-## Local development
-
-See [development commands](docs/development.md), [native bindings](docs/native-bindings.md),
-and [API setup](docs/api.md). Current inference validation uses tiny/random fixtures;
-no pretrained throughput or quality results are claimed.
-
-## Documentation and contributions
-
-- [Architecture proposal](docs/design.md), [model targets](docs/models.md),
-  [correctness gates](docs/correctness.md), and [benchmark protocol](docs/benchmarks.md).
-- [Local development](docs/development.md) and the
+- Design: [architecture](docs/architecture.md), [kernels](docs/kernels.md),
+  [sampling](docs/sampling.md), and the original [proposal](docs/design.md).
+- Results: [performance tables](docs/performance.md), [benchmark protocol](docs/benchmarks.md),
+  [correctness gates](docs/correctness.md), and [reference validation](docs/reference-validation.md).
+- Features: [structured output](docs/structured-output.md),
+  [speculative decoding](docs/speculative-decoding.md), [scheduler](docs/scheduler.md),
+  [prefix cache](docs/prefix-cache.md), and [model targets](docs/models.md).
+- Release: [release notes](docs/release-notes.md) and [release review](docs/release-review.md).
+- Contributions: [local development](docs/development.md) and the
   [pull request template](.github/pull_request_template.md) describe how changes are
   validated.
 

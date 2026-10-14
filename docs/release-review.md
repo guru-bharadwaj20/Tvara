@@ -3,13 +3,13 @@
 `python tools/review_release.py` records this v0.1.0 review in
 [bench/results/release-review.json](../bench/results/release-review.json); `--check`
 repeats it without writing. It reads Git index blobs, not the working tree, and takes
-licenses from installed metadata only. The run on 2026-10-14 (index staged on HEAD 53d9491, Python
+licenses from installed metadata only. The run on 2026-10-14 (the v0.1.0 release tree, Python
 3.13.15, Windows, with the `dev`, `server` and `oracle` extras installed) passed with
 0 errors, 0 warnings and 5 info notes. Counts below come from that run.
 
 ## What ships
 
-The release is the set of tracked files: 246 files, 2,401,255 bytes.
+The release is the set of tracked files: 245 files, 2,352,576 bytes.
 
 | Category | Files | License |
 |---|---|---|
@@ -17,7 +17,7 @@ The release is the set of tracked files: 246 files, 2,401,255 bytes.
 | Python package (`python/tvara`) | 22 | MIT |
 | Tests (`tests/core`, `tests/python`) | 62 | MIT |
 | Test fixtures (`tests/fixtures`) | 4 | MIT; upstream provenance below |
-| Tools (`tools/`) | 31 | MIT |
+| Tools (`tools/`) | 30 | MIT |
 | Benchmark results (`bench/results`) | 42 | MIT |
 | Documentation (`*.md`) | 48 | MIT |
 | CI workflows, build config, LICENSE | 6 | MIT |

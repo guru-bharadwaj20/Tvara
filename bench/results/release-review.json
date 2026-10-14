@@ -1,10 +1,10 @@
 {
-  "measured_at_utc": "2026-10-14T08:24:42.750527+00:00",
+  "measured_at_utc": "2026-10-14T08:26:31.649065+00:00",
   "status": "pass",
   "tool": "tools/review_release.py",
   "project": {
     "name": "tvara",
-    "version": "0.1.0.dev0"
+    "version": "0.1.0"
   },
   "python": "3.13.15",
   "implementation": "CPython",
@@ -22,31 +22,31 @@
     "os_name": "nt"
   },
   "git": {
-    "head": "53d94912b41e4db4dd24e3b72da79721dc1d46f2",
+    "head": "55173fc4e400c8de268f7f06c679d4cc93074859",
     "source": "git index blobs (git ls-files -s), not the working tree",
     "index_matches_head": false
   },
-  "tracked_files": 246,
-  "total_bytes": 2401255,
+  "tracked_files": 245,
+  "total_bytes": 2352576,
   "categories": {
     "benchmark-results": {
       "files": 42,
-      "bytes": 470150,
+      "bytes": 470145,
       "license": "MIT (LICENSE)"
     },
     "build-config": {
       "files": 3,
-      "bytes": 1011,
+      "bytes": 1006,
       "license": "MIT (LICENSE)"
     },
     "ci": {
       "files": 2,
-      "bytes": 7814,
+      "bytes": 7771,
       "license": "MIT (LICENSE)"
     },
     "documentation": {
       "files": 48,
-      "bytes": 155862,
+      "bytes": 108009,
       "license": "MIT (LICENSE)"
     },
     "license-text": {
@@ -56,12 +56,12 @@
     },
     "native-source": {
       "files": 30,
-      "bytes": 114399,
+      "bytes": 114395,
       "license": "MIT (LICENSE)"
     },
     "python-package": {
       "files": 22,
-      "bytes": 136120,
+      "bytes": 136115,
       "license": "MIT (LICENSE)"
     },
     "test-fixtures": {
@@ -71,7 +71,7 @@
     },
     "tests": {
       "files": 62,
-      "bytes": 150920,
+      "bytes": 151364,
       "license": "MIT (LICENSE)"
     },
     "third-party": {
@@ -80,8 +80,8 @@
       "license": "see third_party table"
     },
     "tools": {
-      "files": 31,
-      "bytes": 154914,
+      "files": 30,
+      "bytes": 153706,
       "license": "MIT (LICENSE)"
     }
   },
