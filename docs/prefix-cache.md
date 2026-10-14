@@ -22,4 +22,4 @@ The executable benchmark records actual measurement time, hit count and saved pr
 | Median prefill speedup | 3.55x |
 | Greedy replies and logits identical | yes |
 
-Limitations: the model is a tiny random-weight fixture and the token IDs are synthetic, so these are prefill-cost ratios, not quality or chat-latency results. Reuse is per conversation only, because the native C API has no fork or truncate, so the shared system prompt is not reused across conversations. Single machine, single thread, no thermal or background-load control.
+Limitations: the model is a tiny random-weight fixture and the token IDs are synthetic, so these are prefill-cost ratios, not quality or chat-latency results. Reuse is per conversation only, because the native C API has no sequence fork (it gained `tvara_sequence_truncate` but cannot share one prefix between sequences), so the shared system prompt is not reused across conversations. Single machine, single thread, no thermal or background-load control.

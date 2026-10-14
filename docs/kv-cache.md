@@ -16,8 +16,7 @@ The cache is currently single-owner: a scheduler or caller must serialize mutati
 Audits verify free-list membership, block-table lengths, and reference counts; external
 prefix pins must be supplied to the audit as extra expected references.
 
-The paged native executor matches the uncached tiny-checkpoint oracle logits. It
-currently materializes a layer's cached prefix for scalar attention, so paging correctness
-is established without claiming fused attention performance. Later attention work will
-consume pages directly. Run ctest --preset debug and the native-logit Python test to
+The paged native executor matches the uncached tiny-checkpoint oracle logits. Its
+decode path runs fused paged attention directly over cached blocks, without gathering a
+contiguous prefix ([optimizations.md](optimizations.md), [kernels.md](kernels.md)). Run ctest --preset debug and the native-logit Python test to
 reproduce the local cache and executor checks.
