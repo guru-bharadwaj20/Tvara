@@ -192,8 +192,13 @@ def pending_can_match(grammar, state, pending):
                 maximum = 0x8F
         low.append(minimum)
         high.append(maximum)
-    left = ord(low.decode("utf8"))
-    right = ord(high.decode("utf8"))
+    try:
+        left = ord(low.decode("utf8"))
+        right = ord(high.decode("utf8"))
+    except UnicodeDecodeError:
+        # The incremental decoder defers some checks (e.g. ED A0 surrogates) to the
+        # final byte; a prefix with no valid completion matches nothing.
+        return False
     for stack in closure(grammar, state.stacks):
         if not stack:
             continue

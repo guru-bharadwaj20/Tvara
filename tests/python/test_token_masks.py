@@ -109,6 +109,19 @@ def test_split_utf8_and_malformed_sequences():
     assert m.advance_byte(done_g, m.ByteState(GrammarState.start(done_g)), 0xE2) is None
 
 
+def test_surrogate_prefixes_are_pruned_instead_of_raising():
+    g = grammar("[^a]*")
+    start = m.ByteState(GrammarState.start(g))
+    lead = m.advance_byte(g, start, 0xED)
+    assert lead.pending == bytes([0xED])
+    assert m.advance_byte(g, lead, 0x9F).pending == bytes([0xED, 0x9F])
+    for byte in (0xA0, 0xBF):
+        assert m.advance_byte(g, lead, byte) is None
+    vocabulary = [bytes([b]) for b in range(256)]
+    allowed = m.MaskEngine(vocabulary, g).mask(lead).ids()
+    assert allowed == tuple(range(0x80, 0xA0))
+
+
 def test_constraint_dominates_logits_and_preserves_transactional_state():
     c = m.TokenConstraint(m.MaskEngine([b"a", b"b", b""], grammar('"a"'), eos_id=2))
     assert int(c.mask_logits(np.array([1.0, 999.0, 5.0])).argmax()) == 0
