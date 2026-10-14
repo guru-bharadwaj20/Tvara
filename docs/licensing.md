@@ -7,8 +7,9 @@ added to Git commits without the maintainer's request.
 
 MIT applies to original repository material. It does not relicense pretrained model
 weights, tokenizers, datasets, copied third-party code, or installed dependencies.
-Record each dependency's upstream license before release. Link to model terms and
-require authorized access where applicable; do not commit gated weights or tokens.
+Dependency, third-party source and model licenses are recorded in the
+[release review](release-review.md). Link to model terms and require authorized
+access where applicable; do not commit gated weights or tokens.
 
 Benchmark input distribution and derived result redistribution must respect dataset
 terms. Cite papers for algorithms and retain any required notices for reused code.

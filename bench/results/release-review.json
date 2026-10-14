@@ -1,0 +1,1303 @@
+{
+  "measured_at_utc": "2026-10-14T08:24:42.750527+00:00",
+  "status": "pass",
+  "tool": "tools/review_release.py",
+  "project": {
+    "name": "tvara",
+    "version": "0.1.0.dev0"
+  },
+  "python": "3.13.15",
+  "implementation": "CPython",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "marker_environment": {
+    "python_version": "3.13",
+    "python_full_version": "3.13.15",
+    "implementation_version": "3.13.15",
+    "implementation_name": "cpython",
+    "platform_python_implementation": "CPython",
+    "platform_system": "Windows",
+    "platform_machine": "AMD64",
+    "platform_release": "11",
+    "sys_platform": "win32",
+    "os_name": "nt"
+  },
+  "git": {
+    "head": "53d94912b41e4db4dd24e3b72da79721dc1d46f2",
+    "source": "git index blobs (git ls-files -s), not the working tree",
+    "index_matches_head": false
+  },
+  "tracked_files": 246,
+  "total_bytes": 2401255,
+  "categories": {
+    "benchmark-results": {
+      "files": 42,
+      "bytes": 470150,
+      "license": "MIT (LICENSE)"
+    },
+    "build-config": {
+      "files": 3,
+      "bytes": 1011,
+      "license": "MIT (LICENSE)"
+    },
+    "ci": {
+      "files": 2,
+      "bytes": 7814,
+      "license": "MIT (LICENSE)"
+    },
+    "documentation": {
+      "files": 48,
+      "bytes": 155862,
+      "license": "MIT (LICENSE)"
+    },
+    "license-text": {
+      "files": 1,
+      "bytes": 1073,
+      "license": "MIT license text"
+    },
+    "native-source": {
+      "files": 30,
+      "bytes": 114399,
+      "license": "MIT (LICENSE)"
+    },
+    "python-package": {
+      "files": 22,
+      "bytes": 136120,
+      "license": "MIT (LICENSE)"
+    },
+    "test-fixtures": {
+      "files": 4,
+      "bytes": 1189025,
+      "license": "MIT (LICENSE)"
+    },
+    "tests": {
+      "files": 62,
+      "bytes": 150920,
+      "license": "MIT (LICENSE)"
+    },
+    "third-party": {
+      "files": 1,
+      "bytes": 19967,
+      "license": "see third_party table"
+    },
+    "tools": {
+      "files": 31,
+      "bytes": 154914,
+      "license": "MIT (LICENSE)"
+    }
+  },
+  "third_party": [
+    {
+      "path": "bench/third_party/stream.c",
+      "component": "STREAM 5.10 (John D. McCalpin, Joe R. Zagar)",
+      "license": "STREAM license (embedded in file header)",
+      "upstream": "https://www.cs.virginia.edu/stream/FTP/Code/stream.c",
+      "upstream_sha256_lf": "a52bae5e175bea3f7832112af9c085adab47117f7d2ce219165379849231692b",
+      "notice_doc": "docs/third-party.md",
+      "sha256_lf": "a52bae5e175bea3f7832112af9c085adab47117f7d2ce219165379849231692b",
+      "matches_upstream": true,
+      "header_license_present": true
+    }
+  ],
+  "allowlisted_artifacts": [
+    {
+      "path": "tests/fixtures/reference-logits.npz",
+      "bytes": 1188076,
+      "sha256": "bca836432da8e6d312cdcc8b81515f29799067879edd2648a924e65f1e78919c",
+      "members": [
+        "logits_0.npy",
+        "logits_1.npy",
+        "logits_2.npy",
+        "tokens_0.npy",
+        "tokens_1.npy",
+        "tokens_2.npy"
+      ],
+      "matched_rules": [
+        "array data (.npz)"
+      ],
+      "reason": "Small test fixture: token IDs and float32 output logits captured from the random-weight hf-internal-testing/tiny-random-LlamaForCausalLM oracle (tests/fixtures/reference-model.json). Contains no weights or tokenizer files."
+    }
+  ],
+  "excluded_by_gitignore": [
+    "/.venv/",
+    "/build/",
+    "/models/",
+    "/_work/",
+    "__pycache__/",
+    "*.py[cod]",
+    "*.egg-info/",
+    ".pytest_cache/",
+    ".ruff_cache/",
+    "*.gguf",
+    "*.safetensors",
+    ".env"
+  ],
+  "dependencies": [
+    {
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "runtime"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:runtime"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "numpy",
+      "version": "2.5.4",
+      "installed": true,
+      "license": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "runtime",
+        "oracle"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:runtime",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "regex",
+      "version": "2026.9.29",
+      "installed": true,
+      "license": "Apache-2.0 AND CNRI-Python",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "runtime",
+        "oracle"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:runtime",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "runtime"
+      ],
+      "direct": false,
+      "required_by": [
+        "jsonschema",
+        "referencing"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "runtime"
+      ],
+      "direct": false,
+      "required_by": [
+        "jsonschema"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "referencing",
+      "version": "0.37.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "runtime"
+      ],
+      "direct": false,
+      "required_by": [
+        "jsonschema",
+        "jsonschema-specifications"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "rpds-py",
+      "version": "2026.9.1",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "runtime"
+      ],
+      "direct": false,
+      "required_by": [
+        "jsonschema",
+        "referencing"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "cmake",
+      "version": "3.31.6",
+      "installed": true,
+      "license": "Apache 2.0",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: Apache Software License",
+        "OSI Approved :: BSD License"
+      ],
+      "groups": [
+        "dev"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:dev"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "pytest",
+      "version": "8.4.2",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: MIT License"
+      ],
+      "groups": [
+        "dev"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:dev"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "ruff",
+      "version": "0.11.13",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: MIT License"
+      ],
+      "groups": [
+        "dev"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:dev"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6",
+      "installed": true,
+      "license": "BSD License",
+      "license_source": "classifier",
+      "license_classifiers": [
+        "OSI Approved :: BSD License"
+      ],
+      "groups": [
+        "dev",
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "pytest",
+        "tqdm"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.1",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "dev"
+      ],
+      "direct": false,
+      "required_by": [
+        "pytest"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "installed": true,
+      "license": "Apache-2.0 OR BSD-2-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "dev",
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "huggingface-hub",
+        "pytest",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: MIT License"
+      ],
+      "groups": [
+        "dev"
+      ],
+      "direct": false,
+      "required_by": [
+        "pytest"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "Pygments",
+      "version": "2.21.0",
+      "installed": true,
+      "license": "BSD-2-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "dev"
+      ],
+      "direct": false,
+      "required_by": [
+        "pytest"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "installed": true,
+      "license": "BSD License",
+      "license_source": "classifier",
+      "license_classifiers": [
+        "OSI Approved :: BSD License"
+      ],
+      "groups": [
+        "oracle",
+        "server"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:server",
+        "torch"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "safetensors",
+      "version": "0.8.0",
+      "installed": true,
+      "license": "Apache Software License",
+      "license_source": "classifier",
+      "license_classifiers": [
+        "OSI Approved :: Apache Software License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:oracle",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "tokenizers",
+      "version": "0.22.2",
+      "installed": true,
+      "license": "Apache Software License",
+      "license_source": "classifier",
+      "license_classifiers": [
+        "OSI Approved :: Apache Software License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:oracle",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "torch",
+      "version": "2.14.1",
+      "installed": true,
+      "license": "Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clause AND BSD-3-Clause AND BSL-1.0 AND MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:oracle"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "transformers",
+      "version": "4.57.6",
+      "installed": true,
+      "license": "Apache 2.0 License",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: Apache Software License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:oracle"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "installed": true,
+      "license": "MPL-2.0",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
+      ],
+      "groups": [
+        "oracle",
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "httpcore",
+        "httpx",
+        "requests"
+      ],
+      "copyleft": true
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License",
+      "license_classifiers": [],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "requests"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "filelock",
+      "version": "4.1.1",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [
+        "OSI Approved :: MIT License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "huggingface-hub",
+        "torch",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "fsspec",
+      "version": "2026.9.0",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "huggingface-hub",
+        "torch"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "huggingface_hub",
+      "version": "0.36.2",
+      "installed": true,
+      "license": "Apache",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: Apache Software License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "tokenizers",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "idna",
+      "version": "3.20",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle",
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "anyio",
+        "httpx",
+        "requests"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "3.0.4",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle",
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "jinja2"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "mpmath",
+      "version": "1.3.0",
+      "installed": true,
+      "license": "BSD",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: BSD License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "sympy"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "networkx",
+      "version": "3.7",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "torch"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: MIT License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "huggingface-hub",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2",
+      "installed": true,
+      "license": "Apache-2.0",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: Apache Software License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "huggingface-hub",
+        "transformers"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "setuptools",
+      "version": "84.0.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "torch"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "sympy",
+      "version": "1.14.0",
+      "installed": true,
+      "license": "BSD",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: BSD License"
+      ],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "torch"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "tqdm",
+      "version": "4.70.1",
+      "installed": true,
+      "license": "MPL-2.0 AND MIT",
+      "license_source": "License",
+      "license_classifiers": [],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "huggingface-hub",
+        "transformers"
+      ],
+      "copyleft": true
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0",
+      "installed": true,
+      "license": "PSF-2.0",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle",
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "anyio",
+        "fastapi",
+        "huggingface-hub",
+        "opentelemetry-api",
+        "pydantic",
+        "pydantic-core",
+        "torch",
+        "typing-inspection"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "oracle"
+      ],
+      "direct": false,
+      "required_by": [
+        "requests"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "fastapi",
+      "version": "0.143.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:server"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: BSD License"
+      ],
+      "groups": [
+        "server"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:server"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.54.0",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": true,
+      "required_by": [
+        "pyproject:server"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "annotated-doc",
+      "version": "0.0.5",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "fastapi"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [
+        "OSI Approved :: MIT License"
+      ],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "pydantic"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "anyio",
+      "version": "4.15.1",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "httpx",
+        "starlette"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "click",
+      "version": "8.5.0",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "uvicorn"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License",
+      "license_classifiers": [
+        "OSI Approved :: MIT License"
+      ],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "httpcore",
+        "uvicorn"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [
+        "OSI Approved :: BSD License"
+      ],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "httpx"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "opentelemetry-api",
+      "version": "1.45.1",
+      "installed": true,
+      "license": "Apache-2.0",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "fastapi"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "pydantic",
+      "version": "2.14.1",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "fastapi"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.50.1",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "pydantic"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "starlette",
+      "version": "1.8.0",
+      "installed": true,
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "fastapi"
+      ],
+      "copyleft": false
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.4",
+      "installed": true,
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "license_classifiers": [],
+      "groups": [
+        "server"
+      ],
+      "direct": false,
+      "required_by": [
+        "fastapi",
+        "pydantic"
+      ],
+      "copyleft": false
+    }
+  ],
+  "imports": [
+    {
+      "module": "anyio",
+      "status": "transitive",
+      "distributions": [
+        "anyio"
+      ],
+      "files": [
+        "python/tvara/server.py"
+      ]
+    },
+    {
+      "module": "fastapi",
+      "status": "declared",
+      "distributions": [
+        "fastapi"
+      ],
+      "files": [
+        "python/tvara/server.py",
+        "tests/python/test_api_scalar_types.py",
+        "tests/python/test_chat_tool_context.py",
+        "tests/python/test_server.py",
+        "tools/evaluate_structured_output.py"
+      ]
+    },
+    {
+      "module": "httpx",
+      "status": "declared",
+      "distributions": [
+        "httpx"
+      ],
+      "files": [
+        "tests/python/test_server.py",
+        "tools/run_demo.py",
+        "tools/smoke_api.py"
+      ]
+    },
+    {
+      "module": "jinja2",
+      "status": "declared",
+      "distributions": [
+        "jinja2"
+      ],
+      "files": [
+        "python/tvara/chat_templates.py"
+      ]
+    },
+    {
+      "module": "jsonschema",
+      "status": "declared",
+      "distributions": [
+        "jsonschema"
+      ],
+      "files": [
+        "python/tvara/schema.py",
+        "tests/python/test_grammar.py",
+        "tests/python/test_token_masks.py",
+        "tools/benchmark_grammar_masks.py",
+        "tools/evaluate_structured_output.py",
+        "tools/run_demo.py"
+      ]
+    },
+    {
+      "module": "numpy",
+      "status": "declared",
+      "distributions": [
+        "numpy"
+      ],
+      "files": [
+        "python/tvara/moe.py",
+        "python/tvara/native.py",
+        "python/tvara/quantized_kv.py",
+        "python/tvara/reference/math.py",
+        "python/tvara/reference/metrics.py",
+        "python/tvara/reference/model.py",
+        "python/tvara/reference/variants.py",
+        "python/tvara/scheduler.py",
+        "python/tvara/speculative.py",
+        "python/tvara/speculative_tree.py",
+        "python/tvara/token_masks.py",
+        "python/tvara/tokenizer.py",
+        "tests/python/test_metrics.py",
+        "tests/python/test_native_logits.py",
+        "tests/python/test_native_sampling_regressions.py",
+        "tests/python/test_native_sampling_types.py",
+        "tests/python/test_reference_logits.py",
+        "tests/python/test_reference_math.py",
+        "tests/python/test_reference_model.py",
+        "tests/python/test_speculative.py",
+        "tests/python/test_token_masks.py",
+        "tests/python/test_tokenizer_identity_regressions.py",
+        "tests/python/test_variant_t242.py",
+        "tests/python/test_variant_t245.py",
+        "tests/python/test_variant_t246.py",
+        "tests/python/test_variant_t251.py",
+        "tests/python/test_variant_t253.py",
+        "tests/python/test_variant_t254.py",
+        "tools/bench_quantized_kv.py",
+        "tools/bench_speculative.py",
+        "tools/benchmark_grammar_masks.py",
+        "tools/capture_reference.py",
+        "tools/check_portability_logits.py",
+        "tools/check_speculative_distribution.py",
+        "tools/convert_reference_gguf.py",
+        "tools/final_regression.py",
+        "tools/make_api_fixture.py",
+        "tools/run_matched_baseline.py",
+        "tools/run_prefix_cache_traces.py",
+        "tools/run_scheduler_concurrency.py",
+        "tools/run_speculative_speedups.py"
+      ]
+    },
+    {
+      "module": "pydantic",
+      "status": "transitive",
+      "distributions": [
+        "pydantic"
+      ],
+      "files": [
+        "python/tvara/server.py"
+      ]
+    },
+    {
+      "module": "pytest",
+      "status": "declared",
+      "distributions": [
+        "pytest"
+      ],
+      "files": [
+        "tests/python/test_api_scalar_types.py",
+        "tests/python/test_chat_tool_context.py",
+        "tests/python/test_grammar.py",
+        "tests/python/test_greedy.py",
+        "tests/python/test_metrics.py",
+        "tests/python/test_native_bindings.py",
+        "tests/python/test_native_logits.py",
+        "tests/python/test_native_sampling_regressions.py",
+        "tests/python/test_native_sampling_types.py",
+        "tests/python/test_oracle.py",
+        "tests/python/test_reference_logits.py",
+        "tests/python/test_reference_math.py",
+        "tests/python/test_reference_model.py",
+        "tests/python/test_scheduler.py",
+        "tests/python/test_server.py",
+        "tests/python/test_speculative.py",
+        "tests/python/test_token_masks.py",
+        "tests/python/test_tokenizer.py",
+        "tests/python/test_tokenizer_identity_regressions.py",
+        "tests/python/test_tokenizer_oracle.py",
+        "tests/python/test_variant_t241.py",
+        "tests/python/test_variant_t242.py",
+        "tests/python/test_variant_t243.py",
+        "tests/python/test_variant_t244.py",
+        "tests/python/test_variant_t245.py",
+        "tests/python/test_variant_t246.py",
+        "tests/python/test_variant_t251.py",
+        "tests/python/test_variant_t253.py",
+        "tests/python/test_variant_t254.py"
+      ]
+    },
+    {
+      "module": "regex",
+      "status": "declared",
+      "distributions": [
+        "regex"
+      ],
+      "files": [
+        "python/tvara/tokenizer.py"
+      ]
+    },
+    {
+      "module": "safetensors",
+      "status": "declared",
+      "distributions": [
+        "safetensors"
+      ],
+      "files": [
+        "python/tvara/reference/model.py",
+        "python/tvara/reference/oracle.py",
+        "tests/python/test_reference_logits.py",
+        "tools/convert_reference_gguf.py"
+      ]
+    },
+    {
+      "module": "starlette",
+      "status": "transitive",
+      "distributions": [
+        "starlette"
+      ],
+      "files": [
+        "python/tvara/server.py"
+      ]
+    },
+    {
+      "module": "tokenizers",
+      "status": "declared",
+      "distributions": [
+        "tokenizers"
+      ],
+      "files": [
+        "tests/python/test_tokenizer_oracle.py",
+        "tests/python/test_variant_t243.py"
+      ]
+    },
+    {
+      "module": "torch",
+      "status": "declared",
+      "distributions": [
+        "torch"
+      ],
+      "files": [
+        "python/tvara/reference/oracle.py",
+        "tests/python/test_oracle.py",
+        "tests/python/test_variant_t242.py",
+        "tests/python/test_variant_t245.py",
+        "tests/python/test_variant_t246.py"
+      ]
+    },
+    {
+      "module": "transformers",
+      "status": "declared",
+      "distributions": [
+        "transformers"
+      ],
+      "files": [
+        "python/tvara/reference/oracle.py",
+        "tests/python/test_oracle.py",
+        "tests/python/test_variant_t242.py",
+        "tests/python/test_variant_t245.py",
+        "tests/python/test_variant_t246.py"
+      ]
+    },
+    {
+      "module": "uvicorn",
+      "status": "declared",
+      "distributions": [
+        "uvicorn"
+      ],
+      "files": [
+        "python/tvara/server.py"
+      ]
+    }
+  ],
+  "ci_actions": {
+    "uses": [
+      "actions/checkout@v4",
+      "actions/setup-python@v5",
+      "actions/upload-artifact@v4",
+      "msys2/setup-msys2@v2"
+    ],
+    "note": "Executed by GitHub-hosted CI only; not redistributed with the release"
+  },
+  "limits": "Dependency licenses come from installed metadata in this environment only; markers were evaluated for this interpreter and platform. Packages that are not installed are not resolved transitively. Secret scanning is pattern-based.",
+  "findings": [
+    {
+      "severity": "info",
+      "check": "copyleft",
+      "subject": "certifi",
+      "message": "MPL-2.0 (optional extra only: oracle, server); installed from PyPI by the user, not vendored or redistributed in the repository"
+    },
+    {
+      "severity": "info",
+      "check": "copyleft",
+      "subject": "tqdm",
+      "message": "MPL-2.0 AND MIT (optional extra only: oracle); installed from PyPI by the user, not vendored or redistributed in the repository"
+    },
+    {
+      "severity": "info",
+      "check": "imports",
+      "subject": "anyio",
+      "message": "imported directly but declared only transitively via ['httpx', 'starlette']"
+    },
+    {
+      "severity": "info",
+      "check": "imports",
+      "subject": "pydantic",
+      "message": "imported directly but declared only transitively via ['fastapi']"
+    },
+    {
+      "severity": "info",
+      "check": "imports",
+      "subject": "starlette",
+      "message": "imported directly but declared only transitively via ['fastapi']"
+    }
+  ]
+}
