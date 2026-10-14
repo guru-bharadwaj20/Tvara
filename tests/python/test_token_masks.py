@@ -163,6 +163,7 @@ def test_schema_request_constraints_validate_real_json():
 
 
 def test_gguf_chat_template_roles_and_sandbox():
+    pytest.importorskip("jinja2")
     from tvara.chat_templates import render_chat_template
 
     class Tok:

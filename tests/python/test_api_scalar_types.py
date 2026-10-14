@@ -1,8 +1,11 @@
 """JSON request types must not coerce booleans into token IDs or counts."""
 
 import pytest
-from fastapi.testclient import TestClient
-from tvara.server import GenerationEvent, ServerConfig, create_app
+
+pytest.importorskip("fastapi")
+pytest.importorskip("httpx")
+from fastapi.testclient import TestClient  # noqa: E402
+from tvara.server import GenerationEvent, ServerConfig, create_app  # noqa: E402
 
 
 class Backend:

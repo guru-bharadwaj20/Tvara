@@ -20,8 +20,14 @@ TVARA_TEST_NOINLINE void* operator new(std::size_t size){
     if(auto data=std::malloc(size?size:1))return data;
     throw std::bad_alloc();
 }
+// The nothrow forms (used by std::stable_sort's temporary buffer) must also pair
+// with malloc/free; otherwise sanitizers see the runtime's new freed by this free.
+TVARA_TEST_NOINLINE void* operator new(std::size_t size,const std::nothrow_t&)noexcept{
+    try{return ::operator new(size);}catch(...){return nullptr;}
+}
 TVARA_TEST_NOINLINE void operator delete(void* data)noexcept{std::free(data);}
 TVARA_TEST_NOINLINE void operator delete(void* data,std::size_t)noexcept{std::free(data);}
+TVARA_TEST_NOINLINE void operator delete(void* data,const std::nothrow_t&)noexcept{std::free(data);}
 
 void sampler_overflow(){
     auto large=std::numeric_limits<double>::max()*0.75;

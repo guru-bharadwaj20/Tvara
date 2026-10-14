@@ -1,8 +1,12 @@
 import pytest
 from types import SimpleNamespace
-from fastapi.testclient import TestClient
-from tvara.chat_templates import render_chat_template
-from tvara.server import NativeBackend, ServerConfig, GenerationEvent, create_app
+
+pytest.importorskip("fastapi")
+pytest.importorskip("httpx")
+pytest.importorskip("jinja2")
+from fastapi.testclient import TestClient  # noqa: E402
+from tvara.chat_templates import render_chat_template  # noqa: E402
+from tvara.server import NativeBackend, ServerConfig, GenerationEvent, create_app  # noqa: E402
 
 
 class Tokenizer:
