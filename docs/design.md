@@ -1,7 +1,6 @@
 # Architecture proposal
 
-This is the repository's tracked design baseline. Components below are planned
-unless the task list links to implementation and validation evidence. The
+This is the repository's original design baseline. The
 implemented state is described in [architecture.md](architecture.md),
 [kernels.md](kernels.md) and [sampling.md](sampling.md).
 

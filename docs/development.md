@@ -12,7 +12,6 @@ python -m venv .venv
 .venv/Scripts/python.exe -m pytest -q
 .venv/Scripts/ruff.exe check python tests/python tools
 .venv/Scripts/ruff.exe format --check python tests/python tools
-.venv/Scripts/python.exe tools/audit_roadmap.py
 ```
 
 For release, substitute the release preset in the configure, build, and test steps.

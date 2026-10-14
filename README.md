@@ -62,10 +62,12 @@ no pretrained throughput or quality results are claimed.
 
 - [Architecture proposal](docs/design.md), [model targets](docs/models.md),
   [correctness gates](docs/correctness.md), and [benchmark protocol](docs/benchmarks.md).
-- [Contributing guide and timeline](CONTRIBUTING.md): workflow and task status.
+- [Local development](docs/development.md) and the
+  [pull request template](.github/pull_request_template.md) describe how changes are
+  validated.
 
-See the contributing guide before starting work. Model weights, datasets, and
-third-party dependencies retain their own licenses and access requirements.
+Model weights, datasets, and third-party dependencies retain their own licenses and
+access requirements.
 
 ## License
 
