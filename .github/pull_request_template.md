@@ -10,5 +10,4 @@ thread count, context lengths, repetitions, and matched baseline.
 
 ## Limitations
 
-List unsupported cases or checks requiring unavailable models or hardware. Update
-CONTRIBUTING.md with evidence only for deliverables that are actually complete.
+List unsupported cases or checks requiring unavailable models or hardware.

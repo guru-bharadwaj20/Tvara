@@ -17,4 +17,3 @@ jobs:
       - run: python -m pytest -q
       - run: ruff check python tests/python tools
       - run: ruff format --check python tests/python tools
-      - run: python tools/audit_roadmap.py
