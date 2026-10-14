@@ -1,6 +1,7 @@
 # Performance measurement protocol
 
-No benchmark results have been collected yet. Report prefill and decode separately.
+Recorded results are tabulated in [performance.md](performance.md), generated from
+`bench/results/` by `tools/render_performance_tables.py`. Report prefill and decode separately.
 Use identical model bytes, thread counts, input token counts, generated token counts,
 and sampling settings when comparing Tvara with llama.cpp.
 
