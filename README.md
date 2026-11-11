@@ -1,4 +1,12 @@
 # Tvara
+<p align="center">
+  <a href="Tvara%20Demo.mp4">
+    <img src="docs/Tvara%20Demo%20thumbnail.png" alt="Watch the Tvara demo video" width="720">
+  </a>
+  <br>
+  <sub>▶ <b><a href="Tvara%20Demo.mp4">Watch the Tvara demo</a></b> (90 s): a fresh clone serving the README demo fixture through Swagger UI, every response checked against the committed transcript, and a real SmolLM2 GGUF whose tokenizer the loader refuses</sub>
+</p>
+
 
 **A CPU-only inference engine for small language models, built from scratch — and measured honestly against the references it replaces.**
 
